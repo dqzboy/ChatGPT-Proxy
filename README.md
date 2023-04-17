@@ -135,5 +135,6 @@ docker logs -f go-chatgpt-api
 ![image](https://user-images.githubusercontent.com/42825450/232587904-23285b15-2133-4a35-abc0-0c6ad41f1dec.png)
 
 
-
+## ChatGPT WEB项目一键部署脚本
+[chatgpt-web一键部署脚本](https://github.com/dqzboy/ShellProject/tree/main/ChatGPT)
 
