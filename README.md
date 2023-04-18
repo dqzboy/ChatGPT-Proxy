@@ -55,6 +55,7 @@ mkdir -p /data/go-chatgpt-api && cd $_
 ```shell
 vim docker-compose.yml
 
+version: "3"
 services:
   go-chatgpt-api:
     container_name: go-chatgpt-api
