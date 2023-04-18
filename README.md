@@ -8,7 +8,6 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 - 一台VPS，规格最低配 1C1G(项目作者文档里作了说明)
 - 可以访问到openai地址;或者国内服务器实现科学上网也可以，可以参考这篇文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
 - 部署docker和docker-compose
--  **注意：** 如果你使用的是那种万人骑的机场或者你的VPNS IP被重点关注了，那此方法也无法解决你的问题！
 ### 2、部署docker
 - 设置一个yum源，下面两个都可用
 ```shell
@@ -148,7 +147,7 @@ docker logs -f go-chatgpt-api
  ## 五、问题总结
  ### 1、ERRO[00xx] Access denied
  - 问题描述：按照步骤部署起来了，但是查看go-chatgpt-api日志提示ERRO[0015] Access denied
- - 问题原因：节点IP或者你使用的科学上网分配的地址被重点关注了。这个只能换地址，看下项目作者的这个[issue](https://github.com/linweiyuan/go-chatgpt-api/issues/25#issuecomment-1510818536)
+ - 问题原因：如果使用的是第一种模式，那么你的VPS IP很可能被重点关注了；如果使用的是warp，那么有可能分配的IP有问题，尝试重启warp换一个新的IP，然后重启go-chatgpt-api容器
   
 ## ChatGPT WEB项目一键部署脚本
 [chatgpt-web一键部署脚本](https://github.com/dqzboy/ShellProject/tree/main/ChatGPT)
