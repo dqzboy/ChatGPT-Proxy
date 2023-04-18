@@ -8,6 +8,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 - 一台VPS，规格最低配 1C1G(项目作者文档里作了说明)
 - 可以访问到openai地址;或者国内服务器实现科学上网也可以，可以参考这篇文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
 - 部署docker和docker-compose
+-  **注意：** 如果你使用的是那种万人骑的机场或者你的VPNS IP被重点关注了，那此方法也无法解决你的问题！
 ### 2、部署docker
 - 设置一个yum源，下面两个都可用
 ```shell
