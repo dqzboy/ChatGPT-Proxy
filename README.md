@@ -144,6 +144,11 @@ docker logs -f go-chatgpt-api
 ![image](https://user-images.githubusercontent.com/42825450/232587904-23285b15-2133-4a35-abc0-0c6ad41f1dec.png)
 
 
+ ## 五、问题总结
+ ### 1、ERRO[00xx] Access denied
+ - 问题描述：按照步骤部署起来了，但是查看go-chatgpt-api日志提示ERRO[0015] Access denied
+ - 问题原因：节点IP或者你使用的科学上网分配的地址被重点关注了。这个只能换地址，看下项目作者的这个[issue](https://github.com/linweiyuan/go-chatgpt-api/issues/25#issuecomment-1510818536)
+  
 ## ChatGPT WEB项目一键部署脚本
 [chatgpt-web一键部署脚本](https://github.com/dqzboy/ShellProject/tree/main/ChatGPT)
 
