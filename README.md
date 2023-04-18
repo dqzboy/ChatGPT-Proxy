@@ -53,7 +53,7 @@ mkdir -p /data/go-chatgpt-api && cd $_
 ```
 ## 2、创建部署清单
 - 同时使用ChatGPT和API 模式
-  - 如果你的VPS IP没有被Ban就使用这个模式
+  - 如果你的VPS IP稳定，或者你使用的科学上网地址稳定，那就首选这种方式
 ```shell
 vim docker-compose.yml
 
