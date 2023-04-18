@@ -145,8 +145,11 @@ docker logs -f go-chatgpt-api
 - 同样日志返回结果正常
 ![image](https://user-images.githubusercontent.com/42825450/232587904-23285b15-2133-4a35-abc0-0c6ad41f1dec.png)
 
+## 五、总结
+> 目前部署发现，使用第一种方式，只要确保节点稳定或者国内服务器配置的代理地址稳定，那么就可以正常使用
 
- ## 五、问题总结
+
+ ## 六、问题总结
  ### 1、ERRO[00xx] Access denied
  - 问题描述：按照步骤部署起来了，但是查看go-chatgpt-api日志提示ERRO[0015] Access denied
  - 问题原因：如果使用的是第一种模式，那么你的VPS IP很可能被重点关注了；如果使用的是warp，那么有可能分配的IP有问题，尝试重启warp换一个新的IP，然后重启go-chatgpt-api容器
