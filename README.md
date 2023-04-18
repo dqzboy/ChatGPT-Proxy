@@ -140,10 +140,11 @@ docker logs -f go-chatgpt-api
 ![image](https://user-images.githubusercontent.com/42825450/232587811-056556cf-f861-44ca-ad0d-ed2cc819a950.png)
 
 - 现在我们访问chatgpt-web，查看是否可以正常使用
-![image](https://user-images.githubusercontent.com/42825450/232588137-51b1bfa3-9cca-4141-8fd1-4c97004b2b7e.png)
+![image](https://user-images.githubusercontent.com/42825450/232803687-27bb460f-9f23-4ea8-ab59-04257c32c6a0.png)
 
-- 同样日志返回结果正常
-![image](https://user-images.githubusercontent.com/42825450/232587904-23285b15-2133-4a35-abc0-0c6ad41f1dec.png)
+
+- 同样日志返回请求结果正常
+![image](https://user-images.githubusercontent.com/42825450/232803765-e7f25c84-cb8a-4b97-a801-8b6882300dc6.png)
 
 ## 五、总结
 > 目前部署发现，使用第一种方式，只要确保节点稳定或者国内服务器配置的代理地址稳定，那么就可以正常使用
