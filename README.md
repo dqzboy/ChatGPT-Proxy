@@ -64,8 +64,8 @@ services:
     environment:
       - GIN_MODE=release
       - CHATGPT_PROXY_SERVER=http://chatgpt-proxy-server:9515
-#      - NETWORK_PROXY_SERVER=http://host:port     # NETWORK_PROXY_SERVER：科学上网地址
-#      - NETWORK_PROXY_SERVER=socks5://host:port
+#      - NETWORK_PROXY_SERVER=http://host:port     # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://127.0.0.1:7890
+#      - NETWORK_PROXY_SERVER=socks5://host:port   # NETWORK_PROXY_SERVER：科学上网代理地址
     depends_on:
       - chatgpt-proxy-server
     restart: unless-stopped
@@ -120,6 +120,8 @@ ss -tnlp|grep 8080
 ```
 
 ### 4、检查是否正常
+- 注意确保chatgpt-proxy-server运行正常
+- go-chatgpt-api需要初始化启动需要耐心等待
 ```shell
 # 查看容器日志是否运行正常
 docker logs -f chatgpt-proxy-server
