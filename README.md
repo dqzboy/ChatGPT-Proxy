@@ -111,7 +111,7 @@ image: linweiyuan/go-chatgpt-api
 ```shell
 docker-compose up -d
 
-# 检查运行的容器
+# 检查运行的容器；确保容器状态为UP
 docker ps
 
 # 检测容器映射到宿主机的监听端口是否监听
