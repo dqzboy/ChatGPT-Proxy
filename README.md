@@ -59,10 +59,12 @@ services:
     container_name: go-chatgpt-api
     image: linweiyuan/go-chatgpt-api
     ports:
-      - 8080:8080 # 宿主机30080端口可按需改为其它端口
+      - 8080:8080  # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     environment:
       - GIN_MODE=release
       - CHATGPT_PROXY_SERVER=http://chatgpt-proxy-server:9515
+#      - NETWORK_PROXY_SERVER=http://host:port     # NETWORK_PROXY_SERVER：科学上网地址
+#      - NETWORK_PROXY_SERVER=socks5://host:port
     depends_on:
       - chatgpt-proxy-server
     restart: unless-stopped
@@ -83,8 +85,6 @@ services:
   go-chatgpt-api:
     container_name: go-chatgpt-api
     image: linweiyuan/go-chatgpt-api
-    ports:
-      - 8080:8080 # 宿主机8080端口可按需改为其它端口
     environment:
       - GIN_MODE=release
       - CHATGPT_PROXY_SERVER=http://chatgpt-proxy-server:9515
@@ -93,12 +93,12 @@ services:
       - chatgpt-proxy-server
       - chatgpt-proxy-server-warp
     restart: unless-stopped
- 
+
   chatgpt-proxy-server:
     container_name: chatgpt-proxy-server
     image: linweiyuan/chatgpt-proxy-server
     restart: unless-stopped
- 
+
   chatgpt-proxy-server-warp:
     container_name: chatgpt-proxy-server-warp
     image: linweiyuan/chatgpt-proxy-server-warp
