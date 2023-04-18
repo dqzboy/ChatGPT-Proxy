@@ -43,6 +43,14 @@ chmod +x /usr/bin/docker-compose
 docker-compose -v
 ```
 
+### 4、clash代理docker流量
+- 如果你的服务器在国内，并且通过clash实现了科学上网，那么要确保docker容器的流量是经过clash内核进行处理！可以通过iptables方式进行配置(适用于clash部署在宿主机上)，下面命令供参考：
+```shell
+iptables -t nat -A PREROUTING -i docker0 -p tcp -j REDIRECT --to-ports 7890
+iptables -t nat -A PREROUTING -i docker0 -p udp -j REDIRECT --to-ports 7890
+```
+> 在上面的命令中，docker0 是 Docker 默认的桥接网络接口，7890是 Clash 的代理端口。注意：你的端口和docker虚拟网卡不一定与此处一样，根据实际环境进行修改！
+
 ## 三、部署ChatGPT反代
 - 这里使用的chatGPT反代项目：[linweiyuan/go-chatgpt-api](https://github.com/linweiyuan/go-chatgpt-api)
 
