@@ -3,8 +3,8 @@
 
 ## 二、所需环境组件安装
 ### 1、环境说明
-一台VPS，并且可以访问到openai地址;或者国内服务器实现科学上网也可以，可以参考这篇文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
-部署docker和docker-compose
+- 一台VPS，并且可以访问到openai地址;或者国内服务器实现科学上网也可以，可以参考这篇文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
+- 部署docker和docker-compose
 ### 2、部署docker
 - 设置一个yum源，下面两个都可用
 ```shell
