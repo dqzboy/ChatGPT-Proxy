@@ -154,7 +154,11 @@ docker logs -f go-chatgpt-api
  ## 六、问题总结
  ### 1、ERRO[00xx] Access denied
  - 问题描述：按照步骤部署起来了，但是查看go-chatgpt-api日志提示ERRO[0015] Access denied
- - 问题原因：如果使用的是第一种模式，那么你的VPS IP很可能被重点关注了；如果使用的是warp，那么有可能分配的IP有问题，尝试重启warp换一个新的IP，然后重启go-chatgpt-api容器
+ - 问题原因：如果使用的是第一种模式，那么你的VPS IP很可能被重点关注了；如果使用的是warp，那么有可能分配的IP有问题，尝试重启warp换一个新的IP，然后重启go-chatgpt-api容器；如果使用的代理，那么进入到容器查看下分配的IP是啥
+ ```shell
+ docker exec -it chatgpt-proxy-server /bin/bash
+ curl -x socks5://10.0.8.9:7890 ipinfo.io
+ ```
  
  ### 2、Failed to handle captcha: timeout
  - 问题原因：这个错误就是处理不了验证码
