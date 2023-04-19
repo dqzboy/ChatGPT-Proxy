@@ -4,6 +4,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 因此，对于那些希望免费使用OpenAI GPT-3.5模型的用户来说，选择Access Token方式是比较好的选择。但是需要解决的问题是不稳定以及可能IP被封禁的问题。为了解决这些问题，我们可以自建反向代理服务来提高稳定性，并保护我们的IP地址不被OpenAI封禁。也有一些公共的反向代理服务可以选择使用，但是很不稳定，因为它们是免费共享的。所以自建反向代理服务是一个不错的选择
 
 ## 二、所需环境组件安装
+> 如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！
 ### 1、环境说明
 - 一台VPS，规格最低配 1C1G(项目作者文档里作了说明)，不支持arm架构的机器
 - 可以访问到openai地址;或者国内服务器实现科学上网也可以，可以参考这篇文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
@@ -159,6 +160,19 @@ docker logs -f go-chatgpt-api
  - 问题原因：这个错误就是处理不了验证码
  - 解决方法：重启 api 恢复正常；先 down 再 up，不能 restart
   
+## ChatGPT-Porxy一键部署脚本
+- **说明**：目前该脚本适用于CentOS 7、Ubuntu系统；因为脚本测试环境不一样，不能确保在你的环境可以完美运行
+- **提示**：目前脚步中只使用了 `ChatGPT和API 模式`
+
+```shell
+# CentOS
+yum -y install wget
+# Ubuntu
+apt -y install wget
+
+bash -c "$(wget -q -O- https://raw.githubusercontent.com/dqzboy/ChatGPT-Porxy/main/install/chatgpt-proxy.sh)"
+```
+
 ## ChatGPT WEB项目一键部署脚本
 [chatgpt-web一键部署脚本](https://github.com/dqzboy/ShellProject/tree/main/ChatGPT)
 
