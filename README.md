@@ -7,7 +7,9 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 > 如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！底部有脚本安装命令
 ### 1、环境说明
 - 一台VPS，规格最低配 1C1G(项目作者文档里作了说明)，不支持arm架构的机器
-- 可以访问到openai地址;或者国内服务器实现科学上网也可以，可以参考这篇文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
+- 可以访问到openai地址;或者国内服务器实现科学上网也可以
+  - 参考这篇文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
+  - 目前个人使用的机场：<a href="https://mojie.la/#/register?code=CG6h8Irm" target="_blank">机场1按量不限时</a> ，<a href="https://teacat.cloud/#/register?code=ps4sZcDa" target="_blank">机场2按周期</a>
 - 部署docker和docker-compose
 
 > 特别说明：目前这个项目，作者也说了不保证完美处理；适合自建自用，多人会有各种问题
