@@ -83,8 +83,7 @@ services:
 ```
 
 - 基于Cloudflare WARP模式
-  - 解决IP被Ban，提示Access denied之类的报错
-  - 本人测试这种方式不稳定，大家看自己的情况选择；建议自己注册WARP账号，在自己本地单独运行WARP
+  - 解决IP被Ban，提示Access denied之类的报错；大概率是你机器IP不干净或者用的国内服务器
   - Cloudflare WARP官网文档：https://developers.cloudflare.com/warp-client/get-started/linux
 ```shell
 vim docker-compose.yml
@@ -100,7 +99,7 @@ services:
       - GIN_MODE=release
       - CHATGPT_PROXY_SERVER=http://chatgpt-proxy-server:9515
       - NETWORK_PROXY_SERVER=socks5://chatgpt-proxy-server-warp:65535
-      #国内机器NETWORK_PROXY_SERVER 填 http://代理地址:prot（换掉 warp 配置）
+      #国内机器NETWORK_PROXY_SERVER 填 http://代理地址:prot 或者socks5://代理地址:prot（换掉 warp 配置）
     depends_on:
       - chatgpt-proxy-server
       - chatgpt-proxy-server-warp
@@ -151,13 +150,13 @@ docker logs -f go-chatgpt-api
 ![image](https://user-images.githubusercontent.com/42825450/232806032-aea4bf11-a88b-4f20-b409-edcfe99326c2.png)
 
 ## 五、总结
-> 目前部署发现，使用第一种方式，只要确保节点稳定或者国内服务器配置的代理地址稳定，那么就可以正常使用
+> 目前部署发现，只要确保节点稳定或者国内服务器配置的代理地址稳定，那么就可以正常使用
 
 
  ## 六、问题总结
  ### 1、ERRO[00xx] Access denied
  - 问题描述：按照步骤部署起来了，但是查看go-chatgpt-api日志提示ERRO[0015] Access denied
- - 问题原因：如果使用的是第一种模式，那么你的VPS IP很可能被重点关注了；如果使用的是warp，那么有可能分配的IP有问题，尝试重启warp换一个新的IP，然后重启go-chatgpt-api容器；如果使用的代理，那么进入到容器查看下分配的IP是啥
+ - 问题原因：大概率你的VPS IP不干净或者使用的国内服务器；如果使用的代理，那么进入到容器查看下IP是啥或者更换个代理节点
  ```shell
 docker exec chatgpt-proxy-server curl -x socks5://代理 ipinfo.io
  ```
