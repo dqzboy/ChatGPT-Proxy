@@ -167,7 +167,6 @@ docker exec chatgpt-proxy-server curl -x socks5://代理 ipinfo.io
   
 ## ChatGPT-Porxy一键部署脚本
 - **说明**：目前该脚本适用于CentOS 7、Ubuntu系统；因为脚本测试环境不一样，不能确保在你的环境可以完美运行
-- **提示**：目前脚步中只使用了 `ChatGPT和API 模式`
 
 ```shell
 # CentOS
