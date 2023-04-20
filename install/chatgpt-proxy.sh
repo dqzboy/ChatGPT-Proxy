@@ -9,7 +9,6 @@
 #
 #  ORGANIZATION: DingQz dqzboy.com
 #===============================================================================
-
 SETCOLOR_SKYBLUE="echo -en \\E[1;36m"
 SETCOLOR_SUCCESS="echo -en \\E[0;32m"
 SETCOLOR_NORMAL="echo  -en \\E[0;39m"
@@ -96,11 +95,11 @@ elif [ -f /etc/lsb-release ]; then
         OS="ubuntu"
         systemctl restart systemd-resolved
     else
-        echo "Unknown Linux distribution."
+        ERROR "Unknown Linux distribution."
         exit 1
     fi
 else
-    echo "Unknown Linux distribution."
+    ERROR "Unknown Linux distribution."
     exit 2
 fi
 }
@@ -108,7 +107,7 @@ fi
 function INSTALL_DOCKER() {
 if [ "$OS" == "centos" ]; then
     if ! command -v docker &> /dev/null;then
-      echo "docker 未安装，正在进行安装..."
+      ERROR "docker 未安装，正在进行安装..."
       yum -y install yum-utils | grep -E "ERROR|ELIFECYCLE|WARN"
       yum-config-manager --add-repo http://download.docker.com/linux/centos/docker-ce.repo | grep -E "ERROR|ELIFECYCLE|WARN"
       yum -y install docker-ce | grep -E "ERROR|ELIFECYCLE|WARN"
@@ -122,6 +121,7 @@ if [ "$OS" == "centos" ]; then
     fi
 elif [ "$OS" == "ubuntu" ]; then
     if ! command -v docker &> /dev/null;then
+      ERROR "docker 未安装，正在进行安装..."
       curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
       add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
       apt-get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
@@ -134,7 +134,7 @@ elif [ "$OS" == "ubuntu" ]; then
       systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
     fi
 else
-    echo "Unsupported operating system."
+    ERROR "Unsupported operating system."
     exit 1
 fi
 }
@@ -143,7 +143,7 @@ function INSTALL_COMPOSE() {
 # 根据系统类型执行不同的命令
 if [ "$OS" == "centos" ]; then
    if ! command -v docker-compose &> /dev/null;then
-      echo "docker-compose 未安装，正在进行安装..."
+      ERROR "docker-compose 未安装，正在进行安装..."
       curl -sL https://github.com/docker/compose/releases/download/v2.16.0/docker-compose-`uname -s`-`uname -m` -o /usr/bin/docker-compose | grep -E "ERROR|ELIFECYCLE|WARN"
       chmod +x /usr/bin/docker-compose
       SUCCESS1 "docker-compose --version"
@@ -153,6 +153,7 @@ if [ "$OS" == "centos" ]; then
     fi
 elif [ "$OS" == "ubuntu" ]; then
     if ! command -v docker-compose &> /dev/null;then
+       ERROR "docker-compose 未安装，正在进行安装..."
        curl -sL https://github.com/docker/compose/releases/download/v2.16.0/docker-compose-`uname -s`-`uname -m` -o /usr/bin/docker-compose | grep -E "ERROR|ELIFECYCLE|WARN"
        chmod +x /usr/bin/docker-compose
        SUCCESS1 "docker-compose --version"
@@ -161,7 +162,7 @@ elif [ "$OS" == "ubuntu" ]; then
       SUCCESS1 "docker-compose --version" 
     fi
 else
-    echo "Unsupported operating system."
+    ERROR "Unsupported operating system."
     exit 1
 fi
 }
@@ -224,7 +225,7 @@ services:
     restart: unless-stopped
 EOF
 else
-  echo "参数错误或未输入"
+  ERROR "Invalid or missing parameter"
   exit 1
 fi
 
@@ -244,19 +245,28 @@ case $modify_config in
     done
     
     # 根据类型更新docker-compose.yml文件
-    if [ "$url_type" == "http" ]; then
-        sed -i "s|#- NETWORK_PROXY_SERVER=http://host:port|- NETWORK_PROXY_SERVER=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
-    elif [ "$url_type" == "socks5" ]; then
-        sed -i "s|#- NETWORK_PROXY_SERVER=socks5://host:port|- NETWORK_PROXY_SERVER=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+    if [ "$mode" == "api" ]; then
+       if [ "$url_type" == "http" ]; then
+          sed -i "s|#- NETWORK_PROXY_SERVER=http://host:port|- NETWORK_PROXY_SERVER=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+       elif [ "$url_type" == "socks5" ]; then
+          sed -i "s|#- NETWORK_PROXY_SERVER=socks5://host:port|- NETWORK_PROXY_SERVER=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+       fi
+    elif [ "$mode" == "warp" ]; then
+       if [ "$url_type" == "http" ]; then
+          sed -i "s|- NETWORK_PROXY_SERVER=socks5://chatgpt-proxy-server-warp:65535|- NETWORK_PROXY_SERVER=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+       elif [ "$url_type" == "socks5" ]; then
+          sed -i "s|- NETWORK_PROXY_SERVER=socks5://chatgpt-proxy-server-warp:65535|- NETWORK_PROXY_SERVER=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+       fi
+    else
+       echo "Do not modify！"
     fi
-    
     echo "Updated docker-compose.yml with ${url_type} proxy server at ${url}."
     ;;
   [Nn]* )
-    echo "Skipping configuration modification."
+    WARN "Skipping configuration modification."
     ;;
   * )
-    echo "Invalid input. Skipping configuration modification."
+    ERROR "Invalid input. Skipping configuration modification."
     ;;
 esac
 
@@ -279,7 +289,7 @@ elif [[ "$URL" = "OK" ]];then
     CONFIG
     cd ${DOCKER_DIR} && docker-compose up -d && docker ps -a --filter "name=chatgpt" | grep -v "^CONTAINER" 
 else
-    echo "已取消安装."
+    ERROR "已取消安装."
     exit 0
 fi
 }
