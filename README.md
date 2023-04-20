@@ -26,7 +26,6 @@ yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/d
 yum -y install docker-ce
 
 # 启动并设置开机自启
-mkdir /data/docker
 systemctl start docker
 systemctl enable docker
 systemctl status docker
