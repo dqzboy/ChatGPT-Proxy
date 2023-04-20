@@ -100,6 +100,7 @@ services:
       - GIN_MODE=release
       - CHATGPT_PROXY_SERVER=http://chatgpt-proxy-server:9515
       - NETWORK_PROXY_SERVER=socks5://chatgpt-proxy-server-warp:65535
+      #国内机器NETWORK_PROXY_SERVER 填 http://代理地址:prot（换掉 warp 配置）
     depends_on:
       - chatgpt-proxy-server
       - chatgpt-proxy-server-warp
