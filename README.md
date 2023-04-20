@@ -153,7 +153,7 @@ docker logs -f go-chatgpt-api
 ![image](https://user-images.githubusercontent.com/42825450/232587649-04f9f1ca-bea9-4778-afc7-1d6c94118464.png)
 
 ## 四、项目使用自建反代
-> 现在我们可以找一个项目，使用access token模式，并使用我们自建的代理地址进行访问；自建IP的访问地址为http://<vps-ip>:8080/conversation；  
+> 现在我们可以找一个项目，使用access token模式，并使用我们自建的代理地址进行访问；自建IP的访问地址为http://vps-ip:8080/conversation；  
   如果前端项目是直接跑的并且与反代服务同在一台VPS上，则反代地址可写成：http://127.0.0.1:8080/conversation
   如果你前端项目是容器启的并且与反代服务同在一台VPS上，则反代地址可写成：http://go-chatgpt-api:8080/conversation
 - access token获取：https://chat.openai.com/api/auth/session
