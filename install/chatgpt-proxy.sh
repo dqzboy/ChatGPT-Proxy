@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #===============================================================================
 #
-#          FILE: ChatGPT-Next-Web_build.sh
+#          FILE: chatgpt-proxy.sh
 #
-#         USAGE: ./ChatGPT-Next-Web_build.sh
+#         USAGE: ./chatgpt-proxy.sh
 #
-#   DESCRIPTION: ChatGPT-Next-Web项目一键构建、部署、更新脚本;支持CentOS与Ubuntu
+#   DESCRIPTION: 使用AccessToken访问ChatGPT，绕过CF验证;支持CentOS与Ubuntu
 #
 #  ORGANIZATION: DingQz dqzboy.com
 #===============================================================================
@@ -169,6 +169,10 @@ fi
 function CONFIG() {
 DOCKER_DIR="/data/go-chatgpt-api"
 mkdir -p ${DOCKER_DIR}
+echo -n "请输入使用的模式（api/wrap）："
+read mode
+
+if [ "$mode" == "api" ]; then
 cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: "3"
 services:
@@ -191,6 +195,39 @@ services:
     image: linweiyuan/chatgpt-proxy-server
     restart: unless-stopped
 EOF
+elif [ "$mode" == "wrap" ]; then
+cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
+version: "3"
+services:
+  go-chatgpt-api:
+    container_name: go-chatgpt-api
+    image: linweiyuan/go-chatgpt-api
+    ports:
+      - 8080:8080  # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
+    environment:
+      - GIN_MODE=release
+      - CHATGPT_PROXY_SERVER=http://chatgpt-proxy-server:9515
+      - NETWORK_PROXY_SERVER=socks5://chatgpt-proxy-server-warp:65535
+      #国内机器NETWORK_PROXY_SERVER 填 http://代理地址:prot 或者socks5://代理地址:prot（换掉 warp 配置）
+    depends_on:
+      - chatgpt-proxy-server
+      - chatgpt-proxy-server-warp
+    restart: unless-stopped
+
+  chatgpt-proxy-server:
+    container_name: chatgpt-proxy-server
+    image: linweiyuan/chatgpt-proxy-server
+    restart: unless-stopped
+
+  chatgpt-proxy-server-warp:
+    container_name: chatgpt-proxy-server-warp
+    image: linweiyuan/chatgpt-proxy-server-warp
+    restart: unless-stopped
+EOF
+else
+  echo "参数错误或未输入"
+  exit 1
+fi
 
 # 提示用户是否需要修改配置
 read -e -p "Do you want to add a proxy address? (y/n)：" modify_config
