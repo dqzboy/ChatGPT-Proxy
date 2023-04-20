@@ -169,7 +169,7 @@ fi
 function CONFIG() {
 DOCKER_DIR="/data/go-chatgpt-api"
 mkdir -p ${DOCKER_DIR}
-echo -n "请输入使用的模式（api/wrap）："
+echo -n "请输入使用的模式（api/warp）："
 read mode
 
 if [ "$mode" == "api" ]; then
@@ -195,7 +195,7 @@ services:
     image: linweiyuan/chatgpt-proxy-server
     restart: unless-stopped
 EOF
-elif [ "$mode" == "wrap" ]; then
+elif [ "$mode" == "warp" ]; then
 cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: "3"
 services:
