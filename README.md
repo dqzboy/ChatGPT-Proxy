@@ -84,7 +84,7 @@ services:
 
 - 基于Cloudflare WARP模式
   - 解决IP被Ban，提示Access denied之类的报错
-  - 本人测试这种方式不稳定，大家看自己的情况选择
+  - 本人测试这种方式不稳定，大家看自己的情况选择；建议自己注册WARP账号，在自己本地单独运行WARP
   - Cloudflare WARP官网文档：https://developers.cloudflare.com/warp-client/get-started/linux
 ```shell
 vim docker-compose.yml
