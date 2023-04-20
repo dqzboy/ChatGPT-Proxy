@@ -169,8 +169,7 @@ fi
 function CONFIG() {
 DOCKER_DIR="/data/go-chatgpt-api"
 mkdir -p ${DOCKER_DIR}
-echo -n "请输入使用的模式（api/warp）："
-read mode
+read -e -p "请输入使用的模式（api/warp）：" mode
 
 if [ "$mode" == "api" ]; then
 cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
