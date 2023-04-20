@@ -83,7 +83,7 @@ services:
 
 - 基于Cloudflare WARP模式
   - 解决IP被Ban，提示Access denied之类的报错
-  - 如果使用此模式还是提示Access denied，大概率是你机器IP不干净或者用的国内服务器
+  - 如果使用此模式还是提示Access denied，大概率是你机器IP不干净或者用的国内服务器导致验证码过不去
   - Cloudflare WARP官网文档：https://developers.cloudflare.com/warp-client/get-started/linux
 ```shell
 vim docker-compose.yml
