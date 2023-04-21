@@ -184,6 +184,10 @@ docker exec chatgpt-proxy-server curl -x socks5://代理 ipinfo.io
  ### 2、Failed to handle captcha: timeout
  - 问题原因：这个错误就是处理不了验证码
  - 解决方法：重启 api 恢复正常；先 down 再 up，不能 restart
+ 
+ ### 3、pthread_create: Operation not permitted (1)
+ - 问题原因：是由于 Docker 容器的安全限制导致的，container内的root只是外部的一个普通用户权限，所以会出现这个问题
+ - 问题解决：`docker-compose.yml` 添加参数 `privileged: true`
   
 ## ChatGPT-Porxy一键部署脚本
 - **说明**：目前该脚本适用于CentOS 7、Ubuntu系统；因为脚本测试环境不一样，不能确保在你的环境可以完美运行
