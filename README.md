@@ -62,7 +62,7 @@ docker-compose -v
 
 ## 三、部署ChatGPT反代
 - 这里使用的chatGPT反代项目：[linweiyuan/go-chatgpt-api](https://github.com/linweiyuan/go-chatgpt-api)
-
+- 目前已经支持多次对话
 ## 1、创建工作目录
 ```shell
 mkdir -p /data/go-chatgpt-api && cd $_
