@@ -156,6 +156,18 @@ docker logs -f go-chatgpt-api
 ![image](https://user-images.githubusercontent.com/42825450/232587635-027df223-723d-4191-a02b-0a1eb66f5414.png)
 ![image](https://user-images.githubusercontent.com/42825450/232587649-04f9f1ca-bea9-4778-afc7-1d6c94118464.png)
 
+### 5、容器镜像更新
+```shell
+# 停止
+docker-compose down
+
+# 拉取新镜像
+docker-compose pull
+
+# 启动
+docker-compose up -d
+```
+
 ## 四、项目使用自建反代
 > 现在我们可以找一个项目，使用access token模式，并使用我们自建的代理地址进行访问；自建IP的访问地址为http://vps-ip:8080/conversation；  
   如果前端项目是直接跑的并且与反代服务同在一台VPS上，则反代地址可写成：http://127.0.0.1:8080/conversation
