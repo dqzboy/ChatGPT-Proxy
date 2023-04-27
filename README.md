@@ -200,6 +200,12 @@ docker exec chatgpt-proxy-server curl -x socks5://代理 ipinfo.io
  ### 3、pthread_create: Operation not permitted (1)
  - 问题原因：是由于 Docker 容器的安全限制导致的，container内的root只是外部的一个普通用户权限，所以会出现这个问题
  - 问题解决：`docker-compose.yml` 添加参数 `privileged: true`
+ 
+ ### 4、ChatGPT error 404: {"errorMessage":"[object Object]"}
+ - 问题原因：访问chatgpt-web你还是用的之前的浏览器缓存信息进行访问的
+ - 解决方法：
+   - （1）无痕访问
+   - （2）清理浏览器本地的缓存信息
   
 ## ChatGPT-Porxy一键部署脚本
 - **说明**：目前该脚本适用于CentOS 7、Ubuntu系统；因为脚本测试环境不一样，不能确保在你的环境可以完美运行
