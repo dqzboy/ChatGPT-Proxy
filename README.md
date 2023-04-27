@@ -154,6 +154,8 @@ docker logs -f chatgpt-proxy-server
 docker logs -f go-chatgpt-api
 ```
 ![image](https://user-images.githubusercontent.com/42825450/232587635-027df223-723d-4191-a02b-0a1eb66f5414.png)
+
+- 出现下图中 `Welcome to ChatGPT` 则表示服务可正常使用了
 ![image](https://user-images.githubusercontent.com/42825450/232587649-04f9f1ca-bea9-4778-afc7-1d6c94118464.png)
 
 ### 5、容器镜像更新
