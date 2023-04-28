@@ -208,6 +208,10 @@ docker exec chatgpt-proxy-server curl -x socks5://代理 ipinfo.io
  - 解决方法：
    - （1）无痕访问
    - （2）清理浏览器本地的缓存信息
+ 
+ ### 5、Connection refused
+ - 问题原因：accesstoken过期或者账号被封禁
+ - 问题解决：重启获取新的accesstoken，或者注册新账号
   
 ## ChatGPT-Porxy一键部署脚本
 - **说明**：目前该脚本适用于CentOS 7、Ubuntu系统；因为脚本测试环境不一样，不能确保在你的环境可以完美运行
