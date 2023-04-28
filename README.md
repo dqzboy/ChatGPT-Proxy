@@ -26,7 +26,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
   - 目前个人使用的机场：[机场1按量不限时，解锁ChatGPT](https://mojie.la/#/register?code=CG6h8Irm) \ [机场2按周期，解锁ChatGPT](https://teacat.cloud/#/register?code=ps4sZcDa) 
 - 部署docker和docker-compose
 
-> 特别说明：目前这个项目，作者也说了不保证完美处理；适合自建自用，多人会有各种问题：比如429
+> 特别说明：目前这个项目，作者也说了不保证完美处理；目前可以一个服务多人共用
 ### 2、部署docker
 - 设置一个yum源，下面两个都可用
 ```shell
