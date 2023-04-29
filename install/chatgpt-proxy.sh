@@ -111,12 +111,12 @@ if [ "$OS" == "centos" ]; then
       yum -y install yum-utils | grep -E "ERROR|ELIFECYCLE|WARN"
       yum-config-manager --add-repo http://download.docker.com/linux/centos/docker-ce.repo | grep -E "ERROR|ELIFECYCLE|WARN"
       yum -y install docker-ce | grep -E "ERROR|ELIFECYCLE|WARN"
-      SUCCESS1 "docker --version"
+      SUCCESS1 "$(docker --version)"
       systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
       systemctl enable docker &>/dev/null
     else 
       echo "docker 已安装..."
-      SUCCESS1 "docker --version"
+      SUCCESS1 "$(docker --version)"
       systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
     fi
 elif [ "$OS" == "ubuntu" ]; then
@@ -125,12 +125,12 @@ elif [ "$OS" == "ubuntu" ]; then
       curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
       add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
       apt-get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
-      SUCCESS1 "docker --version"
+      SUCCESS1 "$(docker --version)"
       systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
       systemctl enable docker &>/dev/null
     else
       echo "docker 已安装..."  
-      SUCCESS1 "docker --version"
+      SUCCESS1 "$(docker --version)"
       systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
     fi
 else
@@ -146,20 +146,20 @@ if [ "$OS" == "centos" ]; then
       ERROR "docker-compose 未安装，正在进行安装..."
       curl -sL https://github.com/docker/compose/releases/download/v2.16.0/docker-compose-`uname -s`-`uname -m` -o /usr/bin/docker-compose | grep -E "ERROR|ELIFECYCLE|WARN"
       chmod +x /usr/bin/docker-compose
-      SUCCESS1 "docker-compose --version"
+      SUCCESS1 "$(docker-compose --version)"
     else
       echo "docker-compose 已安装..."  
-      SUCCESS1 "docker-compose --version"
+      SUCCESS1 "$(docker-compose --version)"
     fi
 elif [ "$OS" == "ubuntu" ]; then
     if ! command -v docker-compose &> /dev/null;then
        ERROR "docker-compose 未安装，正在进行安装..."
        curl -sL https://github.com/docker/compose/releases/download/v2.16.0/docker-compose-`uname -s`-`uname -m` -o /usr/bin/docker-compose | grep -E "ERROR|ELIFECYCLE|WARN"
        chmod +x /usr/bin/docker-compose
-       SUCCESS1 "docker-compose --version"
+       SUCCESS1 "$(docker-compose --version)"
     else
       echo "docker-compose 已安装..."  
-      SUCCESS1 "docker-compose --version" 
+      SUCCESS1 "$(docker-compose --version)" 
     fi
 else
     ERROR "Unsupported operating system."
