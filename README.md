@@ -94,6 +94,23 @@ services:
     image: linweiyuan/chatgpt-proxy-server
     restart: unless-stopped
 ```
+- 仅使用 API 模式
+```shell
+vim docker-compose.yml
+
+version: "3"
+services:
+  go-chatgpt-api:
+    container_name: go-chatgpt-api
+    image: linweiyuan/go-chatgpt-api
+    ports:
+      - 8080:8080
+    environment:
+      - GIN_MODE=release
+      #- NETWORK_PROXY_SERVER=http://host:port    # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://10.0.5.10:7890
+      #- NETWORK_PROXY_SERVER=socks5://host:port
+    restart: unless-stopped
+```
 
 - 基于Cloudflare WARP模式
   - 解决IP被Ban，提示Access denied之类的报错
