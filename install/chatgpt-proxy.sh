@@ -280,14 +280,14 @@ function INSTALL_PROXY() {
 # 确认是否强制安装
 if [[ "$force_install" = "y" ]]; then
     # 强制安装代码
-    echo "开始强制安装..."
+    WARN "开始强制安装..."
     INSTALL_DOCKER
     INSTALL_COMPOSE
     CONFIG
     cd ${DOCKER_DIR} && docker-compose up -d && docker ps -a --filter "name=chatgpt" | grep -v "^CONTAINER"
 elif [[ "$URL" = "OK" ]];then
     # 强制安装代码
-    echo "开始安装..."
+    WARN "开始安装..."
     INSTALL_DOCKER
     INSTALL_COMPOSE
     CONFIG
