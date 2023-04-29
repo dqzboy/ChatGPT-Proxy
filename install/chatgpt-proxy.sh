@@ -276,6 +276,19 @@ esac
 
 }
 
+function CHRCK_CONTAINER() {
+# 查看镜像名称包含“linweiyuan”的Docker容器状态
+if docker ps --filter "ancestor=linweiyuan" --format "{{.Names}}: {{.Status}}" | grep -v "Up" > /dev/null ; then
+  SUCCESS "CHECK"
+  ERROR ">>>>> The following containers are not up:"
+  docker ps --filter "ancestor=linweiyuan" --format "{{.Names}}: {{.Status}}" | grep -v "Up"
+else
+  # 如果都为UP则打印提示
+  SUCCESS "CHECK"
+  SUCCESS1 ">>>>> Docker containers are up and running."
+fi
+}
+
 function INSTALL_PROXY() {
 # 确认是否强制安装
 if [[ "$force_install" = "y" ]]; then
@@ -284,14 +297,14 @@ if [[ "$force_install" = "y" ]]; then
     INSTALL_DOCKER
     INSTALL_COMPOSE
     CONFIG
-    cd ${DOCKER_DIR} && docker-compose up -d && docker ps -a --filter "name=chatgpt" | grep -v "^CONTAINER"
+    cd ${DOCKER_DIR} && docker-compose down && docker-compose up -d && sleep 10 && CHRCK_CONTAINER
 elif [[ "$URL" = "OK" ]];then
     # 强制安装代码
     WARN "开始安装..."
     INSTALL_DOCKER
     INSTALL_COMPOSE
     CONFIG
-    cd ${DOCKER_DIR} && docker-compose up -d && docker ps -a --filter "name=chatgpt" | grep -v "^CONTAINER" 
+    cd ${DOCKER_DIR} && docker-compose down && docker-compose up -d && sleep 10 && CHRCK_CONTAINER
 else
     ERROR "已取消安装."
     exit 0
