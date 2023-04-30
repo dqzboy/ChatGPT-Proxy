@@ -210,3 +210,6 @@ bash -c "$(wget -q -O- https://raw.githubusercontent.com/dqzboy/ChatGPT-Porxy/ma
 ## ChatGPT WEB项目一键部署脚本
 [chatgpt-web一键部署脚本](https://github.com/dqzboy/ShellProject/tree/main/ChatGPT)
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=dqzboy/ChatGPT-Porxy&type=Date)](https://star-history.com/#dqzboy/ChatGPT-Porxy&Date)
