@@ -68,33 +68,8 @@ docker-compose -v
 mkdir -p /data/go-chatgpt-api && cd $_
 ```
 ## 2、创建部署清单
-- 同时使用ChatGPT和API 模式
+- 使用API 模式
   - 如果你的VPS IP稳定，或者你使用的科学上网地址稳定，那就首选这种方式
-```shell
-vim docker-compose.yml
-
-version: "3"
-services:
-  go-chatgpt-api:
-    container_name: go-chatgpt-api
-    image: linweiyuan/go-chatgpt-api
-    ports:
-      - 8080:8080  # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
-    environment:
-      - GIN_MODE=release
-      - CHATGPT_PROXY_SERVER=http://chatgpt-proxy-server:9515
-      #- NETWORK_PROXY_SERVER=http://host:port     # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://10.0.5.10:7890
-      #- NETWORK_PROXY_SERVER=socks5://host:port   # NETWORK_PROXY_SERVER：科学上网代理地址
-    depends_on:
-      - chatgpt-proxy-server
-    restart: unless-stopped
-
-  chatgpt-proxy-server:
-    container_name: chatgpt-proxy-server
-    image: linweiyuan/chatgpt-proxy-server
-    restart: unless-stopped
-```
-- 仅使用 API 模式
 ```shell
 vim docker-compose.yml
 
@@ -107,8 +82,7 @@ services:
       - 8080:8080
     environment:
       - GIN_MODE=release
-      #- NETWORK_PROXY_SERVER=http://host:port    # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://10.0.5.10:7890
-      #- NETWORK_PROXY_SERVER=socks5://host:port
+      - GO_CHATGPT_API_PROXY=http://host:port    # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://10.0.5.10:7890
     restart: unless-stopped
 ```
 
@@ -128,19 +102,10 @@ services:
       - 8080:8080    # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     environment:
       - GIN_MODE=release
-      - CHATGPT_PROXY_SERVER=http://chatgpt-proxy-server:9515
-      - NETWORK_PROXY_SERVER=socks5://chatgpt-proxy-server-warp:65535
-      #国内机器NETWORK_PROXY_SERVER 填 http://代理地址:prot 或者socks5://代理地址:prot（换掉 warp 配置）
+      - GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535
+      #国内机器GO_CHATGPT_API_PROXY 填 http://代理地址:prot 或者socks5://代理地址:prot（换掉 warp 配置）
     depends_on:
-      - chatgpt-proxy-server
       - chatgpt-proxy-server-warp
-    restart: unless-stopped
-
-  chatgpt-proxy-server:
-    container_name: chatgpt-proxy-server
-    image: linweiyuan/chatgpt-proxy-server
-    environment:
-      - LOG_LEVEL=OFF
     restart: unless-stopped
 
   chatgpt-proxy-server-warp:
