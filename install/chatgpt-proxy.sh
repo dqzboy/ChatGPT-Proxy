@@ -180,24 +180,15 @@ services:
     container_name: go-chatgpt-api
     image: linweiyuan/go-chatgpt-api
     ports:
-      - 8080:8080  # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
+      - 8080:8080
     environment:
       - GIN_MODE=release
-      - CHATGPT_PROXY_SERVER=http://chatgpt-proxy-server:9515
-      #- NETWORK_PROXY_SERVER=http://host:port     # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://10.0.5.10:7890
-      #- NETWORK_PROXY_SERVER=socks5://host:port   # NETWORK_PROXY_SERVER：科学上网代理地址
-    depends_on:
-      - chatgpt-proxy-server
-    restart: unless-stopped
-
-  chatgpt-proxy-server:
-    container_name: chatgpt-proxy-server
-    image: linweiyuan/chatgpt-proxy-server
+      #- GO_CHATGPT_API_PROXY=http://host:port      # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://10.0.5.10:7890
+      #- GO_CHATGPT_API_PROXY=socks5://host:port    # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://10.0.5.10:7890
     restart: unless-stopped
 EOF
 elif [ "$mode" == "warp" ]; then
 cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
-version: "3"
 services:
   go-chatgpt-api:
     container_name: go-chatgpt-api
@@ -206,19 +197,9 @@ services:
       - 8080:8080    # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     environment:
       - GIN_MODE=release
-      - CHATGPT_PROXY_SERVER=http://chatgpt-proxy-server:9515
-      - NETWORK_PROXY_SERVER=socks5://chatgpt-proxy-server-warp:65535
-      #国内机器NETWORK_PROXY_SERVER 填 http://代理地址:prot 或者socks5://代理地址:prot（换掉 warp 配置）
+      - GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535
     depends_on:
-      - chatgpt-proxy-server
       - chatgpt-proxy-server-warp
-    restart: unless-stopped
-
-  chatgpt-proxy-server:
-    container_name: chatgpt-proxy-server
-    image: linweiyuan/chatgpt-proxy-server
-    environment:
-      - LOG_LEVEL=OFF
     restart: unless-stopped
 
   chatgpt-proxy-server-warp:
@@ -251,15 +232,15 @@ case $modify_config in
     # 根据类型更新docker-compose.yml文件
     if [ "$mode" == "api" ]; then
        if [ "$url_type" == "http" ]; then
-          sed -i "s|#- NETWORK_PROXY_SERVER=http://host:port|- NETWORK_PROXY_SERVER=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+          sed -i "s|#- GO_CHATGPT_API_PROXY=http://host:port|- GO_CHATGPT_API_PROXY=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
-          sed -i "s|#- NETWORK_PROXY_SERVER=socks5://host:port|- NETWORK_PROXY_SERVER=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+          sed -i "s|#- GO_CHATGPT_API_PROXY=socks5://host:port|- GO_CHATGPT_API_PROXY=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        fi
     elif [ "$mode" == "warp" ]; then
        if [ "$url_type" == "http" ]; then
-          sed -i "s|- NETWORK_PROXY_SERVER=socks5://chatgpt-proxy-server-warp:65535|- NETWORK_PROXY_SERVER=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+          sed -i "s|- GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535|- GO_CHATGPT_API_PROXY=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
-          sed -i "s|- NETWORK_PROXY_SERVER=socks5://chatgpt-proxy-server-warp:65535|- NETWORK_PROXY_SERVER=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+          sed -i "s|- GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535|- GO_CHATGPT_API_PROXY=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        fi
     else
        echo "Do not modify！"
@@ -276,15 +257,32 @@ esac
 
 }
 
+function Progress() {
+spin='-\|/'
+count=0
+endtime=$((SECONDS+10))
+
+while [ $SECONDS -lt $endtime ];
+do
+    spin_index=$(($count % 4))
+    printf "\r[%c] " "${spin:$spin_index:1}"
+    sleep 0.1
+    count=$((count + 1))
+done
+}
+
+
 function CHRCK_CONTAINER() {
 # 查看镜像名称包含“linweiyuan”的Docker容器状态
 if docker ps --filter "ancestor=linweiyuan" --format "{{.Names}}: {{.Status}}" | grep -v "Up" > /dev/null ; then
   SUCCESS "CHECK"
+  Progress
   ERROR ">>>>> The following containers are not up:"
   docker ps --filter "ancestor=linweiyuan" --format "{{.Names}}: {{.Status}}" | grep -v "Up"
 else
   # 如果都为UP则打印提示
   SUCCESS "CHECK"
+  Progress
   SUCCESS1 ">>>>> Docker containers are up and running."
 fi
 }
@@ -297,14 +295,14 @@ if [[ "$force_install" = "y" ]]; then
     INSTALL_DOCKER
     INSTALL_COMPOSE
     CONFIG
-    cd ${DOCKER_DIR} && docker-compose down && docker-compose up -d && sleep 10 && CHRCK_CONTAINER
+    cd ${DOCKER_DIR} && docker-compose down && docker-compose up -d && CHRCK_CONTAINER
 elif [[ "$URL" = "OK" ]];then
     # 强制安装代码
     WARN "开始安装..."
     INSTALL_DOCKER
     INSTALL_COMPOSE
     CONFIG
-    cd ${DOCKER_DIR} && docker-compose down && docker-compose up -d && sleep 10 && CHRCK_CONTAINER
+    cd ${DOCKER_DIR} && docker-compose down && docker-compose up -d && CHRCK_CONTAINER
 else
     ERROR "已取消安装."
     exit 0
