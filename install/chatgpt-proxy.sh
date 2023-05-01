@@ -180,7 +180,8 @@ services:
     container_name: go-chatgpt-api
     image: linweiyuan/go-chatgpt-api
     ports:
-      - 8080:8080
+      - 8080:8080         # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
+    #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效；clash TUN模式下使用此方法
     environment:
       - GIN_MODE=release
       #- GO_CHATGPT_API_PROXY=http://host:port      # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://10.0.5.10:7890
@@ -194,7 +195,8 @@ services:
     container_name: go-chatgpt-api
     image: linweiyuan/go-chatgpt-api
     ports:
-      - 8080:8080    # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
+      - 8080:8080         # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
+    #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效；clash TUN模式下使用此方法
     environment:
       - GIN_MODE=release
       - GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535
