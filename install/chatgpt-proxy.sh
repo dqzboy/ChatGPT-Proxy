@@ -296,15 +296,17 @@ if [[ "$force_install" = "y" ]]; then
     WARN "开始强制安装..."
     INSTALL_DOCKER
     INSTALL_COMPOSE
+    docker-compose down &>/dev/null
     CONFIG
-    cd ${DOCKER_DIR} && docker-compose down && docker-compose up -d && CHRCK_CONTAINER
+    cd ${DOCKER_DIR} && docker-compose up -d && CHRCK_CONTAINER
 elif [[ "$URL" = "OK" ]];then
     # 强制安装代码
     WARN "开始安装..."
     INSTALL_DOCKER
     INSTALL_COMPOSE
+    docker-compose down &>/dev/null
     CONFIG
-    cd ${DOCKER_DIR} && docker-compose down && docker-compose up -d && CHRCK_CONTAINER
+    cd ${DOCKER_DIR} && docker-compose up -d && CHRCK_CONTAINER
 else
     ERROR "已取消安装."
     exit 0
