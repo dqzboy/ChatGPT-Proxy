@@ -198,7 +198,7 @@ docker exec chatgpt-proxy-server curl -x socks5://代理 ipinfo.io
  - 问题解决：重启获取新的accesstoken，或者注册新账号
   
 ## ChatGPT-Porxy一键部署脚本
-- **说明**：目前该脚本适用于CentOS 7、Ubuntu系统；因为脚本测试环境不一样，不能确保在你的环境可以完美运行
+- **说明**：目前该脚本适用于CentOS 7\8、RHEL-8、Ubuntu系统；因为脚本测试环境不一样，不能确保在你的环境可以完美运行
 
 ```shell
 # CentOS
