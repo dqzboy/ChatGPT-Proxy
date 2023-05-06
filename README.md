@@ -7,7 +7,7 @@
 [![Typing SVG](https://readme-typing-svg.herokuapp.com?font=Handlee&center=true&vCenter=true&width=500&height=60&lines=This+is+chat+gpt+proxy+service.)](https://git.io/typing-svg)
 
 <img src="https://camo.githubusercontent.com/82291b0fe831bfc6781e07fc5090cbd0a8b912bb8b8d4fec0696c881834f81ac/68747470733a2f2f70726f626f742e6d656469612f394575424971676170492e676966"
-width="800"  height="3">
+width="1800"  height="3">
 
 </div>
 
@@ -28,7 +28,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
   - 目前个人使用的机场：[机场1按量不限时，解锁ChatGPT](https://mojie.la/#/register?code=CG6h8Irm) \ [机场2按周期，解锁ChatGPT](https://teacat.cloud/#/register?code=ps4sZcDa) \ [机场3按量不限时，最便宜40/3T](https://yysw.acyun.tk/#/register?code=ZvmLh28A)
 - 部署docker和docker-compose
 
-> 特别说明：目前这个项目，不保证完美处理；目前可以一个服务多人共用
+> 特别说明：目前这个项目，经过多个版本迭代之后还算比较稳定；目前可以一个服务多人共用
 ### 2、部署docker
 - 设置一个yum源，下面两个都可用
 ```shell
@@ -139,10 +139,12 @@ ss -tnlp|grep 8080
 docker logs -f chatgpt-proxy-server
 docker logs -f go-chatgpt-api
 ```
-![image](https://user-images.githubusercontent.com/42825450/232587635-027df223-723d-4191-a02b-0a1eb66f5414.png)
+
+<img src="https://user-images.githubusercontent.com/42825450/232587635-027df223-723d-4191-a02b-0a1eb66f5414.png" width="800px">
+
 - 出现下图中 `Welcome to ChatGPT` 则表示服务可正常使用了
 
-![image](https://user-images.githubusercontent.com/42825450/232587649-04f9f1ca-bea9-4778-afc7-1d6c94118464.png)
+<img src="https://user-images.githubusercontent.com/42825450/232587649-04f9f1ca-bea9-4778-afc7-1d6c94118464.png" width="800px">
 
 ### 5、容器镜像更新
 ```shell
@@ -157,17 +159,18 @@ docker-compose up -d
 ```
 
 ## 四、项目使用自建反代
-> 现在我们可以找一个项目，使用access token模式，并使用我们自建的代理地址进行访问；自建IP的访问地址为http://vps-ip:8080/conversation；  
-  如果前端项目是直接跑的并且与反代服务同在一台VPS上，则反代地址可写成：http://127.0.0.1:8080/conversation
-  如果你前端项目是容器启的并且与反代服务同在一台VPS上，则反代地址可写成：http://go-chatgpt-api:8080/conversation
+> 现在我们可以找一个项目，使用access token模式，并使用我们自建的代理地址进行访问；自建IP的访问地址为http://vps-ip:8080/chatgpt/conversation；  
+  如果前端项目是直接跑的并且与反代服务同在一台VPS上，则反代地址可写成：http://127.0.0.1:8080/chatgpt/conversation
+  如果你前端项目是容器启的并且与反代服务同在一台VPS上，则反代地址可写成：http://go-chatgpt-api:8080/chatgpt/conversation
+
 - access token获取：https://chat.openai.com/api/auth/session
-![image](https://user-images.githubusercontent.com/42825450/232587811-056556cf-f861-44ca-ad0d-ed2cc819a950.png)
+
+<img src="https://user-images.githubusercontent.com/42825450/236638042-1deb983c-0417-4cc1-a494-1cab900f7492.png" width="800px">
 
 - 现在我们访问chatgpt-web，查看是否可以正常使用
-![chatGPT-proxy](https://user-images.githubusercontent.com/42825450/232805958-eca2db84-d14f-4356-a066-7d6f55761e65.gif)
-
+<img src="https://user-images.githubusercontent.com/42825450/236637545-5b121bf1-79c4-4985-87cb-b64bd23ba453.gif" width="800px">
 - 同样日志返回请求结果正常
-![image](https://user-images.githubusercontent.com/42825450/232806032-aea4bf11-a88b-4f20-b409-edcfe99326c2.png)
+<img src="https://user-images.githubusercontent.com/42825450/236637560-ae2baf1f-69ed-423e-b4d8-4700aedee3e4.png" width="800px">
 
 ## 五、总结
 > 目前部署发现，只要确保节点稳定或者国内服务器配置的代理地址稳定，那么就可以正常使用
@@ -190,10 +193,11 @@ docker exec chatgpt-proxy-server curl -x socks5://代理 ipinfo.io
  - 问题解决：`docker-compose.yml` 添加参数 `privileged: true`
  
  ### 4、ChatGPT error 404: {"errorMessage":"[object Object]"}
- - 问题原因：访问chatgpt-web你还是用的之前的浏览器缓存信息进行访问的
+ - 问题原因：如果你更新到了新版本，那么接口需要进行更改
  - 解决方法：
-   - （1）无痕访问
-   - （2）清理浏览器本地的缓存信息
+ ```shell
+ http://127.0.0.1:8080/chatgpt/conversation
+ ```
  
  ### 5、Connection refused
  - 问题原因：accesstoken过期或者账号被封禁
