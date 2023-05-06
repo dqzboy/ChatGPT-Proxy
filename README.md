@@ -28,7 +28,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
   - 目前个人使用的机场：[机场1按量不限时，解锁ChatGPT](https://mojie.la/#/register?code=CG6h8Irm) \ [机场2按周期，解锁ChatGPT](https://teacat.cloud/#/register?code=ps4sZcDa) \ [机场3按量不限时，最便宜40/3T](https://yysw.acyun.tk/#/register?code=ZvmLh28A)
 - 部署docker和docker-compose
 
-> 特别说明：目前这个项目，经过多个版本迭代之后还算比较稳定；目前可以一个服务多人共用
+> 特别说明：目前这个项目，经过多个版本迭代之后比较稳定；目前可以一个服务多人共用
 ### 2、部署docker
 - 设置一个yum源，下面两个都可用
 ```shell
@@ -132,15 +132,11 @@ ss -tnlp|grep 8080
 ```
 
 ### 4、检查是否正常
-- 注意确保chatgpt-proxy-server运行正常
 - go-chatgpt-api需要初始化启动需要耐心等待
 ```shell
 # 查看容器日志是否运行正常
-docker logs -f chatgpt-proxy-server
 docker logs -f go-chatgpt-api
 ```
-
-<img src="https://user-images.githubusercontent.com/42825450/232587635-027df223-723d-4191-a02b-0a1eb66f5414.png" width="800px">
 
 - 出现下图中 `Welcome to ChatGPT` 则表示服务可正常使用了
 
