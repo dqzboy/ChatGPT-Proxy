@@ -75,7 +75,7 @@ mkdir -p /data/go-chatgpt-api && cd $_
 ```shell
 vim docker-compose.yml
 
-version: "3"
+version: "3" 
 services:
   go-chatgpt-api:
     container_name: go-chatgpt-api
@@ -84,7 +84,6 @@ services:
       - 8080:8080         # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效；clash TUN模式下使用此方法
     environment:
-      - GIN_MODE=release
       - GO_CHATGPT_API_PROXY=http://host:port    # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://10.0.5.10:7890
     restart: unless-stopped
 ```
