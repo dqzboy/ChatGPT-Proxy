@@ -209,7 +209,7 @@ yum -y install wget
 # Ubuntu
 apt -y install wget
 
-bash -c "$(wget -q -O- https://raw.githubusercontent.com/dqzboy/ChatGPT-Porxy/main/install/chatgpt-proxy.sh)"
+bash -c "$(wget -q -O- https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/main/install/chatgpt-proxy.sh)"
 ```
 
 ## ChatGPT WEB项目一键部署脚本
