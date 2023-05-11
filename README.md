@@ -17,7 +17,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 
 因此，对于那些希望免费使用OpenAI GPT-3.5模型的用户来说，选择Access Token方式是比较好的选择。但是需要解决的问题是不稳定以及可能IP被封禁的问题。为了解决这些问题，我们可以自建反向代理服务来提高稳定性，并保护我们的IP地址不被OpenAI封禁。也有一些公共的反向代理服务可以选择使用，但是很不稳定，因为它们是免费共享的。所以自建反向代理服务是一个不错的选择
 
-[ChatGPT for QQ体验交流群](https://qm.qq.com/cgi-bin/qm/qr?k=JDXkeAMBScNepF4awUjNk4rkSBr1PFld&jump_from=webapi&authKey=6xoVlv591sQZ0DDyHg9uMUie2I+Ztqy3YbCZa9w1OVhTURDLd+HwNGKN8WPXZIET)
+[TG闲聊吹水，技术交流群](https://t.me/+ghs_XDp1vwxkMGU9)
 
 ## 二、所需环境组件安装
 > 如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！底部有脚本安装命令
