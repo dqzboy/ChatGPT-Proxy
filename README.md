@@ -233,4 +233,4 @@ bash -c "$(wget -q -O- https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/ma
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=dqzboy/ChatGPT-Porxy&type=Date)](https://star-history.com/#dqzboy/ChatGPT-Porxy&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=dqzboy/ChatGPT-Proxy&type=Date)](https://star-history.com/#dqzboy/ChatGPT-Proxy&Date)
