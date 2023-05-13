@@ -17,18 +17,19 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 
 因此，对于那些希望免费使用OpenAI GPT-3.5模型的用户来说，选择Access Token方式是比较好的选择。但是需要解决的问题是不稳定以及可能IP被封禁的问题。为了解决这些问题，我们可以自建反向代理服务来提高稳定性，并保护我们的IP地址不被OpenAI封禁。也有一些公共的反向代理服务可以选择使用，但是很不稳定，因为它们是免费共享的。所以自建反向代理服务是一个不错的选择
 
-[TG交流群](https://t.me/+ghs_XDp1vwxkMGU9)
+> 如果部署或者配置过程出现问题或不懂的地方，请先搜索历史issue或者加[TG交流群](https://t.me/+ghs_XDp1vwxkMGU9)
 
 ## 二、所需环境组件安装
 > 如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！底部有脚本安装命令
 ### 1、环境说明
-- 一台VPS，规格最低配 1C1G(项目作者文档里作了说明)，不支持arm架构的机器
-- 可以访问到openai地址;或者国内服务器实现科学上网也可以
+- 一台VPS，规格最低配 1C1G；**注意**：warp不支持arm架构的机器
+- VPS可以正常访问[chatgpt](https://chat.openai.com)；或者国内服务器实现科学上网也可以
   - 参考这篇文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
-  - 目前个人使用的机场：[机场1按量不限时，解锁ChatGPT](https://mojie.la/#/register?code=CG6h8Irm) \ [机场2按周期，解锁ChatGPT](https://teacat.cloud/#/register?code=ps4sZcDa) \ [机场3按量不限时，最便宜40/3T](https://yysw.acyun.tk/#/register?code=ZvmLh28A)
+  - 目前个人使用的机场：[机场1按量不限时，解锁ChatGPT](https://mojie.la/#/register?code=CG6h8Irm) \ [机场2按周期，解锁ChatGPT](https://teacat.cloud/#/register?code=ps4sZcDa) 
 - 部署docker和docker-compose
 
 > 特别说明：目前这个项目，经过多个版本迭代之后比较稳定；目前可以一个服务多人共用
+
 ### 2、部署docker
 - 设置一个yum源，下面两个都可用
 ```shell
@@ -152,9 +153,11 @@ docker-compose up -d
 ```
 
 ## 四、项目使用自建反代
-> 现在我们可以找一个项目，使用access token模式，并使用我们自建的代理地址进行访问；自建IP的访问地址为http://vps-ip:8080/chatgpt/conversation；  
-  如果前端项目是直接跑的并且与反代服务同在一台VPS上，则反代地址可写成：http://127.0.0.1:8080/chatgpt/conversation
-  如果你前端项目是容器启的并且与反代服务同在一台VPS上，则反代地址可写成：http://go-chatgpt-api:8080/chatgpt/conversation
+### ChatGPTUnofficialProxyAPI(网页 accessToken)
+- 现在我们可以找一个项目，使用access token模式，并使用我们自建的代理地址进行访问；
+  - 自建IP的访问地址为http://vps-ip:8080/chatgpt/conversation
+  - 如果前端项目是直接跑的并且与反代服务同在一台VPS上，则反代地址可写成：http://127.0.0.1:8080/chatgpt/conversation
+  - 如果你前端项目是容器启的并且与反代服务同在一台VPS上，则反代地址可写成：http://go-chatgpt-api:8080/chatgpt/conversation
 
 - access token获取：https://chat.openai.com/api/auth/session
 
@@ -162,8 +165,19 @@ docker-compose up -d
 
 - 现在我们访问chatgpt-web，查看是否可以正常使用
 <img src="https://user-images.githubusercontent.com/42825450/236637545-5b121bf1-79c4-4985-87cb-b64bd23ba453.gif" width="800px">
+
 - 同样日志返回请求结果正常
 <img src="https://user-images.githubusercontent.com/42825450/236637560-ae2baf1f-69ed-423e-b4d8-4700aedee3e4.png" width="800px">
+
+### ChatGPTAPI(gpt-3.5-turbo-0301)
+- 使用ChatGPTAPI模式，并使用我们自建的代理地址进行访问；
+  - 自建IP的访问地址为http://vps-ip:8080/platform  
+  - 如果前端项目是直接跑的并且与反代服务同在一台VPS上，则反代地址可写成：http://127.0.0.1:8080/platform
+  - 如果你前端项目是容器启的并且与反代服务同在一台VPS上，则反代地址可写成：http://go-chatgpt-api:8080/platform
+```shell
+OPENAI_API_BASE_URL=http://127.0.0.1:8080/platform
+```
+<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/aa93dd61-ab4d-4e56-9677-d86d8287eab9" width="800px">
 
 ## 五、总结
 > 目前部署发现，只要确保节点稳定或者国内服务器配置的代理地址稳定，那么就可以正常使用
