@@ -160,7 +160,9 @@ docker-compose up -d
   - 如果你前端项目是容器启的并且与反代服务同在一台VPS上，则反代地址可写成：http://go-chatgpt-api:8080/chatgpt/conversation
 
 - access token获取：https://chat.openai.com/api/auth/session
-
+```shell
+API_REVERSE_PROXY=http://127.0.0.1:8080/chatgpt/conversation
+```
 <img src="https://user-images.githubusercontent.com/42825450/236638042-1deb983c-0417-4cc1-a494-1cab900f7492.png" width="800px">
 
 - 现在我们访问chatgpt-web，查看是否可以正常使用
