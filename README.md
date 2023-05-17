@@ -136,7 +136,7 @@ ss -tnlp|grep 8080
 docker logs -f go-chatgpt-api
 ```
 
-- 出现下图中 `Service go-chatgpt-api is ready.T` 则表示服务可正常使用了
+- 出现下图中 `Service go-chatgpt-api is ready.` 则表示服务可正常使用了
 
 <img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/081886e0-72e8-44b5-954f-e122efcedfcb" width="800px">
 
