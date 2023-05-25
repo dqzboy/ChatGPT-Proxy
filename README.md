@@ -25,7 +25,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 - 一台VPS，规格最低配 1C1G；**注意**：warp不支持arm架构的机器
 - VPS可以正常访问[chatgpt](https://chat.openai.com)；或者国内服务器实现科学上网也可以
   - 参考这篇文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
-  - 目前个人使用的机场：[机场1按量不限时，解锁ChatGPT](https://mojie.la/#/register?code=CG6h8Irm) \ [机场2按周期，解锁ChatGPT](https://teacat.cloud/#/register?code=ps4sZcDa) 
+  - 目前个人使用的机场：[机场1按量不限时，解锁ChatGPT](https://mojie.me/#/register?code=CG6h8Irm) \ [机场2按周期，解锁ChatGPT](https://teacat.cloud/#/register?code=ps4sZcDa) 
 - 部署docker和docker-compose
 
 > 特别说明：目前这个项目，经过多个版本迭代之后比较稳定；目前可以一个服务多人共用
