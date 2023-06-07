@@ -312,10 +312,18 @@ else
 fi
 }
 
+function DEL_IMG_NONE() {
+# 删除go-chatgpt-api所有处于 "none" 状态的镜像
+if [ -n "$(docker images -q --filter "dangling=true" --filter "reference=linweiyuan/go-chatgpt-api")" ]; then
+    docker rmi $(docker images -q --filter "dangling=true" --filter "reference=linweiyuan/go-chatgpt-api")
+fi
+}
+
 main() {
   CHECK_CPU
   CHECK_OPENAI
   CHECK_OS
   INSTALL_PROXY
+  DEL_IMG_NONE
 }
 main
