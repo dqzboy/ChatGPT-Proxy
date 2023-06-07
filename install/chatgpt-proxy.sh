@@ -72,7 +72,7 @@ url="https://chat.openai.com"
 
 # 检测是否能够访问chat.openai.com
 echo "Testing connection to ${url}..."
-if curl --output /dev/null --silent --head --fail "${url}"; then
+if ping -c 3 ${url} &> /dev/null; then
   echo "Connection successful!"
   URL="OK"
 else
