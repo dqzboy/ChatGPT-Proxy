@@ -68,7 +68,7 @@ SUCCESS "提示"
 printf "%*s\033[31m%s\033[0m%*s\n" $padding "" "$text" $padding ""
 SUCCESS "END"
 
-url="https://chat.openai.com"
+url="chat.openai.com"
 
 # 检测是否能够访问chat.openai.com
 echo "Testing connection to ${url}..."
@@ -183,8 +183,9 @@ services:
       - 8080:8080         # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效；clash TUN模式下使用此方法
     environment:
-      #- GO_CHATGPT_API_PROXY=http://host:port      # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://10.0.5.10:7890
-      #- GO_CHATGPT_API_PROXY=socks5://host:port    # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://10.0.5.10:7890
+      - GO_CHATGPT_API_PROXY=
+      #http://host:port      # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://10.0.5.10:7890
+      #socks5://host:port    # NETWORK_PROXY_SERVER：科学上网代理地址，例如：http://10.0.5.10:7890
     restart: unless-stopped
 EOF
 elif [ "$mode" == "warp" ]; then
@@ -233,9 +234,11 @@ case $modify_config in
     # 根据类型更新docker-compose.yml文件
     if [ "$mode" == "api" ]; then
        if [ "$url_type" == "http" ]; then
-          sed -i "s|#- GO_CHATGPT_API_PROXY=http://host:port|- GO_CHATGPT_API_PROXY=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+	  sed -i '/- GO_CHATGPT_API_PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
+          sed -i "s|#http://host:port|- GO_CHATGPT_API_PROXY=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
-          sed -i "s|#- GO_CHATGPT_API_PROXY=socks5://host:port|- GO_CHATGPT_API_PROXY=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+	  sed -i '/- GO_CHATGPT_API_PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
+          sed -i "s|#socks5://host:port|- GO_CHATGPT_API_PROXY=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        fi
     elif [ "$mode" == "warp" ]; then
        if [ "$url_type" == "http" ]; then
