@@ -48,10 +48,14 @@ WARN() {
 }
 
 function CHECK_CPU() {
-# 判断当前操作系统是否为ARM架构
+# 判断当前操作系统是否为 ARM 或 AMD 架构
 if [[ "$(uname -m)" == "arm"* ]]; then
     WARN "This script is not supported on ARM architecture. Exiting..."
     exit 1
+elif [[ "$(uname -m)" == "x86_64" ]]; then
+    INFO "This script is running on AMD architecture."
+else
+    WARN "This script may not be fully compatible with the current architecture: $(uname -m)"
 fi
 
 # 如果不是ARM架构则会执行到这里
