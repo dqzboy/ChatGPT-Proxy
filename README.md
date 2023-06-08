@@ -181,6 +181,11 @@ OPENAI_API_BASE_URL=http://127.0.0.1:8080/platform
 ```
 <img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/aa93dd61-ab4d-4e56-9677-d86d8287eab9" width="800px">
 
+### 其他项目接入
+> 例如：[chatgpt-mirai-qq-bot](https://github.com/lss233/chatgpt-mirai-qq-bot)
+```shell
+browserless_endpoint = "http(s)://你的服务/chatgpt/"
+```
 ## 五、总结
 > 目前部署发现，只要确保节点稳定或者国内服务器配置的代理地址稳定，那么就可以正常使用
 
