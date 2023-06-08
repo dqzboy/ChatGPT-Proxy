@@ -57,9 +57,6 @@ elif [[ "$(uname -m)" == "x86_64" ]]; then
 else
     WARN "This script may not be fully compatible with the current architecture: $(uname -m)"
 fi
-
-# 如果不是ARM架构则会执行到这里
-WARN "This script is supported on this system. Continuing with other commands..."
 }
 
 text="检测服务器是否能够访问chat.openai.com"
