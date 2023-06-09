@@ -89,12 +89,14 @@ if [ -f /etc/redhat-release ]; then
     SUCCESS "系统环境检测中，请稍等..."
     INFO "《This is CentOS.》"
     OS="centos"
+    yum install -y lsof &>/dev/null
 elif [ -f /etc/lsb-release ]; then
     if grep -q "DISTRIB_ID=Ubuntu" /etc/lsb-release; then
         SUCCESS "系统环境检测中，请稍等..."
         INFO "《This is Ubuntu.》"
         OS="ubuntu"
         systemctl restart systemd-resolved
+	apt-get install -y lsof &>/dev/null
     else
         ERROR "Unknown Linux distribution."
         exit 1
@@ -168,11 +170,27 @@ else
 fi
 }
 
+function MODIFY_PORT() {
+read -e -p "是否修改容器映射端口号？(y/n): " answer
+
+if [ "$answer" == "y" ]; then
+  while true; do
+    read -e -p "请输入新的端口号: " port
+    # 检查输入的端口是否可用
+    if lsof -i:$port >/dev/null 2>&1; then
+      WARN "该端口已被占用，请重新输入！"
+    else
+      break
+    fi
+  done
+  sed -i "s/- 8080:/- $port:/" ${DOCKER_DIR}/docker-compose.yml
+fi
+}
+
 function CONFIG() {
 DOCKER_DIR="/data/go-chatgpt-api"
 mkdir -p ${DOCKER_DIR}
 read -e -p "请输入使用的模式（api/warp）：" mode
-
 if [ "$mode" == "api" ]; then
 cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: "3"
@@ -259,6 +277,7 @@ case $modify_config in
     ERROR "Invalid input. Skipping configuration modification."
     ;;
 esac
+MODIFY_PORT
 
 }
 
