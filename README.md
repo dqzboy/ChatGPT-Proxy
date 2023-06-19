@@ -165,9 +165,8 @@ docker-compose up -d
 
 - access token获取：https://chat.openai.com/api/auth/session
 ```shell
-API_REVERSE_PROXY=http://127.0.0.1:8080/chatgpt/conversation
+API_REVERSE_PROXY=http://127.0.0.1:8080/chatgpt/backend-api/conversation
 ```
-<img src="https://user-images.githubusercontent.com/42825450/236638042-1deb983c-0417-4cc1-a494-1cab900f7492.png" width="800px">
 
 - 现在我们访问chatgpt-web，查看是否可以正常使用
 <img src="https://user-images.githubusercontent.com/42825450/236637545-5b121bf1-79c4-4985-87cb-b64bd23ba453.gif" width="800px">
