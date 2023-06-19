@@ -17,15 +17,15 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 
 因此，对于那些希望免费使用OpenAI GPT-3.5模型的用户来说，选择Access Token方式是比较好的选择。但是需要解决的问题是不稳定以及可能IP被封禁的问题。为了解决这些问题，我们可以自建反向代理服务来提高稳定性，并保护我们的IP地址不被OpenAI封禁。也有一些公共的反向代理服务可以选择使用，但是很不稳定，因为它们是免费共享的。所以自建反向代理服务是一个不错的选择
 
-> 如果部署或者配置过程出现问题或不懂的地方，请先搜索历史issue或者加[TG交流群](https://t.me/+ghs_XDp1vwxkMGU9)
+> 如果部署或者配置过程出现问题或不懂的地方，请先搜索历史[issue](https://github.com/dqzboy/ChatGPT-Proxy/issues)或者加[TG交流群](https://t.me/+ghs_XDp1vwxkMGU9)
 
 ## 二、所需环境组件安装
 > 如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！底部有脚本安装命令
 ### 1、环境说明
 - 一台VPS，规格最低配 1C1G；~~**注意**：warp不支持arm架构的机器~~ 目前已经可以跑arm架构的机器上了
-- VPS可以正常访问[chatgpt](https://chat.openai.com)；或者国内服务器实现科学上网也可以
+- VPS可以正常访问 [chatgpt](https://chat.openai.com)；或者国内服务器实现科学上网也可以
   - 参考这篇文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
-  - 目前个人使用的机场：[机场1按量不限时，解锁ChatGPT](https://mojie.me/#/register?code=CG6h8Irm) \ [机场2按周期，解锁ChatGPT](https://teacat.cloud/#/register?code=ps4sZcDa) \ [专线机场,不限时不限速不限设备](https://bajie.one/#/register?code=uX4zUk5c)
+  - 目前个人使用的机场：[机场1按量不限时，解锁ChatGPT](https://mojie.me/#/register?code=CG6h8Irm) \ [机场2按周期，解锁ChatGPT](https://teacat.cloud/#/register?code=ps4sZcDa) 
 - 部署docker和docker-compose
 
 > 特别说明：目前这个项目，经过多个版本迭代之后比较稳定；目前可以一个服务多人共用
