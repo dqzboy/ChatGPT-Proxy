@@ -47,6 +47,8 @@ WARN() {
   ${SETCOLOR_YELLOW} && echo " $1 "  && ${SETCOLOR_NORMAL}
 }
 
+DOCKER_DIR="/data/go-chatgpt-api"
+
 function CHECK_CPU() {
 # 判断当前操作系统是否为 ARM 或 AMD 架构
 if [[ "$(uname -m)" == "arm"* ]]; then
@@ -188,7 +190,6 @@ fi
 }
 
 function CONFIG() {
-DOCKER_DIR="/data/go-chatgpt-api"
 mkdir -p ${DOCKER_DIR}
 read -e -p "请输入使用的模式（api/warp）：" mode
 if [ "$mode" == "api" ]; then
@@ -318,17 +319,17 @@ if [[ "$force_install" = "y" ]]; then
     WARN "开始强制安装..."
     INSTALL_DOCKER
     INSTALL_COMPOSE
-    docker-compose down &>/dev/null
+    cd ${DOCKER_DIR} && docker-compose down &>/dev/null
     CONFIG
-    cd ${DOCKER_DIR} && docker-compose up -d && CHRCK_CONTAINER
+    cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && CHRCK_CONTAINER
 elif [[ "$URL" = "OK" ]];then
     # 强制安装代码
     WARN "开始安装..."
     INSTALL_DOCKER
     INSTALL_COMPOSE
-    docker-compose down &>/dev/null
+    cd ${DOCKER_DIR} && docker-compose down &>/dev/null
     CONFIG
-    cd ${DOCKER_DIR} && docker-compose up -d && CHRCK_CONTAINER
+    cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && CHRCK_CONTAINER
 else
     ERROR "已取消安装."
     exit 0
