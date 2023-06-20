@@ -213,7 +213,7 @@ docker exec chatgpt-proxy-server curl -x socks5://代理 ipinfo.io
  - 问题原因：如果你更新到了新版本，那么接口需要进行更改
  - 解决方法：
  ```shell
- http://127.0.0.1:8080/chatgpt/conversation
+ http://127.0.0.1:8080/chatgpt/backend-api/conversation
  ```
  
  ### 5、Connection refused
@@ -223,6 +223,10 @@ docker exec chatgpt-proxy-server curl -x socks5://代理 ipinfo.io
  ### 6、ChatGPTUnofficialProxyAPI.sendMessage: conversationId and parentMessageId must both be set or both be undefined
  - 问题原因：有可能你是api和token同时使用，并且在同一个会话
  - 问题解决：切换新的会话；或者把会话清除掉
+
+ ### 7、ERRO[0000] Looks like you have bean blocked
+ - 问题原因：字面意思，你的VPS或者节点IP被openai封锁了，无法访问；ping通不代表就可以正常访问
+ - 问题解决：（1）更换IP；（2）使用warp
 
 ## ChatGPT-Porxy一键部署脚本
 - **说明**：目前该脚本适用于CentOS 7\8、RHEL-8、Ubuntu系统；因为脚本测试环境不一样，不能确保在你的环境可以完美运行
