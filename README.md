@@ -241,7 +241,7 @@ bash -c "$(wget -q -O- https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/ma
 ```
 
 ## ChatGPT WEB项目一键部署脚本
-[chatgpt-web一键部署脚本](https://github.com/dqzboy/ChatGPT)
+[chatgpt-web一键部署脚本](https://github.com/dqzboy/chatgpt-web)
 
 ## 推荐
 更多学习教程请关注 [浅时光博客](https://www.dqzboy.com/)
