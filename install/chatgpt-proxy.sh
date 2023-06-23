@@ -339,7 +339,7 @@ fi
 function DEL_IMG_NONE() {
 # 删除go-chatgpt-api所有处于 "none" 状态的镜像
 if [ -n "$(docker images -q --filter "dangling=true" --filter "reference=linweiyuan/go-chatgpt-api")" ]; then
-    docker rmi $(docker images -q --filter "dangling=true" --filter "reference=linweiyuan/go-chatgpt-api")
+    docker rmi $(docker images -q --filter "dangling=true" --filter "reference=linweiyuan/go-chatgpt-api") &>/dev/null
 fi
 }
 
