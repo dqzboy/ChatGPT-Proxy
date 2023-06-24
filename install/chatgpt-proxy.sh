@@ -174,7 +174,7 @@ if [ "$repo_type" = "centos" ] || [ "$repo_type" = "rhel" ]; then
       done
 
       if $success; then
-         SUCCESS1 "$(docker --version)"
+         SUCCESS1 ">>> $(docker --version)"
          systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
          systemctl enable docker &>/dev/null
       else
@@ -183,7 +183,7 @@ if [ "$repo_type" = "centos" ] || [ "$repo_type" = "rhel" ]; then
       fi
     else 
       INFO1 "docker 已安装..."
-      SUCCESS1 "$(docker --version)"
+      SUCCESS1 ">>> $(docker --version)"
       systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
     fi
 elif [ "$repo_type" == "ubuntu" ]; then
@@ -203,7 +203,7 @@ elif [ "$repo_type" == "ubuntu" ]; then
       done
 
       if $success; then
-         SUCCESS1 "$(docker --version)"
+         SUCCESS1 ">>> $(docker --version)"
          systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
          systemctl enable docker &>/dev/null
       else
@@ -212,7 +212,7 @@ elif [ "$repo_type" == "ubuntu" ]; then
       fi
     else
       INFO1 "docker 已安装..."  
-      SUCCESS1 "$(docker --version)"
+      SUCCESS1 ">>> $(docker --version)"
       systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
     fi
 elif [ "$repo_type" == "debian" ]; then
@@ -233,7 +233,7 @@ elif [ "$repo_type" == "debian" ]; then
       done
 
       if $success; then
-         SUCCESS1 "$(docker --version)"
+         SUCCESS1 ">>> $(docker --version)"
          systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
          systemctl enable docker &>/dev/null
       else
@@ -242,7 +242,7 @@ elif [ "$repo_type" == "debian" ]; then
       fi
     else
       INFO1 "docker 已安装..."  
-      SUCCESS1 "$(docker --version)"
+      SUCCESS1 ">>> $(docker --version)"
       systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
     fi
 else
@@ -271,14 +271,14 @@ while [ $attempt -lt $MAX_ATTEMPTS ]; do
 done
 
 if $success; then
-    SUCCESS1 "$(docker-compose --version)"
+    SUCCESS1 ">>> $(docker-compose --version)"
 else
     ERROR "docker-compose 下载失败，请尝试手动安装docker-compose"
     exit 1
 fi
 else
    INFO1 "docker-compose 已安装..."  
-   SUCCESS1 "$(docker-compose --version)" 
+   SUCCESS1 ">>> $(docker-compose --version)" 
 fi
 }
 
