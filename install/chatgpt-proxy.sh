@@ -58,6 +58,20 @@ MAX_ATTEMPTS=3
 attempt=0
 success=false
 
+function PACKAGE(){
+PACKAGES="lsof jq wget"
+
+# 检查命令是否存在
+if command -v yum >/dev/null 2>&1; then
+    yum -y install $PACKAGES &>/dev/null
+elif command -v apt-get >/dev/null 2>&1; then
+    apt-get install -y $PACKAGES &>/dev/null
+else
+    WARN "无法确定可用的包管理器"
+    exit 1
+fi
+}
+
 function CHECK_CPU() {
 # 判断当前操作系统是否为 ARM 或 AMD 架构
 if [[ "$(uname -m)" == "arm"* ]]; then
@@ -103,6 +117,7 @@ else
     exit 1
 fi
 
+
 # 根据发行版选择存储库类型
 case "$ID" in
     "centos")
@@ -145,7 +160,6 @@ if [ "$repo_type" = "centos" ] || [ "$repo_type" = "rhel" ]; then
       while [ $attempt -lt $MAX_ATTEMPTS ]; do
         attempt=$((attempt + 1))
         ERROR "docker 未安装，正在进行安装..."
-        yum -y install yum-utils lsof jq wget &>/dev/null | grep -E "ERROR|ELIFECYCLE|WARN"
         yum-config-manager --add-repo $url/$repo_file | grep -E "ERROR|ELIFECYCLE|WARN"
         yum -y install docker-ce | grep -E "ERROR|ELIFECYCLE|WARN"
         # 检查命令的返回值
@@ -173,9 +187,7 @@ elif [ "$repo_type" == "ubuntu" ]; then
     if ! command -v docker &> /dev/null;then
       while [ $attempt -lt $MAX_ATTEMPTS ]; do
         attempt=$((attempt + 1))
-        apt-get install -y lsof jq wget &>/dev/null
         WARN "docker 未安装，正在进行安装..."
-        apt-get install -y lsof jq &>/dev/null
         curl -fsSL $url/gpg | sudo apt-key add - &>/dev/null
         add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
         apt-get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
@@ -205,7 +217,6 @@ elif [ "$repo_type" == "debian" ]; then
       while [ $attempt -lt $MAX_ATTEMPTS ]; do
         attempt=$((attempt + 1))
 
-        apt-get install -y lsof jq wget &>/dev/null
         WARN "docker 未安装，正在进行安装..."
         curl -fsSL $url/gpg | sudo apt-key add - &>/dev/null
         add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
@@ -440,6 +451,7 @@ fi
 }
 
 main() {
+  PACKAGE
   CHECK_CPU
   CHECK_OPENAI
   CHECK_OS
