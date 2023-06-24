@@ -54,6 +54,10 @@ WARN() {
 DOCKER_DIR="/data/go-chatgpt-api"
 mkdir -p $DOCKER_DIR
 
+MAX_ATTEMPTS=3
+attempt=0
+success=false
+
 function CHECK_CPU() {
 # 判断当前操作系统是否为 ARM 或 AMD 架构
 if [[ "$(uname -m)" == "arm"* ]]; then
@@ -136,13 +140,28 @@ url="https://download.docker.com/linux/$repo_type"
 
 if [ "$repo_type" = "centos" ] || [ "$repo_type" = "rhel" ]; then
     if ! command -v docker &> /dev/null;then
+      while [ $attempt -lt $MAX_ATTEMPTS ]; do
+        attempt=$((attempt + 1))
       ERROR "docker 未安装，正在进行安装..."
-      yum -y install yum-utils lsof jq &>/dev/null | grep -E "ERROR|ELIFECYCLE|WARN"
+      yum -y install yum-utils lsof jq wget &>/dev/null | grep -E "ERROR|ELIFECYCLE|WARN"
       yum-config-manager --add-repo $url/$repo_file | grep -E "ERROR|ELIFECYCLE|WARN"
       yum -y install docker-ce | grep -E "ERROR|ELIFECYCLE|WARN"
-      SUCCESS1 "$(docker --version)"
-      systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
-      systemctl enable docker &>/dev/null
+      # 检查命令的返回值
+      if [ $? -eq 0 ]; then
+            success=true
+            break
+        fi
+        echo "docker安装失败，正在尝试重新下载 (尝试次数: $attempt)"
+      done
+
+      if $success; then
+         SUCCESS1 "$(docker --version)"
+         systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
+         systemctl enable docker &>/dev/null
+      else
+         ERROR "docker安装失败，请尝试手动安装"
+         exit 1
+      fi
     else 
       INFO1 "docker 已安装..."
       SUCCESS1 "$(docker --version)"
@@ -150,14 +169,30 @@ if [ "$repo_type" = "centos" ] || [ "$repo_type" = "rhel" ]; then
     fi
 elif [ "$repo_type" == "ubuntu" ]; then
     if ! command -v docker &> /dev/null;then
-      ERROR "docker 未安装，正在进行安装..."
+      while [ $attempt -lt $MAX_ATTEMPTS ]; do
+      attempt=$((attempt + 1))
+      apt-get install -y lsof jq wget &>/dev/null
+      WARN "docker 未安装，正在进行安装..."
       apt-get install -y lsof jq &>/dev/null
       curl -fsSL $url/gpg | sudo apt-key add -
       add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
-      apt-get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
-      SUCCESS1 "$(docker --version)"
-      systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
-      systemctl enable docker &>/dev/null
+      apt -get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
+      # 检查命令的返回值
+      if [ $? -eq 0 ]; then
+            success=true
+            break
+        fi
+        echo "docker安装失败，正在尝试重新下载 (尝试次数: $attempt)"
+      done
+
+      if $success; then
+         SUCCESS1 "$(docker --version)"
+         systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
+         systemctl enable docker &>/dev/null
+      else
+         ERROR "docker安装失败，请尝试手动安装"
+         exit 1
+      fi
     else
       INFO1 "docker 已安装..."  
       SUCCESS1 "$(docker --version)"
@@ -165,14 +200,30 @@ elif [ "$repo_type" == "ubuntu" ]; then
     fi
 elif [ "$repo_type" == "debian" ]; then
     if ! command -v docker &> /dev/null;then
-      apt-get install -y lsof jq &>/dev/null
-      ERROR "docker 未安装，正在进行安装..."
-      curl -fsSL $url/gpg | sudo apt-key add -
-      add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
-      apt-get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
-      SUCCESS1 "$(docker --version)"
-      systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
-      systemctl enable docker &>/dev/null
+      while [ $attempt -lt $MAX_ATTEMPTS ]; do
+        attempt=$((attempt + 1))
+
+        apt-get install -y lsof jq wget &>/dev/null
+        WARN "docker 未安装，正在进行安装..."
+        curl -fsSL $url/gpg | sudo apt-key add -
+        add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
+        apt-get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
+	# 检查命令的返回值
+        if [ $? -eq 0 ]; then
+            success=true
+            break
+        fi
+        echo "docker安装失败，正在尝试重新下载 (尝试次数: $attempt)"
+      done
+
+      if $success; then
+         SUCCESS1 "$(docker --version)"
+         systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
+         systemctl enable docker &>/dev/null
+      else
+         ERROR "docker安装失败，请尝试手动安装"
+         exit 1
+      fi
     else
       INFO1 "docker 已安装..."  
       SUCCESS1 "$(docker --version)"
@@ -185,14 +236,30 @@ fi
 }
 
 function INSTALL_COMPOSE() {
-# 获取版本
 TAG=`curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r '.tag_name'`
-# 根据系统类型执行不同的命令
+
 if ! command -v docker-compose &> /dev/null;then
-   ERROR "docker-compose 未安装，正在进行安装..."
-   curl -sL https://github.com/docker/compose/releases/download/$TAG/docker-compose-`uname -s`-`uname -m` -o /usr/bin/docker-compose | grep -E "ERROR|ELIFECYCLE|WARN"
-   chmod +x /usr/bin/docker-compose
+ERROR "docker-compose 未安装，正在进行安装..."
+while [ $attempt -lt $MAX_ATTEMPTS ]; do
+    attempt=$((attempt + 1))
+
+    wget -q "https://github.com/docker/compose/releases/download/$TAG/docker-compose-$(uname -s)-$(uname -m)" -O /usr/bin/docker-compose
+    # 检查命令的返回值
+    if [ $? -eq 0 ]; then
+        success=true
+        chmod +x /usr/bin/docker-compose
+        break
+    fi
+
+    echo "docker-compose 下载失败，正在尝试重新下载 (尝试次数: $attempt)"
+done
+
+if $success; then
    SUCCESS1 "$(docker-compose --version)"
+else
+    ERROR "docker-compose 下载失败，请尝试手动安装docker-compose"
+    exit 1
+fi
 else
    INFO1 "docker-compose 已安装..."  
    SUCCESS1 "$(docker-compose --version)" 
