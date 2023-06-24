@@ -32,22 +32,27 @@ SUCCESS() {
 }
 
 SUCCESS1() {
-  ${SETCOLOR_SUCCESS} && echo " $1 "  && ${SETCOLOR_NORMAL}
+  ${SETCOLOR_SUCCESS} && echo "$1"  && ${SETCOLOR_NORMAL}
 }
 
 ERROR() {
-  ${SETCOLOR_RED} && echo " $1 "  && ${SETCOLOR_NORMAL}
+  ${SETCOLOR_RED} && echo "$1"  && ${SETCOLOR_NORMAL}
 }
 
 INFO() {
   ${SETCOLOR_SKYBLUE} && echo "------------------------------------ $1 -------------------------------------"  && ${SETCOLOR_NORMAL}
 }
 
+INFO1() {
+  ${SETCOLOR_SKYBLUE} && echo "$1"  && ${SETCOLOR_NORMAL}
+}
+
 WARN() {
-  ${SETCOLOR_YELLOW} && echo " $1 "  && ${SETCOLOR_NORMAL}
+  ${SETCOLOR_YELLOW} && echo "$1"  && ${SETCOLOR_NORMAL}
 }
 
 DOCKER_DIR="/data/go-chatgpt-api"
+mkdir -p $DOCKER_DIR
 
 function CHECK_CPU() {
 # 判断当前操作系统是否为 ARM 或 AMD 架构
@@ -87,54 +92,89 @@ fi
 
 
 function CHECK_OS() {
-if [ -f /etc/redhat-release ]; then
-    SUCCESS "系统环境检测中，请稍等..."
-    INFO "《This is CentOS.》"
-    OS="centos"
-    yum install -y lsof &>/dev/null
-elif [ -f /etc/lsb-release ]; then
-    if grep -q "DISTRIB_ID=Ubuntu" /etc/lsb-release; then
-        SUCCESS "系统环境检测中，请稍等..."
-        INFO "《This is Ubuntu.》"
-        OS="ubuntu"
-        systemctl restart systemd-resolved
-	apt-get install -y lsof &>/dev/null
-    else
-        ERROR "Unknown Linux distribution."
-        exit 1
-    fi
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
 else
-    ERROR "Unknown Linux distribution."
-    exit 2
+    echo "无法确定发行版"
+    exit 1
 fi
+
+# 根据发行版选择存储库类型
+case "$ID" in
+    "centos")
+        repo_type="centos"
+        ;;
+    "debian")
+        repo_type="debian"
+        ;;
+    "rhel")
+        repo_type="rhel"
+        ;;
+    "ubuntu")
+        repo_type="ubuntu"
+        ;;
+    *)
+        WARN "此脚本暂不支持您的系统: $ID"
+        exit 1
+        ;;
+esac
+
+echo "------------------------------------------"
+echo "系统发行版: $NAME"
+echo "系统版本: $VERSION"
+echo "系统ID: $ID"
+echo "系统ID Like: $ID_LIKE"
+echo "发行版系列: $repo_type"
+echo "------------------------------------------"
 }
 
 function INSTALL_DOCKER() {
-if [ "$OS" == "centos" ]; then
+# 定义存储库文件名
+repo_file="docker-ce.repo"
+# 下载存储库文件
+url="https://download.docker.com/linux/$repo_type"
+
+if [ "$repo_type" = "centos" ] || [ "$repo_type" = "rhel" ]; then
     if ! command -v docker &> /dev/null;then
       ERROR "docker 未安装，正在进行安装..."
-      yum -y install yum-utils | grep -E "ERROR|ELIFECYCLE|WARN"
-      yum-config-manager --add-repo http://download.docker.com/linux/centos/docker-ce.repo | grep -E "ERROR|ELIFECYCLE|WARN"
+      yum -y install yum-utils lsof jq &>/dev/null | grep -E "ERROR|ELIFECYCLE|WARN"
+      yum-config-manager --add-repo $url/$repo_file | grep -E "ERROR|ELIFECYCLE|WARN"
       yum -y install docker-ce | grep -E "ERROR|ELIFECYCLE|WARN"
       SUCCESS1 "$(docker --version)"
       systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
       systemctl enable docker &>/dev/null
     else 
-      echo "docker 已安装..."
+      INFO1 "docker 已安装..."
       SUCCESS1 "$(docker --version)"
       systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
     fi
-elif [ "$OS" == "ubuntu" ]; then
+elif [ "$repo_type" == "ubuntu" ]; then
     if ! command -v docker &> /dev/null;then
       ERROR "docker 未安装，正在进行安装..."
-      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-      add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
+      apt-get install -y lsof jq &>/dev/null
+      curl -fsSL $url/gpg | sudo apt-key add -
+      add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
       apt-get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
       SUCCESS1 "$(docker --version)"
       systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
       systemctl enable docker &>/dev/null
     else
-      echo "docker 已安装..."  
+      INFO1 "docker 已安装..."  
+      SUCCESS1 "$(docker --version)"
+      systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
+    fi
+elif [ "$repo_type" == "debian" ]; then
+    if ! command -v docker &> /dev/null;then
+      apt-get install -y lsof jq &>/dev/null
+      ERROR "docker 未安装，正在进行安装..."
+      curl -fsSL $url/gpg | sudo apt-key add -
+      add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
+      apt-get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
+      SUCCESS1 "$(docker --version)"
+      systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
+      systemctl enable docker &>/dev/null
+    else
+      INFO1 "docker 已安装..."  
       SUCCESS1 "$(docker --version)"
       systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
     fi
@@ -145,30 +185,17 @@ fi
 }
 
 function INSTALL_COMPOSE() {
+# 获取版本
+TAG=`curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r '.tag_name'`
 # 根据系统类型执行不同的命令
-if [ "$OS" == "centos" ]; then
-   if ! command -v docker-compose &> /dev/null;then
-      ERROR "docker-compose 未安装，正在进行安装..."
-      curl -sL https://github.com/docker/compose/releases/download/v2.16.0/docker-compose-`uname -s`-`uname -m` -o /usr/bin/docker-compose | grep -E "ERROR|ELIFECYCLE|WARN"
-      chmod +x /usr/bin/docker-compose
-      SUCCESS1 "$(docker-compose --version)"
-    else
-      echo "docker-compose 已安装..."  
-      SUCCESS1 "$(docker-compose --version)"
-    fi
-elif [ "$OS" == "ubuntu" ]; then
-    if ! command -v docker-compose &> /dev/null;then
-       ERROR "docker-compose 未安装，正在进行安装..."
-       curl -sL https://github.com/docker/compose/releases/download/v2.16.0/docker-compose-`uname -s`-`uname -m` -o /usr/bin/docker-compose | grep -E "ERROR|ELIFECYCLE|WARN"
-       chmod +x /usr/bin/docker-compose
-       SUCCESS1 "$(docker-compose --version)"
-    else
-      echo "docker-compose 已安装..."  
-      SUCCESS1 "$(docker-compose --version)" 
-    fi
+if ! command -v docker-compose &> /dev/null;then
+   ERROR "docker-compose 未安装，正在进行安装..."
+   curl -sL https://github.com/docker/compose/releases/download/$TAG/docker-compose-`uname -s`-`uname -m` -o /usr/bin/docker-compose | grep -E "ERROR|ELIFECYCLE|WARN"
+   chmod +x /usr/bin/docker-compose
+   SUCCESS1 "$(docker-compose --version)"
 else
-    ERROR "Unsupported operating system."
-    exit 1
+   INFO1 "docker-compose 已安装..."  
+   SUCCESS1 "$(docker-compose --version)" 
 fi
 }
 
