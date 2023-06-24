@@ -142,12 +142,12 @@ if [ "$repo_type" = "centos" ] || [ "$repo_type" = "rhel" ]; then
     if ! command -v docker &> /dev/null;then
       while [ $attempt -lt $MAX_ATTEMPTS ]; do
         attempt=$((attempt + 1))
-      ERROR "docker 未安装，正在进行安装..."
-      yum -y install yum-utils lsof jq wget &>/dev/null | grep -E "ERROR|ELIFECYCLE|WARN"
-      yum-config-manager --add-repo $url/$repo_file | grep -E "ERROR|ELIFECYCLE|WARN"
-      yum -y install docker-ce | grep -E "ERROR|ELIFECYCLE|WARN"
-      # 检查命令的返回值
-      if [ $? -eq 0 ]; then
+        ERROR "docker 未安装，正在进行安装..."
+        yum -y install yum-utils lsof jq wget &>/dev/null | grep -E "ERROR|ELIFECYCLE|WARN"
+        yum-config-manager --add-repo $url/$repo_file | grep -E "ERROR|ELIFECYCLE|WARN"
+        yum -y install docker-ce | grep -E "ERROR|ELIFECYCLE|WARN"
+        # 检查命令的返回值
+        if [ $? -eq 0 ]; then
             success=true
             break
         fi
@@ -170,15 +170,15 @@ if [ "$repo_type" = "centos" ] || [ "$repo_type" = "rhel" ]; then
 elif [ "$repo_type" == "ubuntu" ]; then
     if ! command -v docker &> /dev/null;then
       while [ $attempt -lt $MAX_ATTEMPTS ]; do
-      attempt=$((attempt + 1))
-      apt-get install -y lsof jq wget &>/dev/null
-      WARN "docker 未安装，正在进行安装..."
-      apt-get install -y lsof jq &>/dev/null
-      curl -fsSL $url/gpg | sudo apt-key add -
-      add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
-      apt -get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
-      # 检查命令的返回值
-      if [ $? -eq 0 ]; then
+        attempt=$((attempt + 1))
+        apt-get install -y lsof jq wget &>/dev/null
+        WARN "docker 未安装，正在进行安装..."
+        apt-get install -y lsof jq &>/dev/null
+        curl -fsSL $url/gpg | sudo apt-key add - &>/dev/null
+        add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
+        apt-get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
+        # 检查命令的返回值
+        if [ $? -eq 0 ]; then
             success=true
             break
         fi
@@ -205,7 +205,7 @@ elif [ "$repo_type" == "debian" ]; then
 
         apt-get install -y lsof jq wget &>/dev/null
         WARN "docker 未安装，正在进行安装..."
-        curl -fsSL $url/gpg | sudo apt-key add -
+        curl -fsSL $url/gpg | sudo apt-key add - &>/dev/null
         add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
         apt-get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
 	# 检查命令的返回值
