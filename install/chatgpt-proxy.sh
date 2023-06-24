@@ -163,8 +163,8 @@ if [ "$repo_type" = "centos" ] || [ "$repo_type" = "rhel" ]; then
       while [ $attempt -lt $MAX_ATTEMPTS ]; do
         attempt=$((attempt + 1))
         ERROR "docker 未安装，正在进行安装..."
-        yum-config-manager --add-repo $url/$repo_file | grep -E "ERROR|ELIFECYCLE|WARN"
-        yum -y install docker-ce | grep -E "ERROR|ELIFECYCLE|WARN"
+        yum-config-manager --add-repo $url/$repo_file &>/dev/null
+        yum -y install docker-ce &>/dev/null
         # 检查命令的返回值
         if [ $? -eq 0 ]; then
             success=true
@@ -190,10 +190,10 @@ elif [ "$repo_type" == "ubuntu" ]; then
     if ! command -v docker &> /dev/null;then
       while [ $attempt -lt $MAX_ATTEMPTS ]; do
         attempt=$((attempt + 1))
-        WARN "docker 未安装，正在进行安装..."
+        ERROR "docker 未安装，正在进行安装..."
         curl -fsSL $url/gpg | sudo apt-key add - &>/dev/null
-        add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
-        apt-get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
+        add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' &>/dev/null
+        apt-get -y install docker-ce docker-ce-cli containerd.io &>/dev/null
         # 检查命令的返回值
         if [ $? -eq 0 ]; then
             success=true
@@ -220,10 +220,10 @@ elif [ "$repo_type" == "debian" ]; then
       while [ $attempt -lt $MAX_ATTEMPTS ]; do
         attempt=$((attempt + 1))
 
-        WARN "docker 未安装，正在进行安装..."
+        ERROR "docker 未安装，正在进行安装..."
         curl -fsSL $url/gpg | sudo apt-key add - &>/dev/null
-        add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' | grep -E "ERROR|ELIFECYCLE|WARN"
-        apt-get -y install docker-ce docker-ce-cli containerd.io | grep -E "ERROR|ELIFECYCLE|WARN"
+        add-apt-repository "deb [arch=amd64] $url $(lsb_release -cs) stable" <<< $'\n' &>/dev/null
+        apt-get -y install docker-ce docker-ce-cli containerd.io &>/dev/null
 	# 检查命令的返回值
         if [ $? -eq 0 ]; then
             success=true
@@ -271,7 +271,7 @@ while [ $attempt -lt $MAX_ATTEMPTS ]; do
 done
 
 if $success; then
-   SUCCESS1 "$(docker-compose --version)"
+    SUCCESS1 "$(docker-compose --version)"
 else
     ERROR "docker-compose 下载失败，请尝试手动安装docker-compose"
     exit 1
