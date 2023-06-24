@@ -117,6 +117,9 @@ case "$ID" in
     "ubuntu")
         repo_type="ubuntu"
         ;;
+    "opencloudos")
+        repo_type="rhel"
+        ;;
     *)
         WARN "此脚本暂不支持您的系统: $ID"
         exit 1
@@ -128,7 +131,6 @@ echo "系统发行版: $NAME"
 echo "系统版本: $VERSION"
 echo "系统ID: $ID"
 echo "系统ID Like: $ID_LIKE"
-echo "发行版系列: $repo_type"
 echo "------------------------------------------"
 }
 
