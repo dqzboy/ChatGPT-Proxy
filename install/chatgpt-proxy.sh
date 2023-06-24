@@ -58,19 +58,6 @@ MAX_ATTEMPTS=3
 attempt=0
 success=false
 
-function PACKAGE(){
-PACKAGES="lsof jq wget"
-
-# 检查命令是否存在
-if command -v yum >/dev/null 2>&1; then
-    yum -y install $PACKAGES &>/dev/null
-elif command -v apt-get >/dev/null 2>&1; then
-    apt-get install -y $PACKAGES &>/dev/null
-else
-    WARN "无法确定可用的包管理器"
-    exit 1
-fi
-}
 
 function CHECK_CPU() {
 # 判断当前操作系统是否为 ARM 或 AMD 架构
@@ -147,6 +134,22 @@ echo "系统版本: $VERSION"
 echo "系统ID: $ID"
 echo "系统ID Like: $ID_LIKE"
 echo "------------------------------------------"
+}
+
+function INSTALL_PACKAGE(){
+PACKAGES="lsof jq wget"
+
+# 检查命令是否存在
+if command -v yum >/dev/null 2>&1; then
+    SUCCESS "安装系统必要组件"
+    yum -y install $PACKAGES &>/dev/null
+elif command -v apt-get >/dev/null 2>&1; then
+    SUCCESS "安装系统必要组件"
+    apt-get install -y $PACKAGES &>/dev/null
+else
+    WARN "无法确定可用的包管理器"
+    exit 1
+fi
 }
 
 function INSTALL_DOCKER() {
@@ -451,10 +454,10 @@ fi
 }
 
 main() {
-  PACKAGE
   CHECK_CPU
   CHECK_OPENAI
   CHECK_OS
+  INSTALL_PACKAGE
   INSTALL_PROXY
   DEL_IMG_NONE
 }
