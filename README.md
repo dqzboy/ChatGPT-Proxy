@@ -229,7 +229,7 @@ docker exec chatgpt-proxy-server curl -x socks5://代理 ipinfo.io
  - 问题解决：（1）更换IP；（2）使用warp
 
 ## ChatGPT-Porxy一键部署脚本
-- **说明**：目前该脚本适用于CentOS 7\8、RHEL-8、Ubuntu系统；因为脚本测试环境不一样，不能确保在你的环境可以完美运行
+- **说明**：目前脚本适用于CentOS 7\8\9、RHEL-8\9、Ubuntu、debian以及opencloudos系统；运行脚本需要确保网络环境稳定。
 
 ```shell
 # CentOS
