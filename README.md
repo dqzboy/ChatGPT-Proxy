@@ -152,12 +152,13 @@ docker-compose pull
 docker-compose up -d
 ```
 
-## 四、项目使用自建反代
+## 四、项目接入自建反代
 ### 接口更新
 - 原接口： http://go-chatgpt-api:8080/chatgpt/conversation
 - 更新后： http://go-chatgpt-api:8080/chatgpt/backend-api/conversation
 
-### ChatGPTUnofficialProxyAPI(网页 accessToken)
+### 项目：[Chanzhaoyu/chatgpt-web](https://github.com/Chanzhaoyu/chatgpt-web) | [Kerwin1202/chatgpt-web](https://github.com/Kerwin1202/chatgpt-web)
+#### **ChatGPTUnofficialProxyAPI(accessToken)**
 - 现在我们可以找一个项目，使用access token模式，并使用我们自建的代理地址进行访问；
   - 自建IP的访问地址为http://vps-ip:8080/chatgpt/backend-api/conversation
   - 如果前端项目是直接跑的并且与反代服务同在一台VPS上，则反代地址可写成：http://127.0.0.1:8080/chatgpt/backend-api/conversation
@@ -174,7 +175,7 @@ API_REVERSE_PROXY=http://127.0.0.1:8080/chatgpt/backend-api/conversation
 - 同样日志返回请求结果正常
 <img src="https://user-images.githubusercontent.com/42825450/236637560-ae2baf1f-69ed-423e-b4d8-4700aedee3e4.png" width="800px">
 
-### ChatGPTAPI(gpt-3.5-turbo-0301)
+#### **ChatGPTAPI(APIKEY)**
 - 使用ChatGPTAPI模式，并使用我们自建的代理地址进行访问；
   - 自建IP的访问地址为http://vps-ip:8080/platform  
   - 如果前端项目是直接跑的并且与反代服务同在一台VPS上，则反代地址可写成：http://127.0.0.1:8080/platform
@@ -184,11 +185,15 @@ OPENAI_API_BASE_URL=http://127.0.0.1:8080/platform
 ```
 <img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/aa93dd61-ab4d-4e56-9677-d86d8287eab9" width="800px">
 
-### 其他项目接入
-> 例如：[chatgpt-mirai-qq-bot](https://github.com/lss233/chatgpt-mirai-qq-bot)
+### 项目：[chatgpt-mirai-qq-bot](https://github.com/lss233/chatgpt-mirai-qq-bot)
 ```shell
 browserless_endpoint = "http(s)://你的服务/chatgpt/backend-api/"
 ```
+### 项目：[moeakwak/chatgpt-web-share](https://github.com/moeakwak/chatgpt-web-share)
+```shell
+CHATGPT_BASE_URL = "http(s)://你的服务/chatgpt/backend-api/"
+```
+
 ## 五、总结
 > 目前部署发现，只要确保节点稳定或者国内服务器配置的代理地址稳定，那么就可以正常使用
 
