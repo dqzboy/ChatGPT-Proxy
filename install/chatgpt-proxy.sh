@@ -14,6 +14,8 @@ SETCOLOR_SUCCESS="echo -en \\E[0;32m"
 SETCOLOR_NORMAL="echo  -en \\E[0;39m"
 SETCOLOR_RED="echo  -en \\E[0;31m"
 SETCOLOR_YELLOW="echo -en \\E[1;33m"
+GREEN="\033[1;32m"
+RESET="\033[0m"
 
 echo
 cat << EOF
@@ -91,7 +93,7 @@ if ping -c 3 ${url} &> /dev/null; then
 else
   echo "Could not connect to ${url}."
   INFO "强制安装"
-  read -e -p "Do you want to force install dependencies? (y/n)：" force_install
+  read -e -p "$(echo -e ${GREEN}"Do you want to force install dependencies? (y/n)："${RESET})" force_install
 fi
 }
 
@@ -283,7 +285,7 @@ fi
 }
 
 function MODIFY_PORT() {
-read -e -p "是否修改容器映射端口号？(y/n): " answer
+read -e -p "$(echo -e ${GREEN}"是否修改容器映射端口号？(y/n): "${RESET})" answer
 
 if [ "$answer" == "y" ]; then
   while true; do
@@ -301,7 +303,7 @@ fi
 
 function CONFIG() {
 mkdir -p ${DOCKER_DIR}
-read -e -p "请输入使用的模式（api/warp）：" mode
+read -e -p "$(echo -e ${GREEN}"请输入使用的模式（api/warp）："${RESET})" mode
 if [ "$mode" == "api" ]; then
 cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: "3"
@@ -347,7 +349,7 @@ else
 fi
 
 # 提示用户是否需要修改配置
-read -e -p "Do you want to add a proxy address? (y/n)：" modify_config
+read -e -p "$(echo -e ${GREEN}"Do you want to add a proxy address? (y/n)："${RESET})" modify_config
 case $modify_config in
   [Yy]* )
     # 获取用户输入的URL及其类型
@@ -456,7 +458,7 @@ fi
 
 function ADD_IMAGESUP() {
 SUCCESS "Crontab"
-read -e -p "是否加入定时更新镜像？(y/n): " cron
+read -e -p "$(echo -e ${GREEN}"是否加入定时更新镜像？(y/n): "${RESET})" cron
 
 if [[ "$cron" == "y" ]]; then
 mkdir -p /opt/script/go-chatgpt-api
@@ -475,8 +477,13 @@ else
 fi
 EOF
 chmod +x /opt/script/go-chatgpt-api/AutoImageUp.sh
+    read -e -p "$(echo -e ${GREEN}"请输入分钟（0-59）: "${RESET})" minute
+    read -e -p "$(echo -e ${GREEN}"请输入小时（0-23）: "${RESET})" hour
+    read -e -p "$(echo -e ${GREEN}"请输入日期（1-31）: "${RESET})" day
+    read -e -p "$(echo -e ${GREEN}"请输入月份（1-12）: "${RESET})" month
+    read -e -p "$(echo -e ${GREEN}"请输入星期几（0-7，其中0和7都表示星期日）: "${RESET})" weekday
 
-    read -e -p "请输入定时任务时间（分 时 日 月 周）（例如：0 4 * * *）: " schedule
+    schedule="$minute $hour $day $month $weekday"
 
     # 获取当前用户的crontab内容
     existing_crontab=$(crontab -l 2>/dev/null)
