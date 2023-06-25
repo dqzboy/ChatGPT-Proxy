@@ -459,7 +459,8 @@ SUCCESS "Crontab"
 read -e -p "是否加入定时更新镜像？(y/n): " cron
 
 if [[ "$cron" == "y" ]]; then
-cat > /data/go-chatgpt-api/AutoImageUp.sh << \EOF
+mkdir -p /opt/script/go-chatgpt-api/AutoImageUp.sh
+cat > /opt/script/go-chatgpt-api/AutoImageUp.sh << \EOF
 IMAGE_NAME="linweiyuan/go-chatgpt-api"
 CURRENT_VERSION=$(docker inspect --format='{{.Id}}' $IMAGE_NAME)
 LATEST_VERSION=$(docker inspect --format='{{.Id}}' $IMAGE_NAME)
@@ -473,7 +474,7 @@ else
   echo "镜像无需更新"
 fi
 EOF
-chmod +x /data/go-chatgpt-api/AutoImageUp.sh
+chmod +x /opt/script/go-chatgpt-api/AutoImageUp.sh
 
     read -e -p "请输入定时任务时间（分 时 日 月 周）（例如：0 4 * * *）: " schedule
 
