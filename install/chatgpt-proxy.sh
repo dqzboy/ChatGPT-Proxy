@@ -468,6 +468,7 @@ if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
   echo "镜像已更新，进行容器重启等操作..."
   docker pull $IMAGE_NAME
   cd /data/go-chatgpt-api && docker-compose down && docker-compose up -d
+  docker rmi $(docker images -q --filter "dangling=true" --filter "reference=linweiyuan/go-chatgpt-api")
 else
   echo "镜像无需更新"
 fi
