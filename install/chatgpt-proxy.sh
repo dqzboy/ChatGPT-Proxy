@@ -482,7 +482,7 @@ chmod +x /opt/script/go-chatgpt-api/AutoImageUp.sh
     existing_crontab=$(crontab -l 2>/dev/null)
 
     # 要添加的定时任务
-    new_cron="$schedule /data/go-chatgpt-api/AutoImageUp.sh"
+    new_cron="$schedule /opt/script/go-chatgpt-api/AutoImageUp.sh"
 
     # 判断crontab中是否存在相同的定时任务
     if echo "$existing_crontab" | grep -qF "$new_cron"; then
