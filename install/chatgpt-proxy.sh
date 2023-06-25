@@ -459,7 +459,7 @@ SUCCESS "Crontab"
 read -e -p "是否加入定时更新镜像？(y/n): " cron
 
 if [[ "$cron" == "y" ]]; then
-mkdir -p /opt/script/go-chatgpt-api/AutoImageUp.sh
+mkdir -p /opt/script/go-chatgpt-api
 cat > /opt/script/go-chatgpt-api/AutoImageUp.sh << \EOF
 IMAGE_NAME="linweiyuan/go-chatgpt-api"
 CURRENT_VERSION=$(docker inspect --format='{{.Id}}' $IMAGE_NAME)
