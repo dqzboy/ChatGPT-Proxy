@@ -272,13 +272,15 @@ while [ $attempt -lt $MAX_ATTEMPTS ]; do
 done
 
 if $success; then
+    chmod +x /usr/bin/docker-compose
     SUCCESS1 ">>> $(docker-compose --version)"
 else
     ERROR "docker-compose 下载失败，请尝试手动安装docker-compose"
     exit 1
 fi
 else
-   INFO1 "docker-compose 已安装..."  
+   INFO1 "docker-compose 已安装..."
+   chmod +x /usr/bin/docker-compose
    SUCCESS1 ">>> $(docker-compose --version)" 
 fi
 }
