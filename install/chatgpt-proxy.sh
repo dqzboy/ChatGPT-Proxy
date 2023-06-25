@@ -408,17 +408,18 @@ done
 
 
 function CHRCK_CONTAINER() {
-# 查看镜像名称包含“linweiyuan”的Docker容器状态
-if docker ps --filter "ancestor=linweiyuan" --format "{{.Names}}: {{.Status}}" | grep -v "Up" > /dev/null ; then
-  SUCCESS "CHECK"
-  Progress
-  ERROR ">>>>> The following containers are not up:"
-  docker ps --filter "ancestor=linweiyuan" --format "{{.Names}}: {{.Status}}" | grep -v "Up"
+# 获取容器状态
+STATUS=$(docker container inspect -f '{{.State.Running}}' go-chatgpt-api 2>/dev/null)
+
+# 判断容器状态并打印提示
+if [ "$STATUS" = "true" ]; then
+    SUCCESS "CHECK"
+    Progress
+    SUCCESS1 ">>>>> Docker containers are up and running."
 else
-  # 如果都为UP则打印提示
-  SUCCESS "CHECK"
-  Progress
-  SUCCESS1 ">>>>> Docker containers are up and running."
+    SUCCESS "CHECK"
+    Progress
+    ERROR ">>>>> The following containers are not up:"
 fi
 }
 
@@ -453,6 +454,54 @@ if [ -n "$(docker images -q --filter "dangling=true" --filter "reference=linweiy
 fi
 }
 
+function ADD_IMAGESUP() {
+SUCCESS "Crontab"
+read -e -p "是否加入定时更新镜像？(y/n): " cron
+
+if [[ "$cron" == "y" ]]; then
+cat > /data/go-chatgpt-api/AutoImageUp.sh << \EOF
+IMAGE_NAME="linweiyuan/go-chatgpt-api"
+CURRENT_VERSION=$(docker inspect --format='{{.Id}}' $IMAGE_NAME)
+LATEST_VERSION=$(docker inspect --format='{{.Id}}' $IMAGE_NAME)
+
+if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
+  echo "镜像已更新，进行容器重启等操作..."
+  docker pull $IMAGE_NAME
+  cd /data/go-chatgpt-api && docker-compose down && docker-compose up -d
+else
+  echo "镜像无需更新"
+fi
+EOF
+chmod +x /data/go-chatgpt-api/AutoImageUp.sh
+
+    read -e -p "请输入定时任务时间（分 时 日 月 周）（例如：0 4 * * *）: " schedule
+
+    # 获取当前用户的crontab内容
+    existing_crontab=$(crontab -l 2>/dev/null)
+
+    # 要添加的定时任务
+    new_cron="$schedule /data/go-chatgpt-api/AutoImageUp.sh"
+
+    # 判断crontab中是否存在相同的定时任务
+    if echo "$existing_crontab" | grep -qF "$new_cron"; then
+        WARN "已存在相同的定时任务！"
+    else
+        # 添加定时任务到crontab
+        (crontab -l ; echo "$new_cron") | crontab -
+        SUCCESS1 "已成功添加定时任务！"
+    fi
+
+    # 提示用户的定时任务执行时间
+    INFO1 "您的定时任务已设置为在 $schedule 时间内执行！"
+
+elif [[ "$cron" == "n" ]]; then
+    # 取消定时任务
+    WARN "已取消定时更新镜像任务！"
+else
+    ERROR "选项错误！请重新运行脚本并选择正确的选项。"
+fi
+}
+
 main() {
   CHECK_CPU
   CHECK_OPENAI
@@ -460,5 +509,6 @@ main() {
   INSTALL_PACKAGE
   INSTALL_PROXY
   DEL_IMG_NONE
+  ADD_IMAGESUP
 }
 main
