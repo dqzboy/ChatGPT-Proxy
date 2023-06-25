@@ -187,7 +187,7 @@ OPENAI_API_BASE_URL=http://127.0.0.1:8080/platform
 ### 其他项目接入
 > 例如：[chatgpt-mirai-qq-bot](https://github.com/lss233/chatgpt-mirai-qq-bot)
 ```shell
-browserless_endpoint = "http(s)://你的服务/chatgpt/"
+browserless_endpoint = "http(s)://你的服务/chatgpt/backend-api/"
 ```
 ## 五、总结
 > 目前部署发现，只要确保节点稳定或者国内服务器配置的代理地址稳定，那么就可以正常使用
