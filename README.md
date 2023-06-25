@@ -244,6 +244,8 @@ apt -y install wget
 
 bash -c "$(wget -q -O- https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/main/install/chatgpt-proxy.sh)"
 ```
+<img src="" width="800px">
+
 
 ## ChatGPT WEB项目一键部署脚本
 [chatgpt-web一键部署脚本](https://github.com/dqzboy/chatgpt-web)
