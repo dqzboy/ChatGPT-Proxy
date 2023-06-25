@@ -77,7 +77,6 @@ text="检测服务器是否能够访问chat.openai.com"
 width=75
 padding=$((($width - ${#text}) / 2))
 
-
 function CHECK_OPENAI() {
 SUCCESS "提示"
 printf "%*s\033[31m%s\033[0m%*s\n" $padding "" "$text" $padding ""
