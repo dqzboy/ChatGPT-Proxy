@@ -121,7 +121,7 @@ case "$ID" in
         repo_type="ubuntu"
         ;;
     "opencloudos")
-        repo_type="rhel"
+        repo_type="centos"
         ;;
     *)
         WARN "此脚本暂不支持您的系统: $ID"
