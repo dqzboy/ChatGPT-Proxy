@@ -71,7 +71,7 @@ docker-compose -v
 mkdir -p /data/go-chatgpt-api && cd $_
 ```
 ## 2、创建部署清单
-- 使用API 模式
+### 服务器直连或通过代理可正常访问ChatGPT
   - 如果你的VPS IP稳定，或者你使用的科学上网地址稳定，那就首选这种方式
 ```shell
 vim docker-compose.yml
@@ -84,12 +84,23 @@ services:
     ports:
       - 8080:8080         # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效；clash TUN模式下使用此方法
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
+      - TZ=Asia/Shanghai
       - GO_CHATGPT_API_PROXY=http://host:port    # GO_CHATGPT_API_PROXY=：可配置科学上网代理地址，例如：http://10.0.5.10:7890；注释掉或者留空则不启用
+      - GO_CHATGPT_API_ARKOSE_TOKEN_URL=http://chatgpt-arkose-token-api:65526
+    depends_on:
+      - chatgpt-arkose-token-api
+    restart: unless-stopped
+
+  chatgpt-arkose-token-api:
+    container_name: chatgpt-arkose-token-api
+    image: linweiyuan/chatgpt-arkose-token-api
     restart: unless-stopped
 ```
 
-- 基于Cloudflare WARP模式
+### 基于Cloudflare WARP模式
   - 解决IP被Ban，提示Access denied之类的报错
   - 如果使用此模式还是提示Access denied，大概率是你机器IP不干净或者用的国内服务器导致验证码过不去
   - Cloudflare WARP官网文档：https://developers.cloudflare.com/warp-client/get-started/linux
@@ -104,10 +115,15 @@ services:
     ports:
       - 8080:8080         # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效；clash TUN模式下使用此方法
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
+      - TZ=Asia/Shanghai
       - GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535
+      - GO_CHATGPT_API_ARKOSE_TOKEN_URL=http://chatgpt-arkose-token-api:65526
     depends_on:
       - chatgpt-proxy-server-warp
+      - chatgpt-arkose-token-api
     restart: unless-stopped
 
   chatgpt-proxy-server-warp:
@@ -115,6 +131,11 @@ services:
     image: linweiyuan/chatgpt-proxy-server-warp
     environment:
       - LOG_LEVEL=OFF
+    restart: unless-stopped
+
+  chatgpt-arkose-token-api:
+    container_name: chatgpt-arkose-token-api
+    image: linweiyuan/chatgpt-arkose-token-api
     restart: unless-stopped
 ```
 
