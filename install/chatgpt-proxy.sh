@@ -494,9 +494,10 @@ read -e -p "$(echo -e ${GREEN}"是否加入定时更新镜像？(y/n): "${RESET}
 if [[ "$cron" == "y" ]]; then
 mkdir -p /opt/script/go-chatgpt-api
 cat > /opt/script/go-chatgpt-api/AutoImageUp.sh << \EOF
+#!/usr/bin/env bash
 IMAGE_NAME="linweiyuan/go-chatgpt-api"
-CURRENT_VERSION=$(docker inspect --format='{{.Id}}' $IMAGE_NAME)
-LATEST_VERSION=$(docker inspect --format='{{.Id}}' $IMAGE_NAME)
+CURRENT_VERSION=$(docker image inspect $IMAGE_NAME --format='{{index .RepoDigests 0}}' | grep -o 'sha256:[^"]*')
+LATEST_VERSION=$(curl -s "https://registry.hub.docker.com/v2/repositories/$IMAGE_NAME/tags/latest" | jq -r '.digest')
 
 if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
   echo "镜像已更新，进行容器重启等操作..."
