@@ -307,7 +307,7 @@ mkdir -p ${DOCKER_DIR}
 read -e -p "$(echo -e ${GREEN}"请输入使用的模式（api/warp）："${RESET})" mode
 if [ "$mode" == "api" ]; then
 cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
-version: "3"
+version: "3" 
 services:
   go-chatgpt-api:
     container_name: go-chatgpt-api
@@ -315,10 +315,21 @@ services:
     ports:
       - 8080:8080         # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效；clash TUN模式下使用此方法
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
-      - GO_CHATGPT_API_PROXY=
+      - TZ=Asia/Shanghai
+      - GO_CHATGPT_API_PROXY=http://host:port    # GO_CHATGPT_API_PROXY=：可配置科学上网代理地址，例如：http://10.0.5.10:7890；注释掉或者留空则不启用
       #http://host:port      # GO_CHATGPT_API_PROXY=：科学上网代理地址，例如：http://10.0.5.10:7890
       #socks5://host:port    # GO_CHATGPT_API_PROXY=：科学上网代理地址，例如：socks5://10.0.5.10:7890
+      - GO_CHATGPT_API_ARKOSE_TOKEN_URL=http://chatgpt-arkose-token-api:65526
+    depends_on:
+      - chatgpt-arkose-token-api
+    restart: unless-stopped
+
+  chatgpt-arkose-token-api:
+    container_name: chatgpt-arkose-token-api
+    image: linweiyuan/chatgpt-arkose-token-api
     restart: unless-stopped
 EOF
 elif [ "$mode" == "warp" ]; then
@@ -331,10 +342,15 @@ services:
     ports:
       - 8080:8080         # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效；clash TUN模式下使用此方法
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
+      - TZ=Asia/Shanghai
       - GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535
+      - GO_CHATGPT_API_ARKOSE_TOKEN_URL=http://chatgpt-arkose-token-api:65526
     depends_on:
       - chatgpt-proxy-server-warp
+      - chatgpt-arkose-token-api
     restart: unless-stopped
 
   chatgpt-proxy-server-warp:
@@ -342,6 +358,11 @@ services:
     image: linweiyuan/chatgpt-proxy-server-warp
     environment:
       - LOG_LEVEL=OFF
+    restart: unless-stopped
+
+  chatgpt-arkose-token-api:
+    container_name: chatgpt-arkose-token-api
+    image: linweiyuan/chatgpt-arkose-token-api
     restart: unless-stopped
 EOF
 else
@@ -411,18 +432,27 @@ done
 
 
 function CHRCK_CONTAINER() {
-# 获取容器状态
-STATUS=$(docker container inspect -f '{{.State.Running}}' go-chatgpt-api 2>/dev/null)
+# 检查 go-chatgpt-api 容器状态
+status_go_chatgpt_api=$(docker container inspect -f '{{.State.Running}}' go-chatgpt-api 2>/dev/null)
+
+# 检查 chatgpt-arkose-token-api 容器状态
+status_chatgpt_arkose_token_api=$(docker container inspect -f '{{.State.Running}}' chatgpt-arkose-token-api 2>/dev/null)
 
 # 判断容器状态并打印提示
-if [ "$STATUS" = "true" ]; then
+if [[ "$status_go_chatgpt_api" == "true" && "$status_chatgpt_arkose_token_api" == "true" ]]; then
     SUCCESS "CHECK"
     Progress
     SUCCESS1 ">>>>> Docker containers are up and running."
 else
     SUCCESS "CHECK"
     Progress
-    ERROR ">>>>> The following containers are not up:"
+    ERROR ">>>>> The following containers are not up"
+    if [[ "$status_go_chatgpt_api" != "true" ]]; then
+        WARN ">>> go-chatgpt-api"
+    fi
+    if [[ "$status_chatgpt_arkose_token_api" != "true" ]]; then
+        WARN ">>> chatgpt-arkose-token-api"
+    fi
 fi
 }
 
