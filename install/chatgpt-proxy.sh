@@ -495,17 +495,30 @@ if [[ "$cron" == "y" ]]; then
 mkdir -p /opt/script/go-chatgpt-api
 cat > /opt/script/go-chatgpt-api/AutoImageUp.sh << \EOF
 #!/usr/bin/env bash
-IMAGE_NAME="linweiyuan/go-chatgpt-api"
-CURRENT_VERSION=$(docker image inspect $IMAGE_NAME --format='{{index .RepoDigests 0}}' | grep -o 'sha256:[^"]*')
-LATEST_VERSION=$(curl -s "https://registry.hub.docker.com/v2/repositories/$IMAGE_NAME/tags/latest" | jq -r '.digest')
+IMAGE_GOCHAT="linweiyuan/go-chatgpt-api"
+IMAGE_ARKOS="linweiyuan/chatgpt-arkose-token-api"
+CURRENT_VERSION=$(docker image inspect $IMAGE_GOCHAT --format='{{index .RepoDigests 0}}' | grep -o 'sha256:[^"]*')
+LATEST_VERSION=$(curl -s "https://registry.hub.docker.com/v2/repositories/$IMAGE_GOCHAT/tags/latest" | jq -r '.digest')
+
+CURRENT_VERSION1=$(docker image inspect $IMAGE_ARKOS --format='{{index .RepoDigests 0}}' | grep -o 'sha256:[^"]*')
+LATEST_VERSION1=$(curl -s "https://registry.hub.docker.com/v2/repositories/$IMAGE_ARKOS/tags/latest" | jq -r '.digest')
 
 if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
-  echo "镜像已更新，进行容器重启等操作..."
-  docker pull $IMAGE_NAME
+  echo "go-chatgpt-api 镜像已更新，进行容器重启等操作..."
+  docker pull $IMAGE_GOCHAT
   cd /data/go-chatgpt-api && docker-compose down && docker-compose up -d
-  docker rmi $(docker images -q --filter "dangling=true" --filter "reference=linweiyuan/go-chatgpt-api") &>/dev/null
+  docker rmi $(docker images -q --filter "dangling=true" --filter "reference=$IMAGE_GOCHAT") &>/dev/null
 else
-  echo "镜像无需更新"
+  echo "go-chatgpt-api 镜像无需更新"
+fi
+
+if [ "$CURRENT_VERSION1" != "$LATEST_VERSION1" ]; then
+  echo "chatgpt-arkose 镜像已更新，进行容器重启等操作..."
+  docker pull $IMAGE_ARKOS
+  cd /data/go-chatgpt-api && docker-compose down && docker-compose up -d
+  docker rmi $(docker images -q --filter "dangling=true" --filter "reference=$IMAGE_ARKOS") &>/dev/null
+else
+  echo "chatgpt-arkose 镜像无需更新"
 fi
 EOF
 chmod +x /opt/script/go-chatgpt-api/AutoImageUp.sh
