@@ -320,8 +320,8 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - GO_CHATGPT_API_PROXY=http://host:port    # GO_CHATGPT_API_PROXY=：可配置科学上网代理地址，例如：http://10.0.5.10:7890；注释掉或者留空则不启用
-      #http://host:port      # GO_CHATGPT_API_PROXY=：科学上网代理地址，例如：http://10.0.5.10:7890
-      #socks5://host:port    # GO_CHATGPT_API_PROXY=：科学上网代理地址，例如：socks5://10.0.5.10:7890
+      #http://host:port      # GO_CHATGPT_API_PROXY=：科学上网代理地址，例如：http://127.0.0.1:7890
+      #socks5://host:port    # GO_CHATGPT_API_PROXY=：科学上网代理地址，例如：socks5://127.0.0.1:7890
       - GO_CHATGPT_API_ARKOSE_TOKEN_URL=http://chatgpt-arkose-token-api:65526
     depends_on:
       - chatgpt-arkose-token-api
