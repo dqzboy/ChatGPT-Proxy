@@ -422,11 +422,8 @@ function CHRCK_CONTAINER() {
 # 检查 go-chatgpt-api 容器状态
 status_go_chatgpt_api=$(docker container inspect -f '{{.State.Running}}' go-chatgpt-api 2>/dev/null)
 
-# 检查 chatgpt-arkose-token-api 容器状态
-status_chatgpt_arkose_token_api=$(docker container inspect -f '{{.State.Running}}' chatgpt-arkose-token-api 2>/dev/null)
-
 # 判断容器状态并打印提示
-if [[ "$status_go_chatgpt_api" == "true" && "$status_chatgpt_arkose_token_api" == "true" ]]; then
+if [[ "$status_go_chatgpt_api" == "true" ]]; then
     SUCCESS "CHECK"
     Progress
     SUCCESS1 ">>>>> Docker containers are up and running."
@@ -436,9 +433,6 @@ else
     ERROR ">>>>> The following containers are not up"
     if [[ "$status_go_chatgpt_api" != "true" ]]; then
         WARN ">>> go-chatgpt-api"
-    fi
-    if [[ "$status_chatgpt_arkose_token_api" != "true" ]]; then
-        WARN ">>> chatgpt-arkose-token-api"
     fi
 fi
 }
