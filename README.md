@@ -81,17 +81,14 @@ services:
   go-chatgpt-api:
     container_name: go-chatgpt-api
     image: linweiyuan/go-chatgpt-api
-    ports:
       - 8080:8080         # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
-    #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效；clash TUN模式下使用此方法
+    #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - TZ=Asia/Shanghai
-      - GO_CHATGPT_API_PROXY=http://host:port    # GO_CHATGPT_API_PROXY=：可配置科学上网代理地址，例如：http://10.0.5.10:7890；注释掉或者留空则不启用
+      - GO_CHATGPT_API_PROXY=   # GO_CHATGPT_API_PROXY=：可配置科学上网代理地址，例如：http://127.0.0.1:7890；注释掉或者留空则不启用
       - GO_CHATGPT_API_PANDORA=1
-    depends_on:
-      - chatgpt-arkose-token-api
     restart: unless-stopped
 ```
 
@@ -109,7 +106,7 @@ services:
     image: linweiyuan/go-chatgpt-api
     ports:
       - 8080:8080         # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
-    #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效；clash TUN模式下使用此方法
+    #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
