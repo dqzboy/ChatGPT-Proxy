@@ -123,6 +123,9 @@ case "$ID" in
     "opencloudos")
         repo_type="centos"
         ;;
+    "rocky")
+        repo_type="centos"
+        ;;
     *)
         WARN "此脚本暂不支持您的系统: $ID"
         exit 1
