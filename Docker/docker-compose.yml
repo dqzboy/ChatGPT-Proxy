@@ -1,4 +1,4 @@
-version: "3" 
+version: "3"
 services:
   go-chatgpt-api:
     container_name: go-chatgpt-api
@@ -10,16 +10,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - TZ=Asia/Shanghai
-      - GO_CHATGPT_API_PROXY=http://127.0.0.1:7890      # GO_CHATGPT_API_PROXY=：科学上网代理地址，例如：http://127.0.0.1:7890；可留空
-      - GO_CHATGPT_API_ARKOSE_TOKEN_URL=http://chatgpt-arkose-token-api:65526
-      #- GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535  # IP被Ban，提示Access denied之类的报错，可尝试使用warp，把注释取消
+      #- GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535   # IP被Ban，提示Access denied之类的报错，可尝试使用warp，把注释取消
+      - GO_CHATGPT_API_PANDORA=1
     depends_on:
-      - chatgpt-arkose-token-api
-    restart: unless-stopped
-
-  chatgpt-arkose-token-api:
-    container_name: chatgpt-arkose-token-api
-    image: linweiyuan/chatgpt-arkose-token-api
+      - chatgpt-proxy-server-warp
     restart: unless-stopped
 
 # IP被Ban，提示Access denied之类的报错，可尝试使用warp，把注释取消
