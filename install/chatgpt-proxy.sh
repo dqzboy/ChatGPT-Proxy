@@ -325,7 +325,8 @@ services:
       - GO_CHATGPT_API_PROXY=    # GO_CHATGPT_API_PROXY=：可配置科学上网代理地址，例如：http://127.0.0.1:7890；注释掉或者留空则不启用
       #http://host:port          # GO_CHATGPT_API_PROXY=：科学上网代理地址，例如：http://127.0.0.1:7890
       #socks5://host:port        # GO_CHATGPT_API_PROXY=：科学上网代理地址，例如：socks5://127.0.0.1:7890
-      - GO_CHATGPT_API_PANDORA=1
+      - GO_CHATGPT_API_PANDORA=
+      - GO_CHATGPT_API_ARKOSE_TOKEN_URL=
     restart: unless-stopped
 EOF
 elif [ "$mode" == "warp" ]; then
@@ -343,7 +344,8 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535
-      - GO_CHATGPT_API_PANDORA=1
+      - GO_CHATGPT_API_PANDORA=
+      - GO_CHATGPT_API_ARKOSE_TOKEN_URL=
     depends_on:
       - chatgpt-proxy-server-warp
     restart: unless-stopped
