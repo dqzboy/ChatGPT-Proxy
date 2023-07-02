@@ -141,7 +141,7 @@ echo "------------------------------------------"
 }
 
 function INSTALL_PACKAGE(){
-PACKAGES="lsof jq wget postfix"
+PACKAGES="lsof jq wget postfix yum-utils"
 
 # 检查命令是否存在
 if command -v yum >/dev/null 2>&1; then
