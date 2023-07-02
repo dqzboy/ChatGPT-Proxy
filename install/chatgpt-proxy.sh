@@ -552,7 +552,7 @@ prev_timestamp=""
 is_alert=false
 
 while true; do
-  current_timestamp=$(docker logs go-chatgpt-api | grep "403" | awk '!/INFO\[0000\] (GO_CHATGPT_API_PROXY|Service go-chatgpt-api is ready)/ { match($0, /[0-9]{4}\/[0-9]{2}\/[0-9]{2} - [0-9]{2}:[0-9]{2}/); if (RSTART > 0) print substr($0, RSTART, RLENGTH) }' | tail -n1)
+  current_timestamp=$(docker logs go-chatgpt-api | grep "403" | awk '!/INFO\[0000\] (GO_CHATGPT_API_PROXY|Service go-chatgpt-api is ready)/ { match($0, /[0-9]{4}\/[0-9]{2}\/[0-9]{2} - [0-9]{2}:[0-9]{2}:[0-9]{2}/); if (RSTART > 0) print substr($0, RSTART, RLENGTH) }' | tail -n1)
 
   if [ -z "$prev_timestamp" ]; then
     prev_timestamp="$current_timestamp"
