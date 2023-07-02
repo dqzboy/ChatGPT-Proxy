@@ -327,6 +327,7 @@ services:
       #socks5://host:port        # GO_CHATGPT_API_PROXY=：科学上网代理地址，例如：socks5://127.0.0.1:7890
       - GO_CHATGPT_API_PANDORA=
       - GO_CHATGPT_API_ARKOSE_TOKEN_URL=
+      - GO_CHATGPT_API_ARKOSE_PUID=
     restart: unless-stopped
 EOF
 elif [ "$mode" == "warp" ]; then
@@ -346,6 +347,7 @@ services:
       - GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535
       - GO_CHATGPT_API_PANDORA=
       - GO_CHATGPT_API_ARKOSE_TOKEN_URL=
+      - GO_CHATGPT_API_ARKOSE_PUID=
     depends_on:
       - chatgpt-proxy-server-warp
     restart: unless-stopped
