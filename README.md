@@ -20,7 +20,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 > 如果部署或者配置过程出现问题或不懂的地方，请先搜索历史[issue](https://github.com/dqzboy/ChatGPT-Proxy/issues)或者加[TG交流群](https://t.me/+ghs_XDp1vwxkMGU9)
 
 ## 二、所需环境组件安装
-> **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！滑动至底部有脚本安装命令。** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新等功能！
+> **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！滑动至底部有脚本安装命令。** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新、403检测邮箱告警等功能！
 ### 1、环境说明
 - 一台VPS，规格最低配 1C1G；~~**注意**：warp不支持arm架构的机器~~ 目前已经可以跑arm架构的机器上了
 - VPS可以正常访问 [chatgpt](https://chat.openai.com)；或者国内服务器实现科学上网也可以
@@ -88,7 +88,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - TZ=Asia/Shanghai
-      - GO_CHATGPT_API_PROXY=   # GO_CHATGPT_API_PROXY=：可配置科学上网代理地址，例如：http://xx.xx.xx.xx:7890；注释掉或者留空则不启用
+      - GO_CHATGPT_API_PROXY=   # GO_CHATGPT_API_PROXY=：可配置科学上网代理地址，例如：http://clash_vpsIP:7890；注释掉或者留空则不启用
       - GO_CHATGPT_API_PANDORA=
       - GO_CHATGPT_API_ARKOSE_TOKEN_URL=
       - GO_CHATGPT_API_ARKOSE_PUID=
