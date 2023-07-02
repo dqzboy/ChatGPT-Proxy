@@ -540,7 +540,7 @@ fi
 
 function ADD_EM_ALERT() {
 SUCCESS "Email alerts"
-read -e -p "$(echo -e ${GREEN}"是否添加403检测和告警功能？(y/n): "${RESET})" alert
+read -e -p "$(echo -e ${GREEN}"是否添加401|403|429检测和告警功能？(y/n): "${RESET})" alert
 
 if [[ "$alert" == "y" ]]; then
 mkdir -p /opt/script/go-chatgpt-api
@@ -552,13 +552,13 @@ prev_timestamp=""
 is_alert=false
 
 while true; do
-  current_timestamp=$(docker logs go-chatgpt-api | grep "403" | awk '!/INFO\[0000\] (GO_CHATGPT_API_PROXY|Service go-chatgpt-api is ready)/ { match($0, /[0-9]{4}\/[0-9]{2}\/[0-9]{2} - [0-9]{2}:[0-9]{2}:[0-9]{2}/); if (RSTART > 0) print substr($0, RSTART, RLENGTH) }' | tail -n1)
+  current_timestamp=$(docker logs go-chatgpt-api | grep -E "401|403|429" | awk '!/INFO\[0000\] (GO_CHATGPT_API_PROXY|Service go-chatgpt-api is ready)/ { match($0, /[0-9]{4}\/[0-9]{2}\/[0-9]{2} - [0-9]{2}:[0-9]{2}:[0-9]{2}/); if (RSTART > 0) print substr($0, RSTART, RLENGTH) }' | tail -n1)
 
   if [ -z "$prev_timestamp" ]; then
     prev_timestamp="$current_timestamp"
   else
     if [ "$current_timestamp" != "$prev_timestamp" ]; then
-      echo "Warning: 403 error at $prev_timestamp" | mail -s "Warning: 403 error detected in container log" $email_address
+      echo "Warning: 401|403|429 error at $prev_timestamp" | mail -s "Warning: 401|403|429 error detected in container log" $email_address
       is_alert=true
     fi
     prev_timestamp="$current_timestamp"
@@ -569,7 +569,7 @@ done
 EOF
 chmod +x /opt/script/go-chatgpt-api/EmailAlert.sh
     read -e -p "$(echo -e ${GREEN}"请输入接收告警邮箱: "${RESET})" email
-    read -e -p "$(echo -e ${GREEN}"请输入403错误检测频率,默认5s: "${RESET})" alert_interval
+    read -e -p "$(echo -e ${GREEN}"请输入401|403|429错误检测频率,默认5s: "${RESET})" alert_interval
 
     sed -i "s#email@com#$email#g" /opt/script/go-chatgpt-api/EmailAlert.sh
     sed -i "s#sleep 5#sleep $alert_interval#g" /opt/script/go-chatgpt-api/EmailAlert.sh
@@ -581,7 +581,7 @@ chmod +x /opt/script/go-chatgpt-api/EmailAlert.sh
     INFO1 "已设置告警消息接收邮箱为 $email 检查频率为 $alert_interval！"
 elif [[ "$alert" == "n" ]]; then
     # 取消定时任务
-    WARN "已取消403错误检测告警功能！"
+    WARN "已取消401|403|429错误检测告警功能！"
 else
     ERROR "选项错误！请重新运行脚本并选择正确的选项。"
 fi
