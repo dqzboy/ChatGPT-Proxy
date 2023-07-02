@@ -88,7 +88,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - TZ=Asia/Shanghai
-      - GO_CHATGPT_API_PROXY=   # GO_CHATGPT_API_PROXY=：可配置科学上网代理地址，例如：http://127.0.0.1:7890；注释掉或者留空则不启用
+      - GO_CHATGPT_API_PROXY=   # GO_CHATGPT_API_PROXY=：可配置科学上网代理地址，例如：http://xx.xx.xx.xx:7890；注释掉或者留空则不启用
       - GO_CHATGPT_API_PANDORA=
       - GO_CHATGPT_API_ARKOSE_TOKEN_URL=
       - GO_CHATGPT_API_ARKOSE_PUID=
