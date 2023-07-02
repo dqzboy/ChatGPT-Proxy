@@ -141,15 +141,17 @@ echo "------------------------------------------"
 }
 
 function INSTALL_PACKAGE(){
-PACKAGES="lsof jq wget"
+PACKAGES="lsof jq wget postfix"
 
 # 检查命令是否存在
 if command -v yum >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
     yum -y install $PACKAGES &>/dev/null
+    systemctl restart postfix &>/dev/null
 elif command -v apt-get >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
     apt-get install -y $PACKAGES &>/dev/null
+    systemctl restart postfix &>/dev/null
 else
     WARN "无法确定可用的包管理器"
     exit 1
@@ -535,6 +537,56 @@ else
 fi
 }
 
+
+function ADD_EM_ALERT() {
+SUCCESS "Email alerts"
+read -e -p "$(echo -e ${GREEN}"是否添加403检测和告警功能？(y/n): "${RESET})" alert
+
+if [[ "$alert" == "y" ]]; then
+mkdir -p /opt/script/go-chatgpt-api
+cat > /opt/script/go-chatgpt-api/EmailAlert.sh << \EOF
+#!/usr/bin/env bash
+email_address="email@com"
+
+prev_timestamp=""
+is_alert=false
+
+while true; do
+  current_timestamp=$(docker logs go-chatgpt-api | grep "403" | awk '!/INFO\[0000\] (GO_CHATGPT_API_PROXY|Service go-chatgpt-api is ready)/ { match($0, /[0-9]{4}\/[0-9]{2}\/[0-9]{2} - [0-9]{2}:[0-9]{2}/); if (RSTART > 0) print substr($0, RSTART, RLENGTH) }' | tail -n1)
+
+  if [ -z "$prev_timestamp" ]; then
+    prev_timestamp="$current_timestamp"
+  else
+    if [ "$current_timestamp" != "$prev_timestamp" ]; then
+      echo "Warning: 403 error at $prev_timestamp" | mail -s "Warning: 403 error detected in container log" $email_address
+      is_alert=true
+    fi
+    prev_timestamp="$current_timestamp"
+  fi
+
+  sleep 5
+done
+EOF
+chmod +x /opt/script/go-chatgpt-api/EmailAlert.sh
+    read -e -p "$(echo -e ${GREEN}"请输入接收告警邮箱: "${RESET})" email
+    read -e -p "$(echo -e ${GREEN}"请输入403错误检测频率,默认5s: "${RESET})" alert_interval
+
+    sed -i "s#email@com#$email#g" /opt/script/go-chatgpt-api/EmailAlert.sh
+    sed -i "s#sleep 5#sleep $alert_interval#g" /opt/script/go-chatgpt-api/EmailAlert.sh
+    if pgrep -f "/opt/script/go-chatgpt-api/EmailAlert.sh" >/dev/null; then
+       pkill -f "/opt/script/go-chatgpt-api/EmailAlert.sh"
+    fi
+    nohup /opt/script/go-chatgpt-api/EmailAlert.sh > /dev/null 2>&1 &
+    # 提示用户的定时任务执行时间
+    INFO1 "已设置告警消息接收邮箱为 $email 检查频率为 $alert_interval！"
+elif [[ "$alert" == "n" ]]; then
+    # 取消定时任务
+    WARN "已取消403错误检测告警功能！"
+else
+    ERROR "选项错误！请重新运行脚本并选择正确的选项。"
+fi
+}
+
 main() {
   CHECK_CPU
   CHECK_OPENAI
@@ -543,5 +595,6 @@ main() {
   INSTALL_PROXY
   DEL_IMG_NONE
   ADD_IMAGESUP
+  ADD_EM_ALERT
 }
 main
