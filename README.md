@@ -22,7 +22,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 ## 二、所需环境组件安装
 > **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！滑动至底部有脚本安装命令。** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新、403检测邮箱告警等功能！
 ### 1、环境说明
-- 一台VPS，规格最低配 1C1G；~~**注意**：warp不支持arm架构的机器~~ 目前已经可以跑arm架构的机器上了
+- 一台VPS，规格最低配 1C1G；**注意**：warp不支持arm架构的机器
 - VPS可以正常访问 [chatgpt](https://chat.openai.com)；或者国内服务器实现科学上网也可以
   - 参考这篇文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
   - 目前个人使用的机场：[机场1按量不限时，解锁ChatGPT](https://mojie.me/#/register?code=CG6h8Irm) \ [机场2按周期，解锁ChatGPT](https://teacat.cloud/#/register?code=ps4sZcDa) 
