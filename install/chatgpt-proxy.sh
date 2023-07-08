@@ -147,7 +147,7 @@ SUCCESS "Firewall && SELinux detection."
 # Check if firewall is enabled
 systemctl stop firewalld &> /dev/null
 systemctl disable firewalld &> /dev/null
-systemctl status iptables &> /dev/null
+systemctl stop iptables &> /dev/null
 systemctl disable iptables &> /dev/null
 ufw disable &> /dev/null
 INFO "Firewall has been disabled."
