@@ -92,7 +92,8 @@ services:
       - GO_CHATGPT_API_PROXY=   # GO_CHATGPT_API_PROXY=：可配置科学上网代理地址，例如：http://clash_vpsIP:7890；注释掉或者留空则不启用
       - GO_CHATGPT_API_PANDORA=
       - GO_CHATGPT_API_ARKOSE_TOKEN_URL=
-      - GO_CHATGPT_API_ARKOSE_PUID=
+      - GO_CHATGPT_API_OPENAI_EMAIL=
+      - GO_CHATGPT_API_OPENAI_PASSWORD=
     restart: unless-stopped
 ```
 
@@ -118,7 +119,8 @@ services:
       - GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535
       - GO_CHATGPT_API_PANDORA=
       - GO_CHATGPT_API_ARKOSE_TOKEN_URL=
-      - GO_CHATGPT_API_ARKOSE_PUID=
+      - GO_CHATGPT_API_OPENAI_EMAIL=
+      - GO_CHATGPT_API_OPENAI_PASSWORD=
     depends_on:
       - chatgpt-proxy-server-warp
     restart: unless-stopped
