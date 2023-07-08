@@ -171,8 +171,7 @@ docker-compose up -d
 ### 接口更新
 - 原接口： http://go-chatgpt-api:8080/chatgpt/conversation
 - 更新后： http://go-chatgpt-api:8080/chatgpt/backend-api/conversation
----
-- 接口：http://go-chatgpt-api:8080/imitate/v1/chat/completions  利用 accessToken 模拟 apiKey，实现伪免费使用 API ，从而支持集成仅支持 apiKey 调用的第三方客户端项目
+
 ### 项目：[Chanzhaoyu/chatgpt-web](https://github.com/Chanzhaoyu/chatgpt-web) | [Kerwin1202/chatgpt-web](https://github.com/Kerwin1202/chatgpt-web)
 #### **ChatGPTUnofficialProxyAPI(accessToken)**
 - 现在我们可以找一个项目，使用access token模式，并使用我们自建的代理地址进行访问；
@@ -209,6 +208,9 @@ browserless_endpoint = "http(s)://你的服务/chatgpt/backend-api/"
 ```shell
 CHATGPT_BASE_URL = "http(s)://你的服务/chatgpt/backend-api/"
 ```
+### 项目：[Yidadaa/ChatGPT-Next-Web](https://github.com/Yidadaa/ChatGPT-Next-Web)
+- 接口：http://go-chatgpt-api:8080/imitate/v1/chat/completions  利用 accessToken 模拟 apiKey，实现伪免费使用 API ，从而支持仅支持 apiKey 调用的第三方客户端项目
+<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/a68b47d5-b887-4a92-95f4-f1896fe02dea" width="800px">
 
 ## 五、总结
 > 目前部署发现，只要确保节点稳定或者国内服务器配置的代理地址稳定，那么就可以正常使用
