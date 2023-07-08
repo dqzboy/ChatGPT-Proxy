@@ -73,6 +73,7 @@ else
 fi
 }
 
+
 text="检测服务器是否能够访问chat.openai.com"
 width=75
 padding=$((($width - ${#text}) / 2))
@@ -138,6 +139,30 @@ echo "系统版本: $VERSION"
 echo "系统ID: $ID"
 echo "系统ID Like: $ID_LIKE"
 echo "------------------------------------------"
+}
+
+function CHECKFIRE() {
+SUCCESS "Firewall && SELinux detection."
+
+# Check if firewall is enabled
+systemctl stop firewalld &> /dev/null
+systemctl disable firewalld &> /dev/null
+systemctl status iptables &> /dev/null
+systemctl disable iptables &> /dev/null
+ufw disable &> /dev/null
+INFO "Firewall has been disabled."
+
+# Check if SELinux is enforcing
+if [[ "$repo_type" == "centos" || "$repo_type" == "rhel" ]]; then
+    if sestatus | grep "SELinux status" | grep -q "enabled"; then
+        WARN "SELinux is enabled. Disabling SELinux..."
+        setenforce 0
+        sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+        INFO "SELinux is already disabled."
+    else
+        INFO "SELinux is already disabled."
+    fi
+fi
 }
 
 function INSTALL_PACKAGE(){
@@ -329,7 +354,8 @@ services:
       #socks5://host:port        # GO_CHATGPT_API_PROXY=：科学上网代理地址，例如：socks5://clash_vpsIP:7890
       - GO_CHATGPT_API_PANDORA=
       - GO_CHATGPT_API_ARKOSE_TOKEN_URL=
-      - GO_CHATGPT_API_ARKOSE_PUID=
+      - GO_CHATGPT_API_OPENAI_EMAIL=
+      - GO_CHATGPT_API_OPENAI_PASSWORD=
     restart: unless-stopped
 EOF
 elif [ "$mode" == "warp" ]; then
@@ -349,7 +375,8 @@ services:
       - GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535
       - GO_CHATGPT_API_PANDORA=
       - GO_CHATGPT_API_ARKOSE_TOKEN_URL=
-      - GO_CHATGPT_API_ARKOSE_PUID=
+      - GO_CHATGPT_API_OPENAI_EMAIL=
+      - GO_CHATGPT_API_OPENAI_PASSWORD=
     depends_on:
       - chatgpt-proxy-server-warp
     restart: unless-stopped
@@ -591,6 +618,7 @@ main() {
   CHECK_CPU
   CHECK_OPENAI
   CHECK_OS
+  CHECKFIRE
   INSTALL_PACKAGE
   INSTALL_PROXY
   DEL_IMG_NONE
