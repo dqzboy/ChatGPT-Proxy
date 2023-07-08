@@ -169,7 +169,8 @@ docker-compose up -d
 ### 接口更新
 - 原接口： http://go-chatgpt-api:8080/chatgpt/conversation
 - 更新后： http://go-chatgpt-api:8080/chatgpt/backend-api/conversation
-
+---
+- 接口：http://go-chatgpt-api:8080/imitate/v1/chat/completions  利用 accessToken 模拟 apiKey，实现伪免费使用 API ，从而支持集成仅支持 apiKey 调用的第三方客户端项目
 ### 项目：[Chanzhaoyu/chatgpt-web](https://github.com/Chanzhaoyu/chatgpt-web) | [Kerwin1202/chatgpt-web](https://github.com/Kerwin1202/chatgpt-web)
 #### **ChatGPTUnofficialProxyAPI(accessToken)**
 - 现在我们可以找一个项目，使用access token模式，并使用我们自建的代理地址进行访问；
