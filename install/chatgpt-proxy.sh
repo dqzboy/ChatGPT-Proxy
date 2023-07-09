@@ -166,16 +166,16 @@ fi
 }
 
 function INSTALL_PACKAGE(){
-PACKAGES="lsof jq wget postfix yum-utils"
-
+PACKAGES_APT="lsof jq wget postfix mailutils"
+PACKAGES_YUM="lsof jq wget postfix yum-utils mailx s-nail"
 # 检查命令是否存在
 if command -v yum >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
-    yum -y install $PACKAGES &>/dev/null
+    yum -y install $PACKAGES_YUM &>/dev/null
     systemctl restart postfix &>/dev/null
 elif command -v apt-get >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
-    apt-get install -y $PACKAGES &>/dev/null
+    apt-get install -y $PACKAGES_APT &>/dev/null
     systemctl restart postfix &>/dev/null
 else
     WARN "无法确定可用的包管理器"
@@ -597,7 +597,15 @@ EOF
 chmod +x /opt/script/go-chatgpt-api/EmailAlert.sh
     read -e -p "$(echo -e ${GREEN}"请输入接收告警邮箱: "${RESET})" email
     read -e -p "$(echo -e ${GREEN}"请输入401|403|429错误检测频率,默认5s: "${RESET})" alert_interval
-
+    # 判断alert_interval是否为空
+    if [[ -z "$alert_interval" ]]; then
+        # 设置默认值为5
+        alert_interval=5
+    elif ! [[ "$alert_interval" =~ ^[0-9]+$ ]]; then
+        # 如果alert_interval不是纯数字，则退出执行
+        echo "输入错误！alert_interval必须为纯数字。"
+        exit 1
+    fi
     sed -i "s#email@com#$email#g" /opt/script/go-chatgpt-api/EmailAlert.sh
     sed -i "s#sleep 5#sleep $alert_interval#g" /opt/script/go-chatgpt-api/EmailAlert.sh
     if pgrep -f "/opt/script/go-chatgpt-api/EmailAlert.sh" >/dev/null; then
