@@ -13,7 +13,8 @@ services:
       #- GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535   # IP被Ban，提示Access denied之类的报错，可尝试使用warp，把注释取消
       - GO_CHATGPT_API_PANDORA=
       - GO_CHATGPT_API_ARKOSE_TOKEN_URL=
-      - GO_CHATGPT_API_ARKOSE_PUID=
+      - GO_CHATGPT_API_OPENAI_EMAIL=
+      - GO_CHATGPT_API_OPENAI_PASSWORD=
     depends_on:
       - chatgpt-proxy-server-warp
     restart: unless-stopped
