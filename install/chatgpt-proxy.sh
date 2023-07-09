@@ -171,11 +171,11 @@ PACKAGES_YUM="lsof jq wget postfix yum-utils mailx s-nail"
 # 检查命令是否存在
 if command -v yum >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
-    yum -y install $PACKAGES_YUM &>/dev/null
+    yum -y install $PACKAGES_YUM --skip-broken &>/dev/null
     systemctl restart postfix &>/dev/null
 elif command -v apt-get >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
-    apt-get install -y $PACKAGES_APT &>/dev/null
+    apt-get install -y $PACKAGES_APT --ignore-missing &>/dev/null
     systemctl restart postfix &>/dev/null
 else
     WARN "无法确定可用的包管理器"
