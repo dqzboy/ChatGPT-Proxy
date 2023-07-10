@@ -574,21 +574,35 @@ mkdir -p /opt/script/go-chatgpt-api
 cat > /opt/script/go-chatgpt-api/EmailAlert.sh << \EOF
 #!/usr/bin/env bash
 email_address="email@com"
-
+images="go-chatgpt-api"
 prev_timestamp=""
 is_alert=false
 
 while true; do
-  current_timestamp=$(docker logs go-chatgpt-api | grep -E "401|403|429" | awk '!/INFO\[0000\] (GO_CHATGPT_API_PROXY|Service go-chatgpt-api is ready)/ { match($0, /[0-9]{4}\/[0-9]{2}\/[0-9]{2} - [0-9]{2}:[0-9]{2}:[0-9]{2}/); if (RSTART > 0) print substr($0, RSTART, RLENGTH) }' | tail -n1)
+  error_code=$(docker logs $images | grep -E "401|403|429" | awk '!/INFO\[0000\] (GO_CHATGPT_API_PROXY|Service go-chatgpt-api is ready)/ { match($0, /401|403|429/); if (RSTART > 0) print substr($0, RSTART, RLENGTH) }' | tail -n1)
 
-  if [ -z "$prev_timestamp" ]; then
-    prev_timestamp="$current_timestamp"
-  else
-    if [ "$current_timestamp" != "$prev_timestamp" ]; then
-      echo "Warning: 401|403|429 error at $current_timestamp" | mail -s "Warning: 401|403|429 error detected in container log" $email_address
-      is_alert=true
+  if [ -n "$error_code" ]; then
+    current_timestamp=$(docker logs $images | grep -E "401|403|429" | awk '!/INFO\[0000\] (GO_CHATGPT_API_PROXY|Service go-chatgpt-api is ready)/ { match($0, /[0-9]{4}\/[0-9]{2}\/[0-9]{2} - [0-9]{2}:[0-9]{2}:[0-9]{2}/); if (RSTART > 0) print substr($0, RSTART, RLENGTH) }' | tail -n1)
+
+    if [ -z "$prev_timestamp" ]; then
+      prev_timestamp="$current_timestamp"
+    else
+      if [ "$current_timestamp" != "$prev_timestamp" ]; then
+	echo -e """
+-------------------------------------------------------------------
+|  报错时间 | $current_timestamp                   
+|------------------------------------------------------------------
+|  容器名称 | $images                       
+|------------------------------------------------------------------
+|  错误代码 | $error_code                     
+|------------------------------------------------------------------
+|  推送信息 | Warning: $error_code error detected in container log
+-------------------------------------------------------------------
+""" | mail -s "Warning: $error_code error" $email_address
+        is_alert=true
+      fi
+      prev_timestamp="$current_timestamp"
     fi
-    prev_timestamp="$current_timestamp"
   fi
 
   sleep 5
