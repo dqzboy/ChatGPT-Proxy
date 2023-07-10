@@ -20,7 +20,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 > 如果部署或者配置过程出现问题或不懂的地方，请先搜索历史[issue](https://github.com/dqzboy/ChatGPT-Proxy/issues)或者加[TG交流群](https://t.me/+ghs_XDp1vwxkMGU9)
 
 ## 二、所需环境组件安装
-> **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！滑动至底部有脚本安装命令。** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新、403检测邮箱告警等功能！
+> **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！滑动至底部有脚本安装命令。** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新、403|401|429检测邮箱告警等功能！
 ### 1、环境说明
 - 一台VPS，规格最低配 1C1G；**注意**：warp不支持arm架构的机器
 - VPS可以正常访问 [chatgpt](https://chat.openai.com)；或者国内服务器实现科学上网也可以
@@ -210,7 +210,11 @@ CHATGPT_BASE_URL = "http(s)://你的服务/chatgpt/backend-api/"
 ```
 ### 项目：[Yidadaa/ChatGPT-Next-Web](https://github.com/Yidadaa/ChatGPT-Next-Web)
 - 接口：http://go-chatgpt-api:8080/imitate/v1/chat/completions  利用 accessToken 模拟 apiKey，实现伪免费使用 API ，从而支持仅支持 apiKey 调用的第三方客户端项目
-<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/a68b47d5-b887-4a92-95f4-f1896fe02dea" width="800px">
+```shell
+http://go-chatgpt-api:8080/imitate
+```
+<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/d834ea2f-a56e-45bf-a540-57f88afbefcd" width="800px">
+
 
 ## 五、总结
 > 目前部署发现，只要确保节点稳定或者国内服务器配置的代理地址稳定，那么就可以正常使用
