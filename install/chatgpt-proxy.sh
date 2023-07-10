@@ -108,7 +108,7 @@ fi
 
 
 # 根据发行版选择存储库类型
-case "$ID" in
+case "$ID" 在
     "centos")
         repo_type="centos"
         ;;
@@ -585,7 +585,7 @@ while true; do
     prev_timestamp="$current_timestamp"
   else
     if [ "$current_timestamp" != "$prev_timestamp" ]; then
-      echo "Warning: 401|403|429 error at $prev_timestamp" | mail -s "Warning: 401|403|429 error detected in container log" $email_address
+      echo "Warning: 401|403|429 error at $current_timestamp" | mail -s "Warning: 401|403|429 error detected in container log" $email_address
       is_alert=true
     fi
     prev_timestamp="$current_timestamp"
