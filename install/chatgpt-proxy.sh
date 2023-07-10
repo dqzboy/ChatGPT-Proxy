@@ -108,7 +108,7 @@ fi
 
 
 # 根据发行版选择存储库类型
-case "$ID" 在
+case "$ID" in
     "centos")
         repo_type="centos"
         ;;
