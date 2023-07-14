@@ -19,7 +19,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 
 > 如果部署或者配置过程出现问题或不懂的地方，请先搜索历史[issue](https://github.com/dqzboy/ChatGPT-Proxy/issues)或者加[TG交流群](https://t.me/+ghs_XDp1vwxkMGU9)
 
-## ChatGPT-Porxy一键部署脚本
+## ChatGPT-Porxy一键部署
 > **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新、403|401|429检测邮箱告警(使用QQ邮箱会被Tencent邮箱服务拦截)等功能！
 - **说明**：目前脚本适用于CentOS 7\8\9、RHEL-8\9、Ubuntu、debian以及opencloudos系统；运行脚本需要确保网络环境稳定(确保系统所需组件可以正常下载)。
 
