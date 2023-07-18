@@ -130,7 +130,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - TZ=Asia/Shanghai
-      - GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535
+      - PROXY=socks5://chatgpt-proxy-server-warp:65535
       - BX=
       - BX_URL=
       - OPENAI_EMAIL=
