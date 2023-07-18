@@ -349,13 +349,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - TZ=Asia/Shanghai
-      - GO_CHATGPT_API_PROXY=    # GO_CHATGPT_API_PROXY=：可配置科学上网代理地址，例如：http://clash_vpsIP:7890；注释掉或者留空则不启用
-      #http://host:port          # GO_CHATGPT_API_PROXY=：科学上网代理地址，例如：http://clash_vpsIP:7890
-      #socks5://host:port        # GO_CHATGPT_API_PROXY=：科学上网代理地址，例如：socks5://clash_vpsIP:7890
-      - GO_CHATGPT_API_PANDORA=
-      - GO_CHATGPT_API_ARKOSE_TOKEN_URL=
-      - GO_CHATGPT_API_OPENAI_EMAIL=
-      - GO_CHATGPT_API_OPENAI_PASSWORD=
+      - PROXY=                   # PROXY=：可配置科学上网代理地址，例如：http://clash_vpsIP:7890；注释掉或者留空则不启用
+      #http://host:port          # PROXY=：科学上网代理地址，例如：http://clash_vpsIP:7890
+      #socks5://host:port        # PROXY=：科学上网代理地址，例如：socks5://clash_vpsIP:7890
+      - ARKOSE_TOKEN_URL=
+      - BX=
+      - BX_URL=
+      - OPENAI_EMAIL=
+      - OPENAI_PASSWORD=
     restart: unless-stopped
 EOF
 elif [ "$mode" == "warp" ]; then
@@ -372,11 +373,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - TZ=Asia/Shanghai
-      - GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535
-      - GO_CHATGPT_API_PANDORA=
-      - GO_CHATGPT_API_ARKOSE_TOKEN_URL=
-      - GO_CHATGPT_API_OPENAI_EMAIL=
-      - GO_CHATGPT_API_OPENAI_PASSWORD=
+      - PROXY=socks5://chatgpt-proxy-server-warp:65535
+      - ARKOSE_TOKEN_URL=
+      - BX=
+      - BX_URL=
+      - OPENAI_EMAIL=
+      - OPENAI_PASSWORD=
     depends_on:
       - chatgpt-proxy-server-warp
     restart: unless-stopped
@@ -411,17 +413,17 @@ case $modify_config in
     # 根据类型更新docker-compose.yml文件
     if [ "$mode" == "api" ]; then
        if [ "$url_type" == "http" ]; then
-	  sed -i '/- GO_CHATGPT_API_PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
-          sed -i "s|#http://host:port|- GO_CHATGPT_API_PROXY=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+	  sed -i '/- PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
+          sed -i "s|#http://host:port|- PROXY=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
-	  sed -i '/- GO_CHATGPT_API_PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
-          sed -i "s|#socks5://host:port|- GO_CHATGPT_API_PROXY=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+	  sed -i '/- PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
+          sed -i "s|#socks5://host:port|- PROXY=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        fi
     elif [ "$mode" == "warp" ]; then
        if [ "$url_type" == "http" ]; then
-          sed -i "s|- GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535|- GO_CHATGPT_API_PROXY=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+          sed -i "s|- PROXY=socks5://chatgpt-proxy-server-warp:65535|- PROXY=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
-          sed -i "s|- GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535|- GO_CHATGPT_API_PROXY=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+          sed -i "s|- PROXY=socks5://chatgpt-proxy-server-warp:65535|- PROXY=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        fi
     else
        echo "Do not modify！"
