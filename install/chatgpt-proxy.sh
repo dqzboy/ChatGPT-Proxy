@@ -16,6 +16,7 @@ SETCOLOR_RED="echo  -en \\E[0;31m"
 SETCOLOR_YELLOW="echo -en \\E[1;33m"
 GREEN="\033[1;32m"
 RESET="\033[0m"
+PURPLE="\033[35m"
 
 echo
 cat << EOF
@@ -60,6 +61,9 @@ MAX_ATTEMPTS=3
 attempt=0
 success=false
 
+# 获取本机网卡和对应IP
+INTERFACE=$(ip -o -4 route show to default | awk '{print $5}')
+IP_ADDR=$(ip -o -4 addr show dev "$INTERFACE" | awk '{split($4, a, "/"); print a[1]}')
 
 function CHECK_CPU() {
 # 判断当前操作系统是否为 ARM 或 AMD 架构
@@ -150,7 +154,7 @@ systemctl disable firewalld &> /dev/null
 systemctl stop iptables &> /dev/null
 systemctl disable iptables &> /dev/null
 ufw disable &> /dev/null
-INFO "Firewall has been disabled."
+INFO1 "Firewall has been disabled."
 
 # Check if SELinux is enforcing
 if [[ "$repo_type" == "centos" || "$repo_type" == "rhel" ]]; then
@@ -158,9 +162,9 @@ if [[ "$repo_type" == "centos" || "$repo_type" == "rhel" ]]; then
         WARN "SELinux is enabled. Disabling SELinux..."
         setenforce 0
         sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
-        INFO "SELinux is already disabled."
+        INFO1 "SELinux is already disabled."
     else
-        INFO "SELinux is already disabled."
+        INFO1 "SELinux is already disabled."
     fi
 fi
 }
@@ -399,10 +403,14 @@ fi
 read -e -p "$(echo -e ${GREEN}"Do you want to add a proxy address? (y/n)："${RESET})" modify_config
 case $modify_config in
   [Yy]* )
+    # 提示用户本机IP
+    ${SETCOLOR_SUCCESS} && echo "---------------------------------------------"  && ${SETCOLOR_NORMAL}
+    echo -e "本机网卡：${PURPLE}${INTERFACE}${RESET} 对应IP：${PURPLE}${IP_ADDR}${RESET}"
+    ${SETCOLOR_SUCCESS} && echo "---------------------------------------------"  && ${SETCOLOR_NORMAL}
     # 获取用户输入的URL及其类型
-    read -e -p "Enter the URL (e.g. host:port): " url
+    read -e -p "$(echo -e ${GREEN}"Enter the URL (e.g. host:port): "${RESET})" url
     while true; do
-      read -e -p "Is this a http or socks5 proxy? (http/socks5)：" type
+      read -e -p "$(echo -e ${GREEN}"Is this a http or socks5 proxy? (http/socks5)："${RESET})" type
       case $type in
           [Hh][Tt]* ) url_type="http"; break;;
           [Ss][Oo]* ) url_type="socks5"; break;;
@@ -597,6 +605,8 @@ while true; do
 |  容器名称 | $images                       
 |------------------------------------------------------------------
 |  错误代码 | $error_code                     
+|------------------------------------------------------------------
+|  服务器IP | $IP_ADDR                     
 |------------------------------------------------------------------
 |  推送信息 | Warning: $error_code error detected in container log
 -------------------------------------------------------------------
