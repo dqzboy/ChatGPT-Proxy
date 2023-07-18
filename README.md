@@ -131,7 +131,6 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - GO_CHATGPT_API_PROXY=socks5://chatgpt-proxy-server-warp:65535
-      - PROXY=
       - BX=
       - BX_URL=
       - OPENAI_EMAIL=
