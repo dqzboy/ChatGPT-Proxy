@@ -84,7 +84,7 @@ docker-compose -v
 mkdir -p /data/go-chatgpt-api && cd $_
 ```
 #### 4.2、创建部署清单
-> GPT-4 相关模型目前需要验证 arkose_token，如果配置 GO_CHATGPT_API_ARKOSE_TOKEN_URL 则使用在线服务获取 arkose_token ，不设置或者留空则由程序内部自己生成
+> GPT-4 相关模型目前需要验证 arkose_token，如果配置 ARKOSE_TOKEN_URL 则使用在线服务获取 arkose_token ，不设置或者留空则由程序内部自己生成
 #### 服务器直连或通过代理可正常访问ChatGPT
   - 如果你的VPS IP稳定，或者你使用的科学上网地址稳定，那就首选这种方式
 ```shell
