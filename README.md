@@ -108,6 +108,7 @@ services:
       - BX_URL=
       - OPENAI_EMAIL=
       - OPENAI_PASSWORD=
+      - CONTINUE_SIGNAL=
     restart: unless-stopped
 ```
 
@@ -135,6 +136,7 @@ services:
       - BX_URL=
       - OPENAI_EMAIL=
       - OPENAI_PASSWORD=
+      - CONTINUE_SIGNAL=
     depends_on:
       - chatgpt-proxy-server-warp
     restart: unless-stopped
