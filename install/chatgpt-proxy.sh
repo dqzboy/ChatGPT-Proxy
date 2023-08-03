@@ -364,7 +364,7 @@ services:
       - BX_URL=
       - OPENAI_EMAIL=
       - OPENAI_PASSWORD=
-      - CONTINUE_SIGNAL=
+      - CONTINUE_SIGNAL=         # CONTINUE_SIGNAL=1，开启/imitate接口自动继续会话功能，留空关闭，默认关闭
     restart: unless-stopped
 EOF
 elif [ "$mode" == "warp" ]; then
@@ -387,7 +387,7 @@ services:
       - BX_URL=
       - OPENAI_EMAIL=
       - OPENAI_PASSWORD=
-      - CONTINUE_SIGNAL=
+      - CONTINUE_SIGNAL=         # CONTINUE_SIGNAL=1，开启/imitate接口自动继续会话功能，留空关闭，默认关闭
     depends_on:
       - chatgpt-proxy-server-warp
     restart: unless-stopped
