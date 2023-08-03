@@ -12,6 +12,7 @@ services:
       - TZ=Asia/Shanghai
       #- PROXY=socks5://chatgpt-proxy-server-warp:65535   # IP被Ban，提示Access denied之类的报错，可尝试使用warp，把注释取消
       - PROXY=   # GO_CHATGPT_API_PROXY=：可配置科学上网代理地址，例如：http://clash_vpsIP:7890；注释掉或者留空则不启用
+      # http://stats.churchless.tech 挑选其中一条绿色的链接配置到 ARKOSE_TOKEN_URL 即可
       - ARKOSE_TOKEN_URL=
       - BX=
       - BX_URL=
