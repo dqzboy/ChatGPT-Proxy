@@ -31,7 +31,10 @@ cat << EOF
 EOF
 
 echo "----------------------------------------------------------------------------------------------------------"
+echo
 echo -e "\033[32m机场推荐\033[0m(\033[34m按量不限时，解锁ChatGPT\033[0m)：\033[34;4mhttps://mojie.mx/#/register?code=CG6h8Irm\033[0m"
+echo
+
 
 SUCCESS() {
   ${SETCOLOR_SUCCESS} && echo "------------------------------------< $1 >-------------------------------------"  && ${SETCOLOR_NORMAL}
@@ -94,7 +97,7 @@ url="chat.openai.com"
 
 # 检测是否能够访问chat.openai.com
 echo "Testing connection to ${url}..."
-if ping -c 3 ${url} &> /dev/null; then
+if curl --output /dev/null --silent --head --fail ${url}; then
   echo "Connection successful!"
   URL="OK"
 else
@@ -520,7 +523,7 @@ fi
 }
 
 function ADD_IMAGESUP() {
-SUCCESS "Crontab"
+SUCCESS "Add Crontab"
 read -e -p "$(echo -e ${GREEN}"是否加入定时更新镜像？(y/n): "${RESET})" cron
 
 if [[ "$cron" == "y" ]]; then
@@ -576,6 +579,7 @@ elif [[ "$cron" == "n" ]]; then
     WARN "已取消定时更新镜像任务！"
 else
     ERROR "选项错误！请重新运行脚本并选择正确的选项。"
+    exit 1
 fi
 }
 
@@ -650,8 +654,86 @@ elif [[ "$alert" == "n" ]]; then
     WARN "已取消401|403|429错误检测告警功能！"
 else
     ERROR "选项错误！请重新运行脚本并选择正确的选项。"
+    exit 1
 fi
 }
+
+
+function ADD_UPTIME_KUMA() {
+    SUCCESS "Uptime Kuma"
+    read -e -p "$(echo -e ${GREEN}"是否部署uptime-kuma监控工具？(y/n): "${RESET})" uptime
+
+    if [[ "$uptime" == "y" ]]; then
+        # 检查是否已经运行了 uptime-kuma 容器
+        if docker ps -a --format "{{.Names}}" | grep -q "uptime-kuma"; then
+            WARN "已经运行了uptime-kuma监控工具。"
+            read -e -p "$(echo -e ${GREEN}"是否停止和删除旧的容器并继续安装？(y/n): "${RESET})" continue_install
+
+            if [[ "$continue_install" == "y" ]]; then
+                docker stop uptime-kuma
+                docker rm uptime-kuma
+                INFO1 "已停止和删除旧的uptime-kuma容器。"
+            else
+                INFO1 "已取消部署uptime-kuma监控工具。"
+                exit 0
+            fi
+        fi
+
+        MAX_TRIES=3
+
+        for ((try=1; try<=${MAX_TRIES}; try++)); do
+            read -e -p "$(echo -e ${GREEN}"请输入监听的端口: "${RESET})" UPTIME_PORT
+
+            # 检查端口是否已被占用
+            if ss -tulwn | grep -q ":${UPTIME_PORT} "; then
+                ERROR "端口 ${UPTIME_PORT} 已被占用，请尝试其他端口。"
+                if [ "${try}" -lt "${MAX_TRIES}" ]; then
+                    WARN "您还有 $((${MAX_TRIES} - ${try})) 次尝试机会。"
+                else
+                    ERROR "您已用尽所有尝试机会。"
+                    exit 1
+                fi
+            else
+                break
+            fi
+        done
+
+        # 提示用户输入映射的目录
+        read -e -p "$(echo -e ${GREEN}"请输入数据持久化在宿主机上的目录路径: "${RESET})" MAPPING_DIR
+        # 检查目录是否存在，如果不存在则创建
+        if [ ! -d "${MAPPING_DIR}" ]; then
+            mkdir -p "${MAPPING_DIR}"
+            INFO1 "目录已创建：${MAPPING_DIR}"
+        fi
+
+        # 启动 Docker 容器
+        docker run -d --restart=always -p "${UPTIME_PORT}":3001 -v "${MAPPING_DIR}":/app/data --name uptime-kuma louislam/uptime-kuma:1
+        # 检查 uptime-kuma 容器状态
+        status_uptime=`docker container inspect -f '{{.State.Running}}' uptime-kuma 2>/dev/null`
+
+        # 判断容器状态并打印提示
+        if [[ "$status_uptime" == "true" ]]; then
+            SUCCESS "CHECK"
+            Progress
+            SUCCESS1 ">>>>> Docker containers are up and running."
+            INFO1 "uptime-kuma 安装完成，请使用浏览器访问 IP:${UPTIME_PORT} 进行访问。"
+        else
+            SUCCESS "CHECK"
+            Progress
+            ERROR ">>>>> The following containers are not up"
+            if [[ "$status_uptime" != "true" ]]; then
+                ERROR "uptime-kuma 安装过程中出现问题，请检查日志或手动验证容器状态。"
+            fi
+        fi
+    elif [[ "$uptime" == "n" ]]; then
+        # 取消部署uptime-kuma
+        WARN "已取消部署uptime-kuma监控工具！"
+    else
+        ERROR "选项错误！请重新运行脚本并选择正确的选项。"
+        exit 1
+    fi
+}
+
 
 main() {
   CHECK_CPU
@@ -663,5 +745,6 @@ main() {
   DEL_IMG_NONE
   ADD_IMAGESUP
   ADD_EM_ALERT
+  ADD_UPTIME_KUMA
 }
 main
