@@ -329,16 +329,19 @@ function MODIFY_PORT() {
 read -e -p "$(echo -e ${GREEN}"是否修改容器映射端口号？(y/n): "${RESET})" answer
 
 if [ "$answer" == "y" ]; then
-  while true; do
-    read -e -p "请输入新的端口号: " port
-    # 检查输入的端口是否可用
-    if lsof -i:$port >/dev/null 2>&1; then
-      WARN "该端口已被占用，请重新输入！"
-    else
-      break
-    fi
-  done
-  sed -i "s/- 8080:/- $port:/" ${DOCKER_DIR}/docker-compose.yml
+    while true; do
+        read -e -p "请输入新的端口号(1-65535): " port
+        # 校验用户输入的端口是否为纯数字且在范围内
+        if ! [[ "$port" =~ ^[0-9]+$ ]] || ((port < 1)) || ((port > 65535)); then
+            ERROR "端口必须是1到65535之间的纯数字且不可为空。"
+        elif lsof -i:$port >/dev/null 2>&1; then
+            WARN "该端口已被占用，请重新输入！"
+        else
+            sed -i "s/- 8080:/- $port:/" ${DOCKER_DIR}/docker-compose.yml
+            break
+        fi
+    done
+    sed -i "s/- 8080:/- $port:/" ${DOCKER_DIR}/docker-compose.yml
 fi
 }
 
@@ -679,27 +682,29 @@ function ADD_UPTIME_KUMA() {
             fi
         fi
 
-        MAX_TRIES=3
-
-        for ((try=1; try<=${MAX_TRIES}; try++)); do
+        while true; do
             read -e -p "$(echo -e ${GREEN}"请输入监听的端口: "${RESET})" UPTIME_PORT
-
-            # 检查端口是否已被占用
-            if ss -tulwn | grep -q ":${UPTIME_PORT} "; then
-                ERROR "端口 ${UPTIME_PORT} 已被占用，请尝试其他端口。"
-                if [ "${try}" -lt "${MAX_TRIES}" ]; then
-                    WARN "您还有 $((${MAX_TRIES} - ${try})) 次尝试机会。"
-                else
-                    ERROR "您已用尽所有尝试机会。"
-                    exit 1
-                fi
+            # 校验用户输入的端口是否为纯数字且在范围内
+            if ! [[ "$UPTIME_PORT" =~ ^[0-9]+$ ]] || ((UPTIME_PORT < 1)) || ((UPTIME_PORT > 65535)); then
+                ERROR "端口必须是1到65535之间的纯数字且不可为空。"
+            elif lsof -i:$UPTIME_PORT >/dev/null 2>&1; then
+                WARN "该端口已被占用，请重新输入！"
             else
                 break
             fi
         done
 
-        # 提示用户输入映射的目录
-        read -e -p "$(echo -e ${GREEN}"请输入数据持久化在宿主机上的目录路径: "${RESET})" MAPPING_DIR
+        while true; do
+            # 提示用户输入映射的目录
+            read -e -p "$(echo -e ${GREEN}"请输入数据持久化在宿主机上的目录路径: "${RESET})" MAPPING_DIR
+            # 校验用户输入的目录路径是否为空
+            if [[ -z "$MAPPING_DIR" ]]; then
+                ERROR "目录路径不能为空。"
+            else
+                break
+            fi
+        done
+
         # 检查目录是否存在，如果不存在则创建
         if [ ! -d "${MAPPING_DIR}" ]; then
             mkdir -p "${MAPPING_DIR}"
