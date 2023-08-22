@@ -84,9 +84,8 @@ docker-compose -v
 mkdir -p /data/go-chatgpt-api && cd $_
 ```
 #### 4.2、创建部署清单
-> GPT-4 相关模型目前需要验证 arkose_token，如果配置 ARKOSE_TOKEN_URL 则使用在线服务获取 arkose_token ，不设置或者留空则由程序内部自己生成 <br>
-> 或者访问这个网站：[Health Status](http://stats.churchless.tech)，在 `Arkose Labs`
-  中挑选其中一条绿色的链接配置到 `ARKOSE_TOKEN_URL` 即可；注意公共服务访问压力大，稳定性未知！
+> GPT-4 相关模型目前需要验证 arkose_token，访问这个网站：[Health Status](http://stats.churchless.tech)，在 `Arkose Labs`
+  中挑选其中一条绿色的链接配置到 `ARKOSE_TOKEN_URL` 即可；注意公共服务访问压力大，稳定性未知！<br>
 #### 服务器直连或通过代理可正常访问ChatGPT
   - 如果你的VPS IP稳定，或者你使用的科学上网地址稳定，那就首选这种方式
 ```shell
