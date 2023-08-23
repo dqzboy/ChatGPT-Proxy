@@ -219,36 +219,25 @@ if ! command -v docker &> /dev/null; then
      rm -rf $save_path/$docker_ver $save_path/docker
      SUCCESS1 ">>> $(docker --version)"
      
-     cat > /usr/lib/systemd/system/docker.service <<EOF
+     cat > /etc/systemd/system/docker.service <<EOF
 [Unit]
 Description=Docker Application Container Engine
 Documentation=https://docs.docker.com
-After=network-online.target docker.socket firewalld.service containerd.service time-set.target
-Wants=network-online.target containerd.service
-Requires=docker.socket
-
+After=network-online.target firewalld.service
+Wants=network-online.target
 [Service]
 Type=notify
-ExecStart=/usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
-ExecReload=/bin/kill -s HUP $MAINPID
-TimeoutStartSec=0
-RestartSec=2
-Restart=always
-
-StartLimitBurst=3
-StartLimitInterval=60s
-
+ExecStart=/usr/bin/dockerd
+ExecReload=/bin/kill -s HUP 
 LimitNOFILE=infinity
 LimitNPROC=infinity
 LimitCORE=infinity
-
-TasksMax=infinity
-
+TimeoutStartSec=0
 Delegate=yes
-
 KillMode=process
-OOMScoreAdjust=-500
-
+Restart=on-failure
+StartLimitBurst=3
+StartLimitInterval=60s
 [Install]
 WantedBy=multi-user.target
 EOF
