@@ -227,7 +227,7 @@ browserless_endpoint = "http(s)://你的服务地址或者IP/chatgpt/backend-api
 ```
 #### 项目：[moeakwak/chatgpt-web-share](https://github.com/moeakwak/chatgpt-web-share)
 ```shell
-CHATGPT_BASE_URL = "http(s)://你的服务/chatgpt/backend-api/"
+CHATGPT_BASE_URL = "http(s)://你的服务地址或者IP/chatgpt/backend-api/"
 ```
 #### 项目：[Yidadaa/ChatGPT-Next-Web](https://github.com/Yidadaa/ChatGPT-Next-Web)
 - 接口：http://go-chatgpt-api:8080/imitate/v1/chat/completions  利用 accessToken 模拟 apiKey，实现伪免费使用 API ，从而支持仅支持 apiKey 调用的第三方客户端项目
