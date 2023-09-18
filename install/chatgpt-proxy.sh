@@ -187,15 +187,15 @@ if command -v yum >/dev/null 2>&1; then
         ERROR "安装失败"
         exit 1
     fi
-    systemctl restart postfix
+    systemctl restart postfix &>/dev/null
 elif command -v apt-get >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
     apt-get update && apt-get install -y $PACKAGES_APT --ignore-missing &>/dev/null
-    systemctl restart postfix
     if [ $? -ne 0 ]; then
         ERROR "安装失败"
         exit 1
     fi
+    systemctl restart postfix &>/dev/null
 else
     WARN "无法确定可用的包管理器"
     exit 1
