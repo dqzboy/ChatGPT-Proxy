@@ -190,6 +190,7 @@ if command -v yum >/dev/null 2>&1; then
     systemctl restart postfix &>/dev/null
 elif command -v apt-get >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
+    dpkg --configure -a &>/dev/null
     apt-get update && apt-get install -y $PACKAGES_APT --ignore-missing &>/dev/null
     if [ $? -ne 0 ]; then
         ERROR "安装失败"
