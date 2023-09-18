@@ -183,11 +183,11 @@ PACKAGES_YUM="lsof jq wget postfix yum-utils mailx s-nail"
 if command -v yum >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
     yum -y install $PACKAGES_YUM --skip-broken &>/dev/null
-    systemctl restart postfix
     if [ $? -ne 0 ]; then
         ERROR "安装失败"
         exit 1
     fi
+    systemctl restart postfix
 elif command -v apt-get >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
     apt-get update && apt-get install -y $PACKAGES_APT --ignore-missing &>/dev/null
