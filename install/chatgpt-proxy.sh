@@ -184,7 +184,7 @@ if command -v yum >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
     yum -y install $PACKAGES_YUM --skip-broken &>/dev/null
     if [ $? -ne 0 ]; then
-        ERROR "安装失败"
+        ERROR "安装失败：系统安装源存在问题,请检查之后再次运行此脚本！"
         exit 1
     fi
     systemctl restart postfix &>/dev/null
@@ -193,7 +193,7 @@ elif command -v apt-get >/dev/null 2>&1; then
     dpkg --configure -a &>/dev/null
     apt-get update && apt-get install -y $PACKAGES_APT --ignore-missing &>/dev/null
     if [ $? -ne 0 ]; then
-        ERROR "安装失败"
+        ERROR "安装失败：系统安装源存在问题,请检查之后再次运行此脚本！"
         exit 1
     fi
     systemctl restart postfix &>/dev/null
