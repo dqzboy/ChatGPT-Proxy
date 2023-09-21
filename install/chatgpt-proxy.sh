@@ -35,7 +35,6 @@ echo
 echo -e "\033[32m机场推荐\033[0m(\033[34m按量不限时，解锁ChatGPT\033[0m)：\033[34;4mhttps://mojie.mx/#/register?code=CG6h8Irm\033[0m"
 echo
 
-
 SUCCESS() {
   ${SETCOLOR_SUCCESS} && echo "------------------------------------< $1 >-------------------------------------"  && ${SETCOLOR_NORMAL}
 }
@@ -99,6 +98,7 @@ url="chat.openai.com"
 echo "Testing connection to ${url}..."
 if curl --output /dev/null --silent --head --fail ${url}; then
   echo "Connection successful!"
+  WARN "提示：此处测试结果代表你的服务器可以访问OPENAI,是否可以使用OPENAI接口还需要在官网测试！"
   URL="OK"
 else
   echo "Could not connect to ${url}."
@@ -183,6 +183,10 @@ PACKAGES_YUM="lsof jq wget postfix yum-utils mailx s-nail"
 if command -v yum >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
     yum -y install epel* &>/dev/null
+    if [ $? -ne 0 ]; then
+        ERROR "安装失败：系统安装源存在问题,请检查之后再次运行此脚本！"
+        exit 1
+    fi
     yum -y install $PACKAGES_YUM --skip-broken &>/dev/null
     if [ $? -ne 0 ]; then
         ERROR "安装失败：系统安装源存在问题,请检查之后再次运行此脚本！"
@@ -514,8 +518,38 @@ SUCCESS "Add Crontab"
 read -e -p "$(echo -e ${GREEN}"是否加入定时更新镜像？(y/n): "${RESET})" cron
 
 if [[ "$cron" == "y" ]]; then
-mkdir -p /opt/script/go-chatgpt-api
-cat > /opt/script/go-chatgpt-api/AutoImageUp.sh << \EOF
+  mkdir -p /opt/script/go-chatgpt-api
+  if [[ "$modify_config" == "y" ]]; then
+    cat > /opt/script/go-chatgpt-api/AutoImageUp.sh << \EOF
+#!/usr/bin/env bash
+export proxy="type_value://url_value"
+export http_proxy=$proxy
+export https_proxy=$proxy
+export ftp_proxy=$proxy
+export no_proxy="localhost, 127.0.0.1, ::1"
+
+IMAGE_GOCHAT="linweiyuan/go-chatgpt-api"
+CURRENT_VERSION=$(docker image inspect $IMAGE_GOCHAT --format='{{index .RepoDigests 0}}' | grep -o 'sha256:[^"]*')
+LATEST_VERSION=$(curl -s --max-time 60 "https://registry.hub.docker.com/v2/repositories/$IMAGE_GOCHAT/tags/latest" | jq -r '.digest')
+
+if [[ -n $CURRENT_VERSION && -n $LATEST_VERSION ]]; then
+  if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
+    echo "go-chatgpt-api 镜像已更新，进行容器重启等操作..."
+    docker pull "$IMAGE_GOCHAT"
+    cd /data/go-chatgpt-api && docker-compose down && docker-compose up -d
+    docker rmi $(docker images -q --filter "dangling=true" --filter "reference=$IMAGE_GOCHAT") &>/dev/null
+  else
+    echo "go-chatgpt-api 镜像无需更新"
+  fi
+else
+  echo "获取Images ID失败请稍后再试！"
+fi
+EOF
+
+      sed -ri "s#type_value#${type}#" /opt/script/go-chatgpt-api/AutoImageUp.sh
+      sed -ri "s#url_value#${url}#" /opt/script/go-chatgpt-api/AutoImageUp.sh
+  else
+    cat > /opt/script/go-chatgpt-api/AutoImageUp.sh << \EOF
 #!/usr/bin/env bash
 IMAGE_GOCHAT="linweiyuan/go-chatgpt-api"
 CURRENT_VERSION=$(docker image inspect $IMAGE_GOCHAT --format='{{index .RepoDigests 0}}' | grep -o 'sha256:[^"]*')
@@ -534,6 +568,8 @@ else
   echo "获取Images ID失败请稍后再试！"
 fi
 EOF
+  fi
+
 chmod +x /opt/script/go-chatgpt-api/AutoImageUp.sh
     read -e -p "$(echo -e ${GREEN}"请输入分钟（0-59）: "${RESET})" minute
     read -e -p "$(echo -e ${GREEN}"请输入小时（0-23）: "${RESET})" hour
