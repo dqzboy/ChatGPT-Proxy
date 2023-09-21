@@ -98,7 +98,9 @@ url="chat.openai.com"
 echo "Testing connection to ${url}..."
 if curl --output /dev/null --silent --head --fail ${url}; then
   echo "Connection successful!"
-  WARN "提示：此处测试结果代表你的服务器可以访问OPENAI,是否可以使用OPENAI接口还需要在官网测试！"
+  echo "--------------------------------------------------------"
+  WARN "提示：此处测试结果仅代表你的服务器可以访问OPENAI"
+  WARN "是否可以使用OPENAI接口还需要部署完成之后测试！"
   URL="OK"
 else
   echo "Could not connect to ${url}."
@@ -143,12 +145,12 @@ case "$ID" in
         ;;
 esac
 
-echo "------------------------------------------"
+echo "--------------------------------------------------------"
 echo "系统发行版: $NAME"
 echo "系统版本: $VERSION"
 echo "系统ID: $ID"
 echo "系统ID Like: $ID_LIKE"
-echo "------------------------------------------"
+echo "--------------------------------------------------------"
 }
 
 function CHECKFIRE() {
