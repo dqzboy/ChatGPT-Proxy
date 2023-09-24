@@ -84,7 +84,8 @@ docker-compose -v
 mkdir -p /data/go-chatgpt-api && cd $_
 ```
 #### 4.2、创建部署清单
-> GPT-4 相关模型目前需要验证 arkose_token，请自行搭建解决！参考项目：[xyhelper-arkose-v2](https://github.com/xyhelper/xyhelper-arkose-v2)、[xyhelper-arkose-v3](https://github.com/xyhelper/xyhelper-arkose-v3)
+> GPT-4 相关模型目前需要验证 arkose_token，自行搭建可参考项目：[xyhelper-arkose-v2](https://github.com/xyhelper/xyhelper-arkose-v2) <br>
+> 免费服务：https://chatarkose.xyhelper.cn/token
 #### 服务器直连或通过代理可正常访问ChatGPT
   - 如果你的VPS IP稳定，或者你使用的科学上网地址稳定，那就首选这种方式
 ```shell
