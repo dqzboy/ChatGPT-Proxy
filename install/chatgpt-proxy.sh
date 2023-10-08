@@ -184,7 +184,7 @@ PACKAGES_YUM="lsof jq wget postfix yum-utils mailx s-nail"
 # 检查命令是否存在
 if command -v yum >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
-    yum -y install epel* &>/dev/null
+    yum -y install epel* --skip-broken &>/dev/null
     if [ $? -ne 0 ]; then
         ERROR "安装失败：系统安装源存在问题,请检查之后再次运行此脚本！"
         exit 1
