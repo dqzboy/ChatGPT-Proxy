@@ -343,24 +343,26 @@ cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: "3" 
 services:
   go-chatgpt-api:
+    build: .
     container_name: go-chatgpt-api
     image: linweiyuan/go-chatgpt-api
     ports:
       - 8080:8080         # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
+      - PORT=
       - TZ=Asia/Shanghai
       - PROXY=                   # PROXY=：可配置科学上网代理地址，例如：http://clash_vpsIP:7890；注释掉或者留空则不启用
       #http://host:port          # PROXY=：科学上网代理地址，例如：http://clash_vpsIP:7890
       #socks5://host:port        # PROXY=：科学上网代理地址，例如：socks5://clash_vpsIP:7890
       - ARKOSE_TOKEN_URL=
-      - BX=
-      - BX_URL=
       - OPENAI_EMAIL=
       - OPENAI_PASSWORD=
       - CONTINUE_SIGNAL=         # CONTINUE_SIGNAL=1，开启/imitate接口自动继续会话功能，留空关闭，默认关闭
+      - ENABLE_HISTORY=
+      - IMITATE_ACCESS_TOKEN=
+    volumes:
+      - ./chat.openai.com.har:/app/chat.openai.com.har
     restart: unless-stopped
 EOF
 elif [ "$mode" == "warp" ]; then
@@ -368,22 +370,24 @@ cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: "3"
 services:
   go-chatgpt-api:
+    build: .
     container_name: go-chatgpt-api
     image: linweiyuan/go-chatgpt-api
     ports:
       - 8080:8080         # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     #network_mode: host   # 可选，将容器加入主机网络模式，即与主机共享网络命名空间；上面的端口映射将失效
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
+      - PORT=
       - TZ=Asia/Shanghai
       - PROXY=socks5://chatgpt-proxy-server-warp:65535
       - ARKOSE_TOKEN_URL=
-      - BX=
-      - BX_URL=
       - OPENAI_EMAIL=
       - OPENAI_PASSWORD=
       - CONTINUE_SIGNAL=         # CONTINUE_SIGNAL=1，开启/imitate接口自动继续会话功能，留空关闭，默认关闭
+      - ENABLE_HISTORY=
+      - IMITATE_ACCESS_TOKEN=
+    volumes:
+      - ./chat.openai.com.har:/app/chat.openai.com.har
     depends_on:
       - chatgpt-proxy-server-warp
     restart: unless-stopped
