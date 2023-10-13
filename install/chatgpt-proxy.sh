@@ -497,7 +497,7 @@ if [[ "$force_install" = "y" ]]; then
     INSTALL_COMPOSE
     cd ${DOCKER_DIR} && docker-compose down &>/dev/null
     GO_CONFIG
-    cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && CHRCK_CONTAINER
+    cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && GO_CHRCK_CONTAINER
 elif [[ "$URL" = "OK" ]];then
     # 强制安装代码
     WARN "开始安装..."
@@ -505,7 +505,7 @@ elif [[ "$URL" = "OK" ]];then
     INSTALL_COMPOSE
     cd ${DOCKER_DIR} && docker-compose down &>/dev/null
     GO_CONFIG
-    cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && CHRCK_CONTAINER
+    cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && GO_CHRCK_CONTAINER
 else
     ERROR "已取消安装."
     exit 0
@@ -867,7 +867,7 @@ if [[ "$force_install" = "y" ]]; then
     INSTALL_COMPOSE
     cd ${DOCKER_DIR} && docker-compose down &>/dev/null
     ninja_CONFIG
-    cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && CHRCK_CONTAINER
+    cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && ninja_CHRCK_CONTAINER
 elif [[ "$URL" = "OK" ]];then
     # 强制安装代码
     WARN "开始安装..."
@@ -875,7 +875,7 @@ elif [[ "$URL" = "OK" ]];then
     INSTALL_COMPOSE
     cd ${DOCKER_DIR} && docker-compose down &>/dev/null
     ninja_CONFIG
-    cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && CHRCK_CONTAINER
+    cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && ninja_CHRCK_CONTAINER
 else
     ERROR "已取消安装."
     exit 0
