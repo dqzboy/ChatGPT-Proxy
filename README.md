@@ -12,16 +12,17 @@ width="1800"  height="3">
 </div>
 
 
-## 为啥需要自建ChatGPT反代服务
+# 为啥需要自建ChatGPT反代服务
 OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的Access Token方式，这种方式可以免费使用GPT-3.5模型，只需要登录即可使用。但缺点是不稳定，且无法扩展。另一种是使用API，注册用户可以获得5美元的赠送额度，但使用完之后就需要付费。这种方式相对更稳定，但缺点是赠送额度较少且存在限流，目前是3条/分钟。
 
 因此，对于那些希望免费使用OpenAI GPT-3.5模型的用户来说，选择Access Token方式是比较好的选择。但是需要解决的问题是不稳定以及可能IP被封禁的问题。为了解决这些问题，我们可以自建反向代理服务来提高稳定性，并保护我们的IP地址不被OpenAI封禁。也有一些公共的反向代理服务可以选择使用，但是很不稳定，因为它们是免费共享的。所以自建反向代理服务是一个不错的选择
 
 > 如果部署或者配置过程出现问题或不懂的地方，请先搜索历史[issue](https://github.com/dqzboy/ChatGPT-Proxy/issues)或者加[TG交流群](https://t.me/+ghs_XDp1vwxkMGU9)
 
-## ChatGPT-Porxy一键部署
+# ChatGPT-Porxy一键部署
 > **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新、403|401|429检测邮箱告警(使用QQ邮箱会被Tencent邮箱服务拦截)、uptime-kuma监控等功能！
 - **说明**：目前脚本适用于CentOS 7\8\9、RHEL-8\9、Ubuntu、debian以及opencloudos系统；运行脚本需要确保网络环境稳定(确保系统所需组件可以正常下载)。
+- **提示**：目前脚本支持[linweiyuan/go-chatgpt-api](https://github.com/linweiyuan/go-chatgpt-api) 和 [gngpp/ninja](https://github.com/gngpp/ninja) 项目的一键部署。go-chatgpt-api项目作者已弃坑，大家搭建时可以选择部署 ninja
 
 ```shell
 # CentOS
@@ -33,8 +34,8 @@ bash -c "$(wget -q -O- https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/ma
 ```
 <img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/78b7bc85-24a5-41f4-8a1b-8b3338c51570" width="800px">
 
-## ChatGPT-Porxy手动部署
-### 1、环境说明
+# ChatGPT-Porxy手动部署
+## 一、环境说明
 - 一台VPS，规格最低配 1C1G；**注意**：warp不支持arm架构的机器
 - VPS可以正常访问 [chatgpt](https://chat.openai.com)；或者国内服务器实现科学上网也可以
   - 参考这篇文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
@@ -43,7 +44,7 @@ bash -c "$(wget -q -O- https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/ma
 
 > 特别说明：目前这个项目，经过多个版本迭代之后比较稳定；目前可以一个服务多人共用
 
-### 2、部署docker
+## 二、部署docker
 - 设置一个yum源，下面两个都可用
 ```shell
 # 中央仓库
@@ -61,7 +62,7 @@ systemctl enable docker
 systemctl status docker
 ```
 
-### 3、部署docker-compose
+## 三、部署docker-compose
 ```shell
 （1）定义Docker-Compose版本变量
 export composeVer=v2.16.0
@@ -76,14 +77,96 @@ chmod +x /usr/bin/docker-compose
 docker-compose -v
 ```
 
-### 4、部署ChatGPT反代
-- 这里使用的chatGPT反代项目：[linweiyuan/go-chatgpt-api](https://github.com/linweiyuan/go-chatgpt-api)
-- 目前已经支持多次对话
-#### 4.1、创建工作目录
+## 四、部署ChatGPT反代
+### ChatGPT反代项目：[gngpp/ninja](https://github.com/gngpp/ninja)
+#### 1、创建工作目录
 ```shell
 mkdir -p /data/go-chatgpt-api && cd $_
 ```
-#### 4.2、创建部署清单
+#### 2、创建部署清单
+> GPT-4 相关模型目前需要验证 arkose_token，自行搭建可参考项目：[xyhelper-arkose-v2](https://github.com/xyhelper/xyhelper-arkose-v2) <br>
+> 免费服务：https://chatarkose.xyhelper.cn/token
+#### 服务器直连或通过代理可正常访问ChatGPT
+- 如果你的VPS IP稳定，或者你使用的科学上网地址稳定，那就首选这种方式
+```shell
+vim docker-compose.yml
+
+version: '3'
+
+services:
+  ninja:
+    image: ghcr.io/gngpp/ninja:latest
+    container_name: ninja
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+      - PROXIES=                 # PROXIES=：可配置科学上网代理地址，例如：http://clash_vpsIP:7890；注释掉或者留空则不启用
+      # - CONFIG=/serve.toml
+      # - PORT=8080
+      # - HOST=0.0.0.0
+      # - TLS_CERT=
+      # - TLS_KEY=
+    # volumes:
+      # - ${PWD}/ssl:/etc
+      # - ${PWD}/serve.toml:/serve.toml
+    command: serve run --disable-direct --disable-webui
+    ports:
+      - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
+```
+
+#### 基于Cloudflare WARP模式
+  - 解决IP被Ban，提示Access denied之类的报错
+  - 如果使用此模式还是提示Access denied，大概率是你机器IP不干净或者用的国内服务器导致验证码过不去
+  - Cloudflare WARP官网文档：https://developers.cloudflare.com/warp-client/get-started/linux
+```shell
+vim docker-compose.yml
+
+version: '3'
+
+services:
+  ninja:
+    image: ghcr.io/gngpp/ninja:latest
+    container_name: ninja
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+      - PROXIES=socks5://warp:10000
+      # - CONFIG=/serve.toml
+      # - PORT=8080
+      # - HOST=0.0.0.0
+      # - TLS_CERT=
+      # - TLS_KEY=
+    # volumes:
+      # - ${PWD}/ssl:/etc
+      # - ${PWD}/serve.toml:/serve.toml
+    command: serve run --disable-direct --disable-webui
+    ports:
+      - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
+    depends_on:
+      - warp
+
+  warp:
+    container_name: warp
+    image: ghcr.io/gngpp/warp:latest
+    restart: unless-stopped
+
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 3600 --cleanup
+    restart: unless-stopped
+```
+---
+
+### ChatGPT反代项目：[linweiyuan/go-chatgpt-api](https://github.com/linweiyuan/go-chatgpt-api)
+- 目前已经支持多次对话
+#### 1、创建工作目录
+```shell
+mkdir -p /data/go-chatgpt-api && cd $_
+```
+#### 2、创建部署清单
 > GPT-4 相关模型目前需要验证 arkose_token，自行搭建可参考项目：[xyhelper-arkose-v2](https://github.com/xyhelper/xyhelper-arkose-v2) <br>
 > 免费服务：https://chatarkose.xyhelper.cn/token
 #### 服务器直连或通过代理可正常访问ChatGPT
@@ -150,7 +233,7 @@ services:
     restart: unless-stopped
 ```
 
-#### 4.3、运行容器服务
+## 五、运行容器服务
 ```shell
 docker-compose up -d
 
@@ -161,8 +244,15 @@ docker ps
 ss -tnlp|grep 8080
 ```
 
-#### 4.4、检查是否正常
-- go-chatgpt-api需要初始化启动需要耐心等待
+## 六、检查是否正常
+### ninja容器运行日志查看
+```shell
+# 查看容器日志是否运行正常
+docker logs -f ninja
+```
+<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/b1d2a0e4-233d-444e-9617-987d069deb76" width="800px">
+
+### go-chatgpt-api需要初始化启动需要耐心等待
 ```shell
 # 查看容器日志是否运行正常
 docker logs -f go-chatgpt-api
@@ -172,7 +262,7 @@ docker logs -f go-chatgpt-api
 
 <img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/081886e0-72e8-44b5-954f-e122efcedfcb" width="800px">
 
-#### 4.5、容器镜像更新
+## 七、容器镜像更新
 ```shell
 # 停止
 docker-compose down
@@ -184,8 +274,18 @@ docker-compose pull
 docker-compose up -d
 ```
 
-### 5、项目接入自建反代
-#### 接口更新
+## 八、项目接入自建反代
+### ninjia
+> 接口使用, * 表示任意URL后缀
+- backend-api, http(s)://host:port/backend-api/*
+- public-api, http(s)://host:port/public-api/*
+- platform-api, http(s)://host:port/v1/*
+- dashboard-api, http(s)://host:port/dashboard/*
+- chatgpt-to-api, http(s)://host:port/to/v1/chat/completions
+
+> 关于关于ChatGPT转API使用，直接拿AceessToken当API Key使用，接口路径：/to/v1/chat/completions
+
+### go-chatgpt-api
 - 原接口： http://go-chatgpt-api:8080/chatgpt/conversation
 - 更新后： http://go-chatgpt-api:8080/chatgpt/backend-api/conversation
 
@@ -198,6 +298,10 @@ docker-compose up -d
 
 - access token获取：https://chat.openai.com/api/auth/session
 ```shell
+# ninja-chatgpt-api
+API_REVERSE_PROXY=http(s)://host:port/backend-api/conversation
+
+# go-chatgpt-api
 API_REVERSE_PROXY=http://127.0.0.1:8080/chatgpt/backend-api/conversation
 ```
 
