@@ -7,7 +7,7 @@
 #
 #   DESCRIPTION: 使用AccessToken访问ChatGPT，绕过CF验证;支持CentOS与Ubuntu
 #
-#  ORGANIZATION: DingQz dqzboy.com
+#  ORGANIZATION: Ding QinZheng dqzboy.com
 #===============================================================================
 SETCOLOR_SKYBLUE="echo -en \\E[1;36m"
 SETCOLOR_SUCCESS="echo -en \\E[0;32m"
@@ -59,9 +59,6 @@ WARN() {
   ${SETCOLOR_YELLOW} && echo "$1"  && ${SETCOLOR_NORMAL}
 }
 
-DOCKER_DIR="/data/go-chatgpt-api"
-mkdir -p $DOCKER_DIR
-
 MAX_ATTEMPTS=3
 attempt=0
 success=false
@@ -69,6 +66,20 @@ success=false
 # 获取本机网卡和对应IP
 INTERFACE=$(ip -o -4 route show to default | awk '{print $5}')
 IP_ADDR=$(ip -o -4 addr show dev "$INTERFACE" | awk '{split($4, a, "/"); print a[1]}')
+
+function Progress() {
+spin='-\|/'
+count=0
+endtime=$((SECONDS+10))
+
+while [ $SECONDS -lt $endtime ];
+do
+    spin_index=$(($count % 4))
+    printf "\r[%c] " "${spin:$spin_index:1}"
+    sleep 0.1
+    count=$((count + 1))
+done
+}
 
 function CHECK_CPU() {
 # 判断当前操作系统是否为 ARM 或 AMD 架构
@@ -314,8 +325,11 @@ function INSTALL_COMPOSE() {
     fi
 }
 
+# --------------------------------------------------  go-chatgpt-api  --------------------------------------------------
+function GO_MODIFY_PORT() {
+DOCKER_DIR="/data/go-chatgpt-api"
+mkdir -p $DOCKER_DIR
 
-function MODIFY_PORT() {
 read -e -p "$(echo -e ${GREEN}"是否修改容器映射端口号？(y/n): "${RESET})" answer
 
 if [ "$answer" == "y" ]; then
@@ -335,7 +349,8 @@ if [ "$answer" == "y" ]; then
 fi
 }
 
-function CONFIG() {
+function GO_CONFIG() {
+DOCKER_DIR="/data/go-chatgpt-api"
 mkdir -p ${DOCKER_DIR}
 read -e -p "$(echo -e ${GREEN}"请输入使用的模式（api/warp）："${RESET})" mode
 if [ "$mode" == "api" ]; then
@@ -450,26 +465,11 @@ case $modify_config in
     ERROR "Invalid input. Skipping configuration modification."
     ;;
 esac
-MODIFY_PORT
+GO_MODIFY_PORT
 
 }
 
-function Progress() {
-spin='-\|/'
-count=0
-endtime=$((SECONDS+10))
-
-while [ $SECONDS -lt $endtime ];
-do
-    spin_index=$(($count % 4))
-    printf "\r[%c] " "${spin:$spin_index:1}"
-    sleep 0.1
-    count=$((count + 1))
-done
-}
-
-
-function CHRCK_CONTAINER() {
+function GO_CHRCK_CONTAINER() {
 # 检查 go-chatgpt-api 容器状态
 status_go_chatgpt_api=$(docker container inspect -f '{{.State.Running}}' go-chatgpt-api 2>/dev/null)
 
@@ -488,7 +488,7 @@ else
 fi
 }
 
-function INSTALL_PROXY() {
+function GO_INSTALL_PROXY() {
 # 确认是否强制安装
 if [[ "$force_install" = "y" ]]; then
     # 强制安装代码
@@ -496,7 +496,7 @@ if [[ "$force_install" = "y" ]]; then
     INSTALL_DOCKER
     INSTALL_COMPOSE
     cd ${DOCKER_DIR} && docker-compose down &>/dev/null
-    CONFIG
+    GO_CONFIG
     cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && CHRCK_CONTAINER
 elif [[ "$URL" = "OK" ]];then
     # 强制安装代码
@@ -504,7 +504,7 @@ elif [[ "$URL" = "OK" ]];then
     INSTALL_DOCKER
     INSTALL_COMPOSE
     cd ${DOCKER_DIR} && docker-compose down &>/dev/null
-    CONFIG
+    GO_CONFIG
     cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && CHRCK_CONTAINER
 else
     ERROR "已取消安装."
@@ -512,14 +512,14 @@ else
 fi
 }
 
-function DEL_IMG_NONE() {
+function GO_DEL_IMG_NONE() {
 # 删除go-chatgpt-api所有处于 "none" 状态的镜像
 if [ -n "$(docker images -q --filter "dangling=true" --filter "reference=linweiyuan/go-chatgpt-api")" ]; then
     docker rmi $(docker images -q --filter "dangling=true" --filter "reference=linweiyuan/go-chatgpt-api") &>/dev/null
 fi
 }
 
-function ADD_IMAGESUP() {
+function GO_ADD_IMAGESUP() {
 SUCCESS "Add Crontab"
 read -e -p "$(echo -e ${GREEN}"是否加入定时更新镜像？(y/n): "${RESET})" cron
 
@@ -613,7 +613,7 @@ fi
 }
 
 
-function ADD_EM_ALERT() {
+function GO_ADD_EM_ALERT() {
 SUCCESS "Email alerts"
 read -e -p "$(echo -e ${GREEN}"是否添加401|403|429检测和告警功能？(y/n): "${RESET})" alert
 
@@ -686,6 +686,285 @@ else
     exit 1
 fi
 }
+
+# --------------------------------------------------  go-chatgpt-api END  --------------------------------------------------
+
+
+# --------------------------------------------------  ninja-chatgpt-api  --------------------------------------------------
+function ninja_MODIFY_PORT() {
+DOCKER_DIR="/data/ninja-chatgpt-api"
+mkdir -p $DOCKER_DIR
+
+read -e -p "$(echo -e ${GREEN}"是否修改容器映射端口号？(y/n): "${RESET})" answer
+
+if [ "$answer" == "y" ]; then
+    while true; do
+        read -e -p "请输入新的端口号(1-65535): " port
+        # 校验用户输入的端口是否为纯数字且在范围内
+        if ! [[ "$port" =~ ^[0-9]+$ ]] || ((port < 1)) || ((port > 65535)); then
+            ERROR "端口必须是1到65535之间的纯数字且不可为空。"
+        elif lsof -i:$port >/dev/null 2>&1; then
+            WARN "该端口已被占用，请重新输入！"
+        else
+            sed -i "s/- 8080:/- $port:/" ${DOCKER_DIR}/docker-compose.yml
+            break
+        fi
+    done
+    sed -i "s/- 8080:/- $port:/" ${DOCKER_DIR}/docker-compose.yml
+fi
+}
+
+function ninja_CONFIG() {
+DOCKER_DIR="/data/ninja-chatgpt-api"
+mkdir -p ${DOCKER_DIR}
+read -e -p "$(echo -e ${GREEN}"请输入使用的模式（api/warp）："${RESET})" mode
+if [ "$mode" == "api" ]; then
+cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
+version: '3'
+
+services:
+  ninja:
+    image: ghcr.io/gngpp/ninja:latest
+    container_name: ninja
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+      - PROXIES=                 # PROXIES=：可配置科学上网代理地址，例如：http://clash_vpsIP:7890；注释掉或者留空则不启用
+      #http://host:port          # PROXIES=：科学上网代理地址，例如：http://clash_vpsIP:7890
+      #socks5://host:port        # PROXIES=：科学上网代理地址，例如：socks5://clash_vpsIP:7890
+      # - CONFIG=/serve.toml
+      # - PORT=8080
+      # - HOST=0.0.0.0
+      # - TLS_CERT=
+      # - TLS_KEY=
+    # volumes:
+      # - ${PWD}/ssl:/etc
+      # - ${PWD}/serve.toml:/serve.toml
+    command: serve run --disable-direct --disable-webui
+    ports:
+      - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
+EOF
+elif [ "$mode" == "warp" ]; then
+cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
+version: '3'
+
+services:
+  ninja:
+    image: ghcr.io/gngpp/ninja:latest
+    container_name: ninja
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+      - PROXIES=socks5://warp:10000
+      # - CONFIG=/serve.toml
+      # - PORT=8080
+      # - HOST=0.0.0.0
+      # - TLS_CERT=
+      # - TLS_KEY=
+    # volumes:
+      # - ${PWD}/ssl:/etc
+      # - ${PWD}/serve.toml:/serve.toml
+    command: serve run --disable-direct --disable-webui
+    ports:
+      - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
+    depends_on:
+      - warp
+
+  warp:
+    container_name: warp
+    image: ghcr.io/gngpp/warp:latest
+    restart: unless-stopped
+
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 3600 --cleanup
+    restart: unless-stopped
+EOF
+else
+  ERROR "Invalid or missing parameter"
+  exit 1
+fi
+
+# 提示用户是否需要修改配置
+read -e -p "$(echo -e ${GREEN}"Do you want to add a proxy address? (y/n)："${RESET})" modify_config
+case $modify_config in
+  [Yy]* )
+    # 提示用户本机IP
+    ${SETCOLOR_SUCCESS} && echo "---------------------------------------------"  && ${SETCOLOR_NORMAL}
+    echo -e "本机网卡：${PURPLE}${INTERFACE}${RESET} 对应IP：${PURPLE}${IP_ADDR}${RESET}"
+    ${SETCOLOR_SUCCESS} && echo "---------------------------------------------"  && ${SETCOLOR_NORMAL}
+    # 获取用户输入的URL及其类型
+    read -e -p "$(echo -e ${GREEN}"Enter the URL (e.g. host:port): "${RESET})" url
+    while true; do
+      read -e -p "$(echo -e ${GREEN}"Is this a http or socks5 proxy? (http/socks5)："${RESET})" type
+      case $type in
+          [Hh][Tt]* ) url_type="http"; break;;
+          [Ss][Oo]* ) url_type="socks5"; break;;
+          * ) echo "Please answer http or socks5.";;
+      esac
+    done
+    
+    # 根据类型更新docker-compose.yml文件
+    if [ "$mode" == "api" ]; then
+       if [ "$url_type" == "http" ]; then
+	  sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
+          sed -i "s|#http://host:port|- PROXIES=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+       elif [ "$url_type" == "socks5" ]; then
+	  sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
+          sed -i "s|#socks5://host:port|- PROXIES=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+       fi
+    elif [ "$mode" == "warp" ]; then
+       if [ "$url_type" == "http" ]; then
+          sed -i "s|- PROXIES=socks5://chatgpt-proxy-server-warp:65535|- PROXIES=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+       elif [ "$url_type" == "socks5" ]; then
+          sed -i "s|- PROXIES=socks5://chatgpt-proxy-server-warp:65535|- PROXIES=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+       fi
+    else
+       echo "Do not modify！"
+    fi
+    echo "Updated docker-compose.yml with ${url_type} proxy server at ${url}."
+    ;;
+  [Nn]* )
+    WARN "Skipping configuration modification."
+    ;;
+  * )
+    ERROR "Invalid input. Skipping configuration modification."
+    ;;
+esac
+ninja_MODIFY_PORT
+
+}
+
+
+function ninja_CHRCK_CONTAINER() {
+# 检查 ninja-chatgpt-api 容器状态
+status_ninja_chatgpt_api=$(docker container inspect -f '{{.State.Running}}' ninja 2>/dev/null)
+
+# 判断容器状态并打印提示
+if [[ "$status_ninja_chatgpt_api" == "true" ]]; then
+    SUCCESS "CHECK"
+    Progress
+    SUCCESS1 ">>>>> Docker containers are up and running."
+else
+    SUCCESS "CHECK"
+    Progress
+    ERROR ">>>>> The following containers are not up"
+    if [[ "$status_ninja_chatgpt_api" != "true" ]]; then
+        WARN ">>> ninja-chatgpt-api"
+    fi
+fi
+}
+
+function ninja_INSTALL_PROXY() {
+# 确认是否强制安装
+if [[ "$force_install" = "y" ]]; then
+    # 强制安装代码
+    WARN "开始强制安装..."
+    INSTALL_DOCKER
+    INSTALL_COMPOSE
+    cd ${DOCKER_DIR} && docker-compose down &>/dev/null
+    ninja_CONFIG
+    cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && CHRCK_CONTAINER
+elif [[ "$URL" = "OK" ]];then
+    # 强制安装代码
+    WARN "开始安装..."
+    INSTALL_DOCKER
+    INSTALL_COMPOSE
+    cd ${DOCKER_DIR} && docker-compose down &>/dev/null
+    ninja_CONFIG
+    cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && CHRCK_CONTAINER
+else
+    ERROR "已取消安装."
+    exit 0
+fi
+}
+
+function ninja_DEL_IMG_NONE() {
+# 删除ninja-chatgpt-api所有处于 "none" 状态的镜像
+if [ -n "$(docker images -q --filter "dangling=true" --filter "reference=ghcr.io/gngpp/ninja")" ]; then
+    docker rmi $(docker images -q --filter "dangling=true" --filter "reference=ghcr.io/gngpp/ninja") &>/dev/null
+fi
+}
+
+
+function ninja_ADD_EM_ALERT() {
+SUCCESS "Email alerts"
+read -e -p "$(echo -e ${GREEN}"是否添加WARN|ERROR日志检测和告警功能？(y/n): "${RESET})" alert
+
+if [[ "$alert" == "y" ]]; then
+mkdir -p /opt/script/ninja-chatgpt-api
+cat > /opt/script/ninja-chatgpt-api/EmailAlert.sh << \EOF
+#!/usr/bin/env bash
+email_address="email@com"
+images="ninja"
+prev_timestamp=""
+is_alert=false
+
+while true; do
+  error_code=$(docker logs $images | grep -E "ERROR|WARN" | tail -n1)
+
+  if [ -n "$error_code" ]; then
+    current_timestamp=$(docker logs $images | grep -E "ERROR|WARN" | awk -F'Z ' '{print $2}' | tail -n1)
+
+    if [ -z "$prev_timestamp" ]; then
+      prev_timestamp="$current_timestamp"
+    else
+      if [ "$current_timestamp" != "$prev_timestamp" ]; then
+        echo -e """
+-------------------------------------------------------------------
+|  报错时间 | $current_timestamp                   
+|------------------------------------------------------------------
+|  容器名称 | $images                       
+|------------------------------------------------------------------
+|  错误信息 | $error_code                     
+|------------------------------------------------------------------
+|  服务器IP | $IP_ADDR                     
+|------------------------------------------------------------------
+|  推送信息 | Warning: $error_code error detected in container log
+-------------------------------------------------------------------
+""" | mail -s "Warning: $error_code error" $email_address
+        is_alert=true
+      fi
+      prev_timestamp="$current_timestamp"
+    fi
+  fi
+
+  sleep 5
+done
+EOF
+chmod +x /opt/script/ninja-chatgpt-api/EmailAlert.sh
+    read -e -p "$(echo -e ${GREEN}"请输入接收告警邮箱: "${RESET})" email
+    read -e -p "$(echo -e ${GREEN}"请输入 ERROR|WARN 日志错误检测频率,默认5s: "${RESET})" alert_interval
+    # 判断alert_interval是否为空
+    if [[ -z "$alert_interval" ]]; then
+        # 设置默认值为5
+        alert_interval=5
+    elif ! [[ "$alert_interval" =~ ^[0-9]+$ ]]; then
+        # 如果alert_interval不是纯数字，则退出执行
+        echo "输入错误！alert_interval必须为纯数字。"
+        exit 1
+    fi
+    sed -i "s#email@com#$email#g" /opt/script/ninja-chatgpt-api/EmailAlert.sh
+    sed -i "s#sleep 5#sleep $alert_interval#g" /opt/script/ninja-chatgpt-api/EmailAlert.sh
+    if pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh" >/dev/null; then
+       pkill -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh"
+    fi
+    nohup /opt/script/ninja-chatgpt-api/EmailAlert.sh > /dev/null 2>&1 &
+    # 提示用户的定时任务执行时间
+    INFO1 "已设置告警消息接收邮箱为 $email 检查频率为 $alert_interval！"
+elif [[ "$alert" == "n" ]]; then
+    # 取消定时任务
+    WARN "已取消 ERROR|WARN 日志错误检测告警功能！"
+else
+    ERROR "选项错误！请重新运行脚本并选择正确的选项。"
+    exit 1
+fi
+}
+
+# --------------------------------------------------  ninja-chatgpt-api END  --------------------------------------------------
 
 
 function ADD_UPTIME_KUMA() {
@@ -765,17 +1044,53 @@ function ADD_UPTIME_KUMA() {
     fi
 }
 
+deploy_go_chatgpt_api() {
+    INFO1 "部署 go-chatgpt-api"
+    GO_INSTALL_PROXY
+    GO_DEL_IMG_NONE
+    GO_ADD_IMAGESUP
+    GO_ADD_EM_ALERT
+}
+
+deploy_ninja_chatgpt_api() {
+    INFO1 "部署 ninja-chatgpt-api"
+    ninja_INSTALL_PROXY
+    ninja_DEL_IMG_NONE
+    ninja_ADD_EM_ALERT
+}
+
+show_menu() {
+    echo -e "${GREEN}请选择要部署的应用:${RESET}"
+    echo -e "1. go-chatgpt-api"
+    echo -e "2. ninja-chatgpt-api"
+    echo -e "3. 退出脚本"
+}
 
 main() {
-  CHECK_CPU
-  CHECK_OPENAI
-  CHECK_OS
-  CHECKFIRE
-  INSTALL_PACKAGE
-  INSTALL_PROXY
-  DEL_IMG_NONE
-  ADD_IMAGESUP
-  ADD_EM_ALERT
-  ADD_UPTIME_KUMA
+    CHECK_CPU
+    CHECK_OPENAI
+    CHECK_OS
+    CHECKFIRE
+    INSTALL_PACKAGE
+
+    show_menu
+    read -e -p "$(echo -e ${GREEN}"请输入对应的数字: "${RESET})" api_choice
+    case $api_choice in
+        1)
+            deploy_go_chatgpt_api
+            ;;
+        2)
+            deploy_ninja_chatgpt_api
+            ;;
+        3)
+            exit 0
+            ;;
+        *)
+            ERROR "无效选项，请重新输入数字并选择正确的选项"
+            exit 1
+            ;;
+    esac
+
+    ADD_UPTIME_KUMA
 }
 main
