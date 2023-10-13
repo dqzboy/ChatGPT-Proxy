@@ -441,10 +441,10 @@ case $modify_config in
     # 根据类型更新docker-compose.yml文件
     if [ "$mode" == "api" ]; then
        if [ "$url_type" == "http" ]; then
-	        sed -i '/- PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
+	  sed -i '/- PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
           sed -i "s|#http://host:port|- PROXY=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
-	        sed -i '/- PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
+	  sed -i '/- PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
           sed -i "s|#socks5://host:port|- PROXY=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        fi
     elif [ "$mode" == "warp" ]; then
@@ -810,11 +810,11 @@ case $modify_config in
     # 根据类型更新docker-compose.yml文件
     if [ "$mode" == "api" ]; then
        if [ "$url_type" == "http" ]; then
-	        sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
+          sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
           sed -i "s|#http://host:port|- PROXIES=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
           sed -i 's/command: serve run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
-	        sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
+	  sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
           sed -i "s|#socks5://host:port|- PROXIES=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
           sed -i 's/command: serve run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        fi
