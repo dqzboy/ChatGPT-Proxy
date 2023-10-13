@@ -441,10 +441,10 @@ case $modify_config in
     # 根据类型更新docker-compose.yml文件
     if [ "$mode" == "api" ]; then
        if [ "$url_type" == "http" ]; then
-	  sed -i '/- PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
+	        sed -i '/- PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
           sed -i "s|#http://host:port|- PROXY=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
-	  sed -i '/- PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
+	        sed -i '/- PROXY=/d' ${DOCKER_DIR}/docker-compose.yml
           sed -i "s|#socks5://host:port|- PROXY=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
        fi
     elif [ "$mode" == "warp" ]; then
@@ -740,7 +740,7 @@ services:
     # volumes:
       # - ${PWD}/ssl:/etc
       # - ${PWD}/serve.toml:/serve.toml
-    command: serve run --disable-direct --disable-webui
+    command: serve run --disable-webui
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
 EOF
@@ -764,7 +764,7 @@ services:
     # volumes:
       # - ${PWD}/ssl:/etc
       # - ${PWD}/serve.toml:/serve.toml
-    command: serve run --disable-direct --disable-webui
+    command: serve run --disable-webui
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     depends_on:
@@ -810,17 +810,21 @@ case $modify_config in
     # 根据类型更新docker-compose.yml文件
     if [ "$mode" == "api" ]; then
        if [ "$url_type" == "http" ]; then
-	  sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
+	        sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
           sed -i "s|#http://host:port|- PROXIES=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+          sed -i 's/command: serve run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
-	  sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
+	        sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
           sed -i "s|#socks5://host:port|- PROXIES=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+          sed -i 's/command: serve run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        fi
     elif [ "$mode" == "warp" ]; then
        if [ "$url_type" == "http" ]; then
           sed -i "s|- PROXIES=socks5://chatgpt-proxy-server-warp:65535|- PROXIES=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+          sed -i 's/command: serve run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
           sed -i "s|- PROXIES=socks5://chatgpt-proxy-server-warp:65535|- PROXIES=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
+          sed -i 's/command: serve run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        fi
     else
        echo "Do not modify！"
