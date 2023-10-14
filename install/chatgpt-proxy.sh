@@ -743,6 +743,13 @@ services:
     command: serve run --disable-webui
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
+  watchtower:
+    container_name: watchtower
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 3600 --cleanup
+    restart: unless-stopped
 EOF
 elif [ "$mode" == "warp" ]; then
 cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
