@@ -660,7 +660,7 @@ done
 EOF
 chmod +x /opt/script/go-chatgpt-api/EmailAlert.sh
     read -e -p "$(echo -e ${GREEN}"请输入接收告警邮箱: "${RESET})" email
-    read -e -p "$(echo -e ${GREEN}"请输入401|403|429错误检测频率,默认5s: "${RESET})" alert_interval
+    read -p "$(echo -e ${GREEN}"请输入401|403|429错误检测频率,默认5s: "${RESET})" alert_interval
     # 判断alert_interval是否为空
     if [[ -z "$alert_interval" ]]; then
         # 设置默认值为5
@@ -948,7 +948,7 @@ done
 EOF
 chmod +x /opt/script/ninja-chatgpt-api/EmailAlert.sh
     read -e -p "$(echo -e ${GREEN}"请输入接收告警邮箱: "${RESET})" email
-    read -e -p "$(echo -e ${GREEN}"请输入 ERROR|WARN 日志错误检测频率,默认5s: "${RESET})" alert_interval
+    read -p "$(echo -e ${GREEN}"请输入 ERROR|WARN 日志错误检测频率,默认5s: "${RESET})" alert_interval
     # 判断alert_interval是否为空
     if [[ -z "$alert_interval" ]]; then
         # 设置默认值为5
