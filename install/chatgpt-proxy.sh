@@ -678,7 +678,7 @@ chmod +x /opt/script/go-chatgpt-api/EmailAlert.sh
     PID=$(pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh")
     if [ ! -z "$PID" ]; then
         # 结束掉进程
-        kill -9 $PID
+        nohup kill -9 $PID > /dev/null 2>&1 &
     fi
 
     nohup /opt/script/go-chatgpt-api/EmailAlert.sh > /dev/null 2>&1 &
@@ -972,7 +972,7 @@ chmod +x /opt/script/ninja-chatgpt-api/EmailAlert.sh
     PID=$(pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh")
     if [ ! -z "$PID" ]; then
         # 结束掉进程
-        kill -9 $PID
+        nohup kill -9 $PID > /dev/null 2>&1 &
     fi
  
     nohup /opt/script/ninja-chatgpt-api/EmailAlert.sh > /dev/null 2>&1 &
