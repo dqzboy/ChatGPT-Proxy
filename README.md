@@ -25,12 +25,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 - **提示**：目前脚本支持[linweiyuan/go-chatgpt-api](https://github.com/linweiyuan/go-chatgpt-api) 和 [gngpp/ninja](https://github.com/gngpp/ninja) 项目的一键部署。go-chatgpt-api项目作者已弃坑，大家搭建时可以选择部署 ninja
 
 ```shell
-# CentOS
-yum -y install wget
-# Ubuntu
-apt -y install wget
-
-bash -c "$(wget -q -O- https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/main/install/chatgpt-proxy.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/main/install/chatgpt-proxy.sh)"
 ```
 <img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/78b7bc85-24a5-41f4-8a1b-8b3338c51570" width="800px">
 
@@ -109,7 +104,7 @@ services:
     # volumes:
       # - ${PWD}/ssl:/etc
       # - ${PWD}/serve.toml:/serve.toml
-    command: serve run --disable-direct --disable-webui
+    command: serve run           # --disable-direct关闭本地直连 --disable-webui关闭自带WEB
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
 ```
@@ -139,7 +134,7 @@ services:
     # volumes:
       # - ${PWD}/ssl:/etc
       # - ${PWD}/serve.toml:/serve.toml
-    command: serve run --disable-direct --disable-webui
+    command: serve run           # --disable-direct关闭本地直连 --disable-webui关闭自带WEB
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     depends_on:
