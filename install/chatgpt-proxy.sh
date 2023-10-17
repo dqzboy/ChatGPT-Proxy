@@ -666,7 +666,7 @@ chmod +x /opt/script/go-chatgpt-api/EmailAlert.sh
         exit 1
     fi
 
-    read -p "$(echo -e ${GREEN}"请输入 ERROR|WARN 日志错误检测频率,单位秒: "${RESET})" alert_interval
+    read -e -p "$(echo -e ${GREEN}"请输入 ERROR|WARN 日志错误检测频率,单位秒: "${RESET})" alert_interval
     # 判断alert_interval是否为空或不是纯数字
     if [[ -z "$alert_interval" || ! "$alert_interval" =~ ^[0-9]+$ ]]; then
         ERROR "ERROR: 输入错误！输入必须为纯数字且不可为空！"
@@ -957,7 +957,7 @@ chmod +x /opt/script/ninja-chatgpt-api/EmailAlert.sh
         exit 1
     fi
 
-    read -p "$(echo -e ${GREEN}"请输入 ERROR|WARN 日志错误检测频率,单位秒: "${RESET})" alert_interval
+    read -e -p "$(echo -e ${GREEN}"请输入 ERROR|WARN 日志错误检测频率,单位秒: "${RESET})" alert_interval
     # 判断alert_interval是否为空或不是纯数字
     if [[ -z "$alert_interval" || ! "$alert_interval" =~ ^[0-9]+$ ]]; then
         ERROR "ERROR: 输入错误！输入必须为纯数字且不可为空！"
