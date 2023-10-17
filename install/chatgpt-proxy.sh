@@ -660,16 +660,19 @@ done
 EOF
 chmod +x /opt/script/go-chatgpt-api/EmailAlert.sh
     read -e -p "$(echo -e ${GREEN}"请输入接收告警邮箱: "${RESET})" email
-    read -p "$(echo -e ${GREEN}"请输入401|403|429错误检测频率,默认5s: "${RESET})" alert_interval
-    # 判断alert_interval是否为空
-    if [[ -z "$alert_interval" ]]; then
-        # 设置默认值为5
-        alert_interval=5
-    elif ! [[ "$alert_interval" =~ ^[0-9]+$ ]]; then
-        # 如果alert_interval不是纯数字，则退出执行
-        echo "输入错误！alert_interval必须为纯数字。"
+    # 判断输入是否为空或邮箱格式是否正确
+    if [[ -z "$email" || ! $email =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$ ]]; then
+        ERROR "ERROR: 请输入正确格式的邮箱地址！"
         exit 1
     fi
+
+    read -p "$(echo -e ${GREEN}"请输入 ERROR|WARN 日志错误检测频率,单位秒: "${RESET})" alert_interval
+    # 判断alert_interval是否为空或不是纯数字
+    if [[ -z "$alert_interval" || ! "$alert_interval" =~ ^[0-9]+$ ]]; then
+        ERROR "ERROR: 输入错误！输入必须为纯数字且不可为空！"
+        exit 1
+    fi
+
     sed -i "s#email@com#$email#g" /opt/script/go-chatgpt-api/EmailAlert.sh
     sed -i "s#sleep 5#sleep $alert_interval#g" /opt/script/go-chatgpt-api/EmailAlert.sh
     if pgrep -f "/opt/script/go-chatgpt-api/EmailAlert.sh" >/dev/null; then
@@ -948,16 +951,19 @@ done
 EOF
 chmod +x /opt/script/ninja-chatgpt-api/EmailAlert.sh
     read -e -p "$(echo -e ${GREEN}"请输入接收告警邮箱: "${RESET})" email
-    read -p "$(echo -e ${GREEN}"请输入 ERROR|WARN 日志错误检测频率,默认5s: "${RESET})" alert_interval
-    # 判断alert_interval是否为空
-    if [[ -z "$alert_interval" ]]; then
-        # 设置默认值为5
-        alert_interval=5
-    elif ! [[ "$alert_interval" =~ ^[0-9]+$ ]]; then
-        # 如果alert_interval不是纯数字，则退出执行
-        echo "输入错误！alert_interval必须为纯数字。"
+    # 判断输入是否为空或邮箱格式是否正确
+    if [[ -z "$email" || ! $email =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$ ]]; then
+        ERROR "ERROR: 请输入正确格式的邮箱地址！"
         exit 1
     fi
+
+    read -p "$(echo -e ${GREEN}"请输入 ERROR|WARN 日志错误检测频率,单位秒: "${RESET})" alert_interval
+    # 判断alert_interval是否为空或不是纯数字
+    if [[ -z "$alert_interval" || ! "$alert_interval" =~ ^[0-9]+$ ]]; then
+        ERROR "ERROR: 输入错误！输入必须为纯数字且不可为空！"
+        exit 1
+    fi
+
     sed -i "s#email@com#$email#g" /opt/script/ninja-chatgpt-api/EmailAlert.sh
     sed -i "s#sleep 5#sleep $alert_interval#g" /opt/script/ninja-chatgpt-api/EmailAlert.sh
     if pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh" >/dev/null; then
