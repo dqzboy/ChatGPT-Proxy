@@ -675,9 +675,20 @@ chmod +x /opt/script/go-chatgpt-api/EmailAlert.sh
 
     sed -i "s#email@com#$email#g" /opt/script/go-chatgpt-api/EmailAlert.sh
     sed -i "s#sleep 5#sleep $alert_interval#g" /opt/script/go-chatgpt-api/EmailAlert.sh
-    if pgrep -f "/opt/script/go-chatgpt-api/EmailAlert.sh" >/dev/null; then
-       pkill -f "/opt/script/go-chatgpt-api/EmailAlert.sh"
+    if pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh" >/dev/null; then
+        # 尝试发送终止信号
+        pkill -TERM -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh"
+
+        # 等待一段时间
+        sleep 5
+
+        # 再次检查是否还存在进程
+        if pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh" >/dev/null; then
+            # 如果还存在，尝试发送强制终止信号
+            pkill -KILL -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh"
+        fi
     fi
+
     nohup /opt/script/go-chatgpt-api/EmailAlert.sh > /dev/null 2>&1 &
     # 提示用户的定时任务执行时间
     INFO1 "已设置告警消息接收邮箱为 $email 检查频率为 $alert_interval！"
@@ -967,8 +978,19 @@ chmod +x /opt/script/ninja-chatgpt-api/EmailAlert.sh
     sed -i "s#email@com#$email#g" /opt/script/ninja-chatgpt-api/EmailAlert.sh
     sed -i "s#sleep 5#sleep $alert_interval#g" /opt/script/ninja-chatgpt-api/EmailAlert.sh
     if pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh" >/dev/null; then
-       pkill -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh"
+        # 尝试发送终止信号
+        pkill -TERM -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh"
+
+        # 等待一段时间
+        sleep 5
+
+        # 再次检查是否还存在进程
+        if pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh" >/dev/null; then
+            # 如果还存在，尝试发送强制终止信号
+            pkill -KILL -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh"
+        fi
     fi
+ 
     nohup /opt/script/ninja-chatgpt-api/EmailAlert.sh > /dev/null 2>&1 &
     # 提示用户的定时任务执行时间
     INFO1 "已设置告警消息接收邮箱为 $email 检查频率为 $alert_interval！"
