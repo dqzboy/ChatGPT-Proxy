@@ -910,39 +910,37 @@ if [[ "$alert" == "y" ]]; then
 mkdir -p /opt/script/ninja-chatgpt-api
 cat > /opt/script/ninja-chatgpt-api/EmailAlert.sh << \EOF
 #!/usr/bin/env bash
-email_address="email@com"
-images="ninja"
-prev_timestamp=""
-is_alert=false
+
+email_address="dingqz@dcyh.com.cn"
+container_name="ninja"
+prev_error_timestamp=""
 
 while true; do
-  error_code=$(docker logs $images | grep -E "ERROR|WARN" | tail -n1)
-
-  if [ -n "$error_code" ]; then
-    current_timestamp=$(docker logs $images | grep -E "ERROR|WARN" | awk -F'Z ' '{print $2}' | tail -n1)
-
-    if [ -z "$prev_timestamp" ]; then
-      prev_timestamp="$current_timestamp"
-    else
-      if [ "$current_timestamp" != "$prev_timestamp" ]; then
-        echo -e """
+  error_logs=$(docker logs "$container_name" 2>/dev/null | grep "ERROR")
+  
+  while read -r error_log; do
+    current_error_timestamp=$(echo "$error_log" | cut -d ' ' -f 1,2)
+    
+    if [ "$current_error_timestamp" != "$prev_error_timestamp" ]; then
+      IP_ADDR=$(curl -s ifconfig.me)
+      message=$(cat <<-EOM
 -------------------------------------------------------------------
-|  报错时间 | $current_timestamp                   
+|  报错时间 | $current_error_timestamp                   
 |------------------------------------------------------------------
-|  容器名称 | $images                       
+|  容器名称 | $container_name                       
 |------------------------------------------------------------------
-|  错误信息 | $error_code                     
+|  错误信息 | $error_log                     
 |------------------------------------------------------------------
 |  服务器IP | $IP_ADDR                     
 |------------------------------------------------------------------
-|  推送信息 | Warning: $error_code error detected in container log
+|  推送信息 | Warning: $error_log error detected in container log
 -------------------------------------------------------------------
-""" | mail -s "Warning: $error_code error" $email_address
-        is_alert=true
-      fi
-      prev_timestamp="$current_timestamp"
+EOM
+)
+      echo "$message" | mail -s "Warning: $error_log error" "$email_address"
+      prev_error_timestamp="$current_error_timestamp"
     fi
-  fi
+  done <<< "$error_logs"
 
   sleep 5
 done
