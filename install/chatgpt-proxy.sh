@@ -675,11 +675,6 @@ chmod +x /opt/script/go-chatgpt-api/EmailAlert.sh
 
     sed -i "s#email@com#$email#g" /opt/script/go-chatgpt-api/EmailAlert.sh
     sed -i "s#sleep 5#sleep $alert_interval#g" /opt/script/go-chatgpt-api/EmailAlert.sh
-    PID=$(pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh")
-    if [ ! -z "$PID" ]; then
-        # 结束掉进程
-        nohup kill -9 $PID > /dev/null 2>&1 &
-    fi
 
     nohup /opt/script/go-chatgpt-api/EmailAlert.sh > /dev/null 2>&1 &
     # 提示用户的定时任务执行时间
@@ -969,11 +964,6 @@ chmod +x /opt/script/ninja-chatgpt-api/EmailAlert.sh
 
     sed -i "s#email@com#$email#g" /opt/script/ninja-chatgpt-api/EmailAlert.sh
     sed -i "s#sleep 5#sleep $alert_interval#g" /opt/script/ninja-chatgpt-api/EmailAlert.sh
-    PID=$(pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh")
-    if [ ! -z "$PID" ]; then
-        # 结束掉进程
-        nohup kill -9 $PID > /dev/null 2>&1 &
-    fi
  
     nohup /opt/script/ninja-chatgpt-api/EmailAlert.sh > /dev/null 2>&1 &
     # 提示用户的定时任务执行时间
