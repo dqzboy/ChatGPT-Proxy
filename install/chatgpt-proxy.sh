@@ -205,7 +205,19 @@ if command -v yum >/dev/null 2>&1; then
         ERROR "安装失败：系统安装源存在问题,请检查之后再次运行此脚本！"
         exit 1
     fi
+    # 检查 /etc/postfix/main.cf 文件是否存在
+    if [ -f "/etc/postfix/main.cf" ]; then
+        # 检查是否已经存在正确的配置
+        if grep -q "^inet_interfaces = all" "/etc/postfix/main.cf"; then
+        else
+            # 将 inet_interfaces 设置为 all
+            sed -i 's/^inet_interfaces =.*/inet_interfaces = all/' /etc/postfix/main.cf
+        fi
+    else
     systemctl restart postfix &>/dev/null
+
+    echo "文件 /etc/postfix/main.cf 不存在"
+fi
 elif command -v apt-get >/dev/null 2>&1; then
     SUCCESS "安装系统必要组件"
     dpkg --configure -a &>/dev/null
@@ -214,6 +226,15 @@ elif command -v apt-get >/dev/null 2>&1; then
         ERROR "安装失败：系统安装源存在问题,请检查之后再次运行此脚本！"
         exit 1
     fi
+    # 检查 /etc/postfix/main.cf 文件是否存在
+    if [ -f "/etc/postfix/main.cf" ]; then
+        # 检查是否已经存在正确的配置
+        if grep -q "^inet_interfaces = all" "/etc/postfix/main.cf"; then
+        else
+            # 将 inet_interfaces 设置为 all
+            sed -i 's/^inet_interfaces =.*/inet_interfaces = all/' /etc/postfix/main.cf
+        fi
+    else
     systemctl restart postfix &>/dev/null
 else
     WARN "无法确定可用的包管理器"
