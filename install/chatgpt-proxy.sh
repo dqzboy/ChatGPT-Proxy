@@ -911,7 +911,7 @@ mkdir -p /opt/script/ninja-chatgpt-api
 cat > /opt/script/ninja-chatgpt-api/EmailAlert.sh << \EOF
 #!/usr/bin/env bash
 
-email_address="dingqz@dcyh.com.cn"
+email_address="email@com"
 container_name="ninja"
 prev_error_timestamp=""
 
