@@ -675,18 +675,10 @@ chmod +x /opt/script/go-chatgpt-api/EmailAlert.sh
 
     sed -i "s#email@com#$email#g" /opt/script/go-chatgpt-api/EmailAlert.sh
     sed -i "s#sleep 5#sleep $alert_interval#g" /opt/script/go-chatgpt-api/EmailAlert.sh
-    if pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh" >/dev/null; then
-        # 尝试发送终止信号
-        pkill -TERM -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh"
-
-        # 等待一段时间
-        sleep 5
-
-        # 再次检查是否还存在进程
-        if pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh" >/dev/null; then
-            # 如果还存在，尝试发送强制终止信号
-            pkill -KILL -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh"
-        fi
+    PID=$(pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh")
+    if [ ! -z "$PID" ]; then
+        # 结束掉进程
+        kill -9 $PID
     fi
 
     nohup /opt/script/go-chatgpt-api/EmailAlert.sh > /dev/null 2>&1 &
@@ -977,18 +969,10 @@ chmod +x /opt/script/ninja-chatgpt-api/EmailAlert.sh
 
     sed -i "s#email@com#$email#g" /opt/script/ninja-chatgpt-api/EmailAlert.sh
     sed -i "s#sleep 5#sleep $alert_interval#g" /opt/script/ninja-chatgpt-api/EmailAlert.sh
-    if pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh" >/dev/null; then
-        # 尝试发送终止信号
-        pkill -TERM -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh"
-
-        # 等待一段时间
-        sleep 5
-
-        # 再次检查是否还存在进程
-        if pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh" >/dev/null; then
-            # 如果还存在，尝试发送强制终止信号
-            pkill -KILL -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh"
-        fi
+    PID=$(pgrep -f "/opt/script/ninja-chatgpt-api/EmailAlert.sh")
+    if [ ! -z "$PID" ]; then
+        # 结束掉进程
+        kill -9 $PID
     fi
  
     nohup /opt/script/ninja-chatgpt-api/EmailAlert.sh > /dev/null 2>&1 &
