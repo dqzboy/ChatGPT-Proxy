@@ -331,10 +331,16 @@ CHATGPT_BASE_URL = "http(s)://你的服务地址或者IP/chatgpt/backend-api/"
 ```
 #### 项目：[Yidadaa/ChatGPT-Next-Web](https://github.com/Yidadaa/ChatGPT-Next-Web)
 - 接口：http://go-chatgpt-api:8080/imitate/v1/chat/completions  利用 accessToken 模拟 apiKey，实现伪免费使用 API ，从而支持仅支持 apiKey 调用的第三方客户端项目
+- **注意：** 下面的接口地址可以直接在浏览器打开访问才可以正常被Next-Web使用
 ```shell
-http://go-chatgpt-api:8080/imitate
+# go-chatgpt-api
+http://公网IP:8080/imitate
+
+# ninja
+http://公网IP:8080/to
 ```
 <img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/d834ea2f-a56e-45bf-a540-57f88afbefcd" width="800px">
+<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/9fe9b7d9-a89d-4637-80c2-302041c1c553" width="800px">
 
 ## 部署总结
 > 目前使用发现，只要确保节点稳定或者国内服务器配置的代理地址稳定(没有被opeai封锁)，那么就可以正常使用。
