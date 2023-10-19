@@ -208,8 +208,7 @@ if command -v yum >/dev/null 2>&1; then
     # 检查 /etc/postfix/main.cf 文件是否存在
     if [ -f "/etc/postfix/main.cf" ]; then
         # 检查是否已经存在正确的配置
-        if grep -q "^inet_interfaces = all" "/etc/postfix/main.cf"; then
-        else
+        if ! grep -q "^inet_interfaces = all" "/etc/postfix/main.cf"; then
             # 将 inet_interfaces 设置为 all
             sed -i 's/^inet_interfaces =.*/inet_interfaces = all/' /etc/postfix/main.cf
         fi
@@ -229,13 +228,13 @@ elif command -v apt-get >/dev/null 2>&1; then
     # 检查 /etc/postfix/main.cf 文件是否存在
     if [ -f "/etc/postfix/main.cf" ]; then
         # 检查是否已经存在正确的配置
-        if grep -q "^inet_interfaces = all" "/etc/postfix/main.cf"; then
-        else
+        if ! grep -q "^inet_interfaces = all" "/etc/postfix/main.cf"; then
             # 将 inet_interfaces 设置为 all
             sed -i 's/^inet_interfaces =.*/inet_interfaces = all/' /etc/postfix/main.cf
         fi
     else
-    systemctl restart postfix &>/dev/null
+        systemctl restart postfix &>/dev/null
+    fi
 else
     WARN "无法确定可用的包管理器"
     exit 1
