@@ -334,10 +334,10 @@ CHATGPT_BASE_URL = "http(s)://你的服务地址或者IP/chatgpt/backend-api/"
 - **注意：** 下面的接口地址可以直接在浏览器打开访问才可以正常被Next-Web使用
 ```shell
 # go-chatgpt-api
-http://公网IP:8080/imitate
+http://IP:8080/imitate
 
 # ninja
-http://公网IP:8080/to
+http://IP:8080/to
 ```
 <img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/d834ea2f-a56e-45bf-a540-57f88afbefcd" width="800px">
 <img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/9fe9b7d9-a89d-4637-80c2-302041c1c553" width="800px">
