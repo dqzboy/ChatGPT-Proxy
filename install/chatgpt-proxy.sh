@@ -34,6 +34,7 @@ echo "--------------------------------------------------------------------------
 echo
 echo -e "\033[32m机场推荐\033[0m(\033[34m按量不限时，解锁ChatGPT\033[0m)：\033[34;4mhttps://mojie.mx/#/register?code=CG6h8Irm\033[0m"
 echo
+echo "----------------------------------------------------------------------------------------------------------"
 
 SUCCESS() {
   ${SETCOLOR_SUCCESS} && echo "------------------------------------< $1 >-------------------------------------"  && ${SETCOLOR_NORMAL}
@@ -164,6 +165,23 @@ echo "系统ID Like: $ID_LIKE"
 echo "--------------------------------------------------------"
 }
 
+function CHECK_PACKAGE_MANAGER() {
+    # 判断使用的包管理工具是 yum 还是 dnf 还是 apt-get
+    if command -v dnf &> /dev/null; then
+        package_manager="dnf"
+	$package_manager clean all &> /dev/null
+    elif command -v yum &> /dev/null; then
+        package_manager="yum"
+	$package_manager clean all &> /dev/null
+    elif command -v apt-get &> /dev/null; then
+        package_manager="apt-get"
+	$package_manager clean all &> /dev/null
+    else
+        ERROR "Unsupported package manager."
+        exit 1
+    fi
+}
+
 function CHECKFIRE() {
 SUCCESS "Firewall && SELinux detection."
 
@@ -192,15 +210,14 @@ function INSTALL_PACKAGE(){
 PACKAGES_APT="lsof jq wget postfix mailutils"
 PACKAGES_YUM="lsof jq wget postfix yum-utils mailx s-nail"
 
-# 检查命令是否存在
-if command -v yum >/dev/null 2>&1; then
+if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
     SUCCESS "安装系统必要组件"
-    yum -y install epel* --skip-broken &>/dev/null
+    $package_manager -y install epel-release --skip-broken &>/dev/null
     if [ $? -ne 0 ]; then
         ERROR "安装失败：系统安装源存在问题,请检查之后再次运行此脚本！"
         exit 1
     fi
-    yum -y install $PACKAGES_YUM --skip-broken &>/dev/null
+    $package_manager -y install $PACKAGES_YUM --skip-broken &>/dev/null
     if [ $? -ne 0 ]; then
         ERROR "安装失败：系统安装源存在问题,请检查之后再次运行此脚本！"
         exit 1
@@ -211,16 +228,15 @@ if command -v yum >/dev/null 2>&1; then
         if ! grep -q "^inet_interfaces = all" "/etc/postfix/main.cf"; then
             # 将 inet_interfaces 设置为 all
             sed -i 's/^inet_interfaces =.*/inet_interfaces = all/' /etc/postfix/main.cf
+            systemctl restart postfix &>/dev/null
         fi
     else
-    systemctl restart postfix &>/dev/null
-
-    echo "文件 /etc/postfix/main.cf 不存在"
-fi
-elif command -v apt-get >/dev/null 2>&1; then
+        echo "文件 /etc/postfix/main.cf 不存在"
+    fi
+elif [ "$package_manager" = "apt-get" ];then
     SUCCESS "安装系统必要组件"
     dpkg --configure -a &>/dev/null
-    apt-get update && apt-get install -y $PACKAGES_APT --ignore-missing &>/dev/null
+    $package_manager update && $package_manager install -y $PACKAGES_APT --ignore-missing &>/dev/null
     if [ $? -ne 0 ]; then
         ERROR "安装失败：系统安装源存在问题,请检查之后再次运行此脚本！"
         exit 1
@@ -231,9 +247,10 @@ elif command -v apt-get >/dev/null 2>&1; then
         if ! grep -q "^inet_interfaces = all" "/etc/postfix/main.cf"; then
             # 将 inet_interfaces 设置为 all
             sed -i 's/^inet_interfaces =.*/inet_interfaces = all/' /etc/postfix/main.cf
+            systemctl restart postfix &>/dev/null
         fi
     else
-        systemctl restart postfix &>/dev/null
+	echo "文件 /etc/postfix/main.cf 不存在"
     fi
 else
     WARN "无法确定可用的包管理器"
@@ -1100,6 +1117,7 @@ show_menu() {
 main() {
     CHECK_CPU
     CHECK_OPENAI
+    CHECK_PACKAGE_MANAGER
     CHECK_OS
     CHECKFIRE
     INSTALL_PACKAGE
