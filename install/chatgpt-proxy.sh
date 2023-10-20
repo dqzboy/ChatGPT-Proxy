@@ -175,7 +175,7 @@ function CHECK_PACKAGE_MANAGER() {
 	$package_manager clean all &> /dev/null
     elif command -v apt-get &> /dev/null; then
         package_manager="apt-get"
-	$package_manager clean all &> /dev/null
+	$package_manager update &> /dev/null
     else
         ERROR "Unsupported package manager."
         exit 1
