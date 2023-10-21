@@ -27,7 +27,9 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 ```shell
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/main/install/chatgpt-proxy.sh)"
 ```
-<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/78b7bc85-24a5-41f4-8a1b-8b3338c51570" width="800px">
+<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/76f6b21d-e305-419a-b065-6e515a38a2a2" width="1000px">
+
+---
 
 # ChatGPT-Porxy手动部署
 ## 一、环境说明
@@ -245,7 +247,7 @@ ss -tnlp|grep 8080
 # 查看容器日志是否运行正常
 docker logs -f ninja
 ```
-<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/b1d2a0e4-233d-444e-9617-987d069deb76" width="800px">
+<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/b1d2a0e4-233d-444e-9617-987d069deb76" width="1000px">
 
 ### go-chatgpt-api需要初始化启动需要耐心等待
 ```shell
@@ -255,7 +257,7 @@ docker logs -f go-chatgpt-api
 
 - 出现下图中 `Service go-chatgpt-api is ready.` 则表示服务可正常使用了
 
-<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/081886e0-72e8-44b5-954f-e122efcedfcb" width="800px">
+<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/081886e0-72e8-44b5-954f-e122efcedfcb" width="1000px">
 
 ## 七、容器镜像更新
 ```shell
@@ -301,10 +303,10 @@ API_REVERSE_PROXY=http://127.0.0.1:8080/chatgpt/backend-api/conversation
 ```
 
 - 现在我们访问chatgpt-web，查看是否可以正常使用
-<img src="https://user-images.githubusercontent.com/42825450/236637545-5b121bf1-79c4-4985-87cb-b64bd23ba453.gif" width="800px">
+<img src="https://user-images.githubusercontent.com/42825450/236637545-5b121bf1-79c4-4985-87cb-b64bd23ba453.gif" width="1000px">
 
 - 同样日志返回请求结果正常
-<img src="https://user-images.githubusercontent.com/42825450/236637560-ae2baf1f-69ed-423e-b4d8-4700aedee3e4.png" width="800px">
+<img src="https://user-images.githubusercontent.com/42825450/236637560-ae2baf1f-69ed-423e-b4d8-4700aedee3e4.png" width="1000px">
 
 ##### **ChatGPTAPI(APIKEY)**
 - 使用ChatGPTAPI模式，并使用我们自建的代理地址进行访问；
@@ -314,7 +316,7 @@ API_REVERSE_PROXY=http://127.0.0.1:8080/chatgpt/backend-api/conversation
 ```shell
 OPENAI_API_BASE_URL=http://127.0.0.1:8080/platform
 ```
-<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/aa93dd61-ab4d-4e56-9677-d86d8287eab9" width="800px">
+<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/aa93dd61-ab4d-4e56-9677-d86d8287eab9" width="1000px">
 
 #### 项目：[chatgpt-mirai-qq-bot](https://github.com/lss233/chatgpt-mirai-qq-bot)
 ```shell
@@ -339,8 +341,8 @@ http://IP:8080/imitate
 # ninja
 http://IP:8080/to
 ```
-<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/d834ea2f-a56e-45bf-a540-57f88afbefcd" width="800px">
-<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/9fe9b7d9-a89d-4637-80c2-302041c1c553" width="800px">
+<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/d834ea2f-a56e-45bf-a540-57f88afbefcd" width="1000px">
+<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/9fe9b7d9-a89d-4637-80c2-302041c1c553" width="1000px">
 
 ## 部署总结
 > 目前使用发现，只要确保节点稳定或者国内服务器配置的代理地址稳定(没有被opeai封锁)，那么就可以正常使用。
