@@ -953,7 +953,7 @@ container_name="ninja"
 prev_error_timestamp=""
 
 while true; do
-  error_logs=$(docker logs "$container_name" 2>/dev/null | grep "ERROR")
+  error_logs=$(docker logs "$container_name" 2>/dev/null | grep -E "ERROR|WARN")
   
   while read -r error_log; do
     current_error_timestamp=$(echo "$error_log" | cut -d ' ' -f 1,2)
