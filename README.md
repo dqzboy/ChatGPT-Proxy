@@ -106,7 +106,7 @@ services:
     # volumes:
       # - ${PWD}/ssl:/etc
       # - ${PWD}/serve.toml:/serve.toml
-    command: serve run           # --disable-direct关闭本地直连 --disable-webui关闭自带WEB
+    command: run           # --disable-direct关闭本地直连 --disable-webui关闭自带WEB
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
 ```
@@ -136,7 +136,7 @@ services:
     # volumes:
       # - ${PWD}/ssl:/etc
       # - ${PWD}/serve.toml:/serve.toml
-    command: serve run           # --disable-direct关闭本地直连 --disable-webui关闭自带WEB
+    command: run           # --disable-direct关闭本地直连 --disable-webui关闭自带WEB
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     depends_on:
