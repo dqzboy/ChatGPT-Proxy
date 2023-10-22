@@ -778,7 +778,7 @@ services:
     # volumes:
       # - ${PWD}/ssl:/etc
       # - ${PWD}/serve.toml:/serve.toml
-    command: serve run --disable-webui
+    command: run --disable-webui
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
   watchtower:
@@ -809,7 +809,7 @@ services:
     # volumes:
       # - ${PWD}/ssl:/etc
       # - ${PWD}/serve.toml:/serve.toml
-    command: serve run --disable-webui
+    command: run --disable-webui
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     depends_on:
