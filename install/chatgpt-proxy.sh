@@ -110,9 +110,13 @@ url="chat.openai.com"
 echo "Testing connection to ${url}..."
 if curl --output /dev/null --silent --head --fail ${url}; then
   echo "Connection successful!"
-  echo "--------------------------------------------------------"
-  WARN "提示：此处测试结果仅代表你的服务器可以访问OPENAI"
-  WARN "是否可以使用OPENAI接口还需要部署完成之后测试！"
+  echo """
+╭──────────────────────────────────────────────────────╮
+│                                                      │
+│  提示：此处测试结果仅代表你的服务器可以访问OPENAI    │
+│       是否可以使用OPENAI接口还需要部署完成之后测试!  │
+│                                                      │
+╰──────────────────────────────────────────────────────╯"""
   URL="OK"
 else
   echo "Could not connect to ${url}."
