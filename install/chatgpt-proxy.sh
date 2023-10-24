@@ -211,21 +211,23 @@ fi
 }
 
 function INSTALL_PACKAGE(){
-PACKAGES_APT="lsof jq wget postfix mailutils"
-PACKAGES_YUM="lsof jq wget postfix yum-utils mailx s-nail"
+PACKAGES_APT=(
+    lsof jq wget postfix mailutils
+)
+PACKAGES_YUM=(
+    epel-release lsof jq wget postfix yum-utils mailx s-nail
+)
 
 if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
-    SUCCESS "安装系统必要组件"
-    $package_manager -y install epel-release --skip-broken &>/dev/null
-    if [ $? -ne 0 ]; then
-        ERROR "安装失败：系统安装源存在问题,请检查之后再次运行此脚本！"
-        exit 1
-    fi
-    $package_manager -y install $PACKAGES_YUM --skip-broken &>/dev/null
-    if [ $? -ne 0 ]; then
-        ERROR "安装失败：系统安装源存在问题,请检查之后再次运行此脚本！"
-        exit 1
-    fi
+    SUCCESS "Install necessary system components"
+    for package in "${PACKAGES_YUM[@]}"; do
+        echo "正在安装 $package ..."
+        $package_manager -y install "$package" --skip-broken > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            ERROR "安装 $Ppackage 失败,请检查系统安装源之后再次运行此脚本！"
+	    exit 1
+        fi
+    done    
     # 检查 /etc/postfix/main.cf 文件是否存在
     if [ -f "/etc/postfix/main.cf" ]; then
         # 检查是否已经存在正确的配置
@@ -238,13 +240,17 @@ if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
         echo "文件 /etc/postfix/main.cf 不存在"
     fi
 elif [ "$package_manager" = "apt-get" ];then
-    SUCCESS "安装系统必要组件"
+    SUCCESS "Install necessary system components"
     dpkg --configure -a &>/dev/null
-    $package_manager update && $package_manager install -y $PACKAGES_APT --ignore-missing &>/dev/null
-    if [ $? -ne 0 ]; then
-        ERROR "安装失败：系统安装源存在问题,请检查之后再次运行此脚本！"
-        exit 1
-    fi
+    $package_manager update &>/dev/null
+    for package in "${PACKAGES_APT[@]}"; do
+        echo "正在安装 $package ..."
+        $package_manager install -y $package > /dev/null 2>&1
+        if [ $? -ne 0 ]; then
+            ERROR "安装 $package 失败,请检查系统安装源之后再次运行此脚本！"
+            exit 1
+        fi
+    done
     # 检查 /etc/postfix/main.cf 文件是否存在
     if [ -f "/etc/postfix/main.cf" ]; then
         # 检查是否已经存在正确的配置
@@ -756,6 +762,38 @@ if [ "$answer" == "y" ]; then
 fi
 }
 
+function ninja_UPLOAD_HAR() {
+read -e -p "$(echo -e ${GREEN}"是否上传HAR文件？(y/n): "${RESET})" har
+
+if [ "$har" == "y" ]; then
+    attempts=0
+    while [ $attempts -lt 3 ]; do
+	read -e -p "请输入本机存放HAR文件的路径(eg:/data/chat.openai.com.har): " hardir
+        # 校验用户输入的路径是否不为空
+        if [ -z "$hardir" ]; then
+            ERROR "路径不能为空，请重新输入！"
+        elif [ ! -f "$hardir" ]; then
+            ERROR "文件不存在，请重新输入！"
+        else
+            sed -i "s|#volumes|volumes|g" ${DOCKER_DIR}/docker-compose.yml
+            sed -i "s|#- HARFILE|- $hardir|g" ${DOCKER_DIR}/docker-compose.yml
+            break
+        fi
+        attempts=$((attempts + 1))
+    done
+    if [ $attempts -ge 3 ]; then
+        ERROR "超过最大尝试次数,请确认文件路径后再次运行此脚本!"
+        exit 1
+    fi
+elif [ "$har" == "n" ]; then
+    WARN "不上传HAR文件"
+else
+    ERROR "无效的输入，请输入 'y' 或 'n'"
+    exit 1
+fi
+}
+
+
 function ninja_CONFIG() {
 DOCKER_DIR="/data/ninja-chatgpt-api"
 mkdir -p ${DOCKER_DIR}
@@ -779,9 +817,10 @@ services:
       # - HOST=0.0.0.0
       # - TLS_CERT=
       # - TLS_KEY=
-    # volumes:
-      # - ${PWD}/ssl:/etc
-      # - ${PWD}/serve.toml:/serve.toml
+    #volumes:
+      #- ${PWD}/ssl:/etc
+      #- ${PWD}/serve.toml:/serve.toml
+      #- HARFILE:/root/.chat.openai.com.har
     command: run --disable-webui
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
@@ -810,9 +849,9 @@ services:
       # - HOST=0.0.0.0
       # - TLS_CERT=
       # - TLS_KEY=
-    # volumes:
-      # - ${PWD}/ssl:/etc
-      # - ${PWD}/serve.toml:/serve.toml
+    #volumes:
+      #- ${PWD}/ssl:/etc
+      #- ${PWD}/serve.toml:/serve.toml
     command: run --disable-webui
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
@@ -861,19 +900,19 @@ case $modify_config in
        if [ "$url_type" == "http" ]; then
           sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
           sed -i "s|#http://host:port|- PROXIES=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
-          sed -i 's/command: serve run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
+          sed -i 's/command: run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
 	  sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
           sed -i "s|#socks5://host:port|- PROXIES=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
-          sed -i 's/command: serve run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
+          sed -i 's/command: run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        fi
     elif [ "$mode" == "warp" ]; then
        if [ "$url_type" == "http" ]; then
           sed -i "s|- PROXIES=socks5://chatgpt-proxy-server-warp:65535|- PROXIES=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
-          sed -i 's/command: serve run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
+          sed -i 's/command: run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
           sed -i "s|- PROXIES=socks5://chatgpt-proxy-server-warp:65535|- PROXIES=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
-          sed -i 's/command: serve run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
+          sed -i 's/command: run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        fi
     else
        echo "Do not modify！"
@@ -888,7 +927,7 @@ case $modify_config in
     ;;
 esac
 ninja_MODIFY_PORT
-
+ninja_UPLOAD_HAR
 }
 
 
@@ -1112,6 +1151,7 @@ deploy_ninja_chatgpt_api() {
 }
 
 show_menu() {
+    echo "--------------------------------------------------------"
     echo -e "${GREEN}请选择要部署的应用:${RESET}"
     echo -e "1. go-chatgpt-api"
     echo -e "2. ninja-chatgpt-api"
