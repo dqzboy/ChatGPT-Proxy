@@ -23,12 +23,12 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 > **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新、403|401|429检测邮箱告警(使用QQ邮箱会被Tencent邮箱服务拦截)、uptime-kuma监控等功能！
 - **说明**：目前脚本适用于CentOS 7\8\9、RHEL-8\9、Ubuntu、debian以及opencloudos系统；运行脚本需要确保网络环境稳定(确保系统所需组件可以正常下载)。
 - **提示**：目前脚本支持[linweiyuan/go-chatgpt-api](https://github.com/linweiyuan/go-chatgpt-api) 和 [gngpp/ninja](https://github.com/gngpp/ninja) 项目的一键部署。go-chatgpt-api项目作者已弃坑，大家搭建时可以选择部署 ninja
+- **提示**：目前GPT3.5和4都需要Arkose Token作为参数发送，所以你需要一个Arkose Toke端点或者去官方发送会话消息获取HAR日志记录文件，ninja项目可以使用启动参数`--arkose-token-endpoint`指定端点获取token 或者使用参数`--arkose-chat-har-file`指定HAR文件路径使用
 
 ```shell
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/main/install/chatgpt-proxy.sh)"
 ```
 <img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/76f6b21d-e305-419a-b065-6e515a38a2a2" width="1000px">
-
 ---
 
 # ChatGPT-Porxy手动部署
@@ -81,7 +81,7 @@ docker-compose -v
 mkdir -p /data/go-chatgpt-api && cd $_
 ```
 #### 2、创建部署清单
-> GPT-4 相关模型目前需要验证 arkose_token，自行搭建可参考项目：[xyhelper-arkose-v2](https://github.com/xyhelper/xyhelper-arkose-v2) <br>
+> 目前GPT3.5和GPT-4 相关模型目前需要验证 arkose_token，自行搭建arkose_token端点可参考项目：[xyhelper-arkose-v2](https://github.com/xyhelper/xyhelper-arkose-v2) <br>
 > 免费服务：https://chatarkose.xyhelper.cn/token
 #### 服务器直连或通过代理可正常访问ChatGPT
 - 如果你的VPS IP稳定，或者你使用的科学上网地址稳定，那就首选这种方式
@@ -164,7 +164,7 @@ services:
 mkdir -p /data/go-chatgpt-api && cd $_
 ```
 #### 2、创建部署清单
-> GPT-4 相关模型目前需要验证 arkose_token，自行搭建可参考项目：[xyhelper-arkose-v2](https://github.com/xyhelper/xyhelper-arkose-v2) <br>
+> 目前GPT3.5和GPT-4 相关模型目前需要验证 arkose_token，自行搭建arkose_token端点可参考项目：[xyhelper-arkose-v2](https://github.com/xyhelper/xyhelper-arkose-v2) <br>
 > 免费服务：https://chatarkose.xyhelper.cn/token
 #### 服务器直连或通过代理可正常访问ChatGPT
   - 如果你的VPS IP稳定，或者你使用的科学上网地址稳定，那就首选这种方式
