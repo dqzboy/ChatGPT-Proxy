@@ -29,6 +29,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/main/install/chatgpt-proxy.sh)"
 ```
 <img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/76f6b21d-e305-419a-b065-6e515a38a2a2" width="1000px">
+
 ---
 
 # ChatGPT-Porxy手动部署
