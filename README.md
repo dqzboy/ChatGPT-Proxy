@@ -20,7 +20,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 > 如果部署或者配置过程出现问题或不懂的地方，请先搜索历史[issue](https://github.com/dqzboy/ChatGPT-Proxy/issues)或者加[TG交流群](https://t.me/+ghs_XDp1vwxkMGU9)
 
 # ChatGPT-Porxy一键部署
-> **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新、403|401|429、ERROR检测邮箱告警(使用QQ邮箱会被Tencent邮箱服务拦截)、uptime-kuma监控、手动上传HAR文件等功能！
+> **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新、403|401|429、ERROR检测邮箱告警、uptime-kuma监控等功能！
 - **说明**：目前脚本适用于CentOS 7\8\9、RHEL-8\9、Ubuntu、debian以及opencloudos系统；运行脚本需要确保网络环境稳定(确保系统所需组件可以正常下载)。
 - **提示**：目前脚本支持[linweiyuan/go-chatgpt-api](https://github.com/linweiyuan/go-chatgpt-api) 和 [gngpp/ninja](https://github.com/gngpp/ninja) 项目的一键部署。go-chatgpt-api项目作者已弃坑，大家搭建时可以选择部署 ninja
 - **提示**：目前GPT3.5和4都需要Arkose Token作为参数发送，所以你需要一个Arkose Toke端点或者去官方发送会话消息获取HAR日志记录文件，ninja项目可以使用启动参数`--arkose-token-endpoint`指定端点获取token 或者使用参数`--arkose-chat-har-file`指定HAR文件路径使用
