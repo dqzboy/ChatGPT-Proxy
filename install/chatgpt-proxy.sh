@@ -763,20 +763,79 @@ fi
 }
 
 function ninja_UPLOAD_HAR() {
-read -e -p "$(echo -e ${GREEN}"是否上传HAR文件？(y/n): "${RESET})" har
-
+#--arkose-chat3-har-file <ARKOSE_CHAT3_HAR_FILE>
+    #About the browser HAR file path requested by ChatGPT GPT-3.5 ArkoseLabs
+#--arkose-chat4-har-file <ARKOSE_CHAT4_HAR_FILE>
+    #About the browser HAR file path requested by ChatGPT GPT-4 ArkoseLabs
+read -e -p "$(echo -e ${GREEN}"是否上传ARKOSE_CHAT_HAR文件？(y/n): "${RESET})" har
 if [ "$har" == "y" ]; then
+    read -e -p "$(echo -e ${GREEN}"要上传GPT-3还是GPT-4的HAR文件？(3/4): "${RESET})" gpt_version
+    if [ "$gpt_version" == "3" ]; then
+        attempts=0
+        while [ $attempts -lt 3 ]; do
+        read -e -p "请输入本机存放ARKOSE_CHAT3_HAR文件的路径(eg:/data/chat.openai.com.har): " hardir
+            # 校验用户输入的路径是否不为空
+            if [ -z "$hardir" ]; then
+                ERROR "路径不能为空，请重新输入！"
+            elif [ ! -f "$hardir" ]; then
+                ERROR "文件不存在，请重新输入！"
+            else
+                sed -i "s|#volumes|volumes|g" ${DOCKER_DIR}/docker-compose.yml
+                sed -i "s|#- HAR3|- $hardir|g" ${DOCKER_DIR}/docker-compose.yml
+                break
+            fi
+            attempts=$((attempts + 1))
+        done
+        if [ $attempts -ge 3 ]; then
+            ERROR "超过最大尝试次数,请确认文件路径后再次运行此脚本!"
+            exit 1
+        fi
+    elif [ "$gpt_version" == "4" ]; then
+        attempts=0
+        while [ $attempts -lt 3 ]; do
+        read -e -p "请输入本机存放ARKOSE_CHAT4_HAR文件的路径(eg:/data/chat.openai.com.har): " hardir
+            # 校验用户输入的路径是否不为空
+            if [ -z "$hardir" ]; then
+                ERROR "路径不能为空，请重新输入！"
+            elif [ ! -f "$hardir" ]; then
+                ERROR "文件不存在，请重新输入！"
+            else
+                sed -i "s|#volumes|volumes|g" ${DOCKER_DIR}/docker-compose.yml
+                sed -i "s|#- HAR4|- $hardir|g" ${DOCKER_DIR}/docker-compose.yml
+                break
+            fi
+            attempts=$((attempts + 1))
+        done
+        if [ $attempts -ge 3 ]; then
+            ERROR "超过最大尝试次数,请确认文件路径后再次运行此脚本!"
+            exit 1
+        fi
+    else
+        ERROR "无效的输入，请输入 '3' 或 '4'"
+        exit 1
+    fi
+elif [ "$har" == "n" ]; then
+    WARN "不上传ARKOSE_CHAT_HAR文件"
+else
+    ERROR "无效的输入，请输入 'y' 或 'n'"
+    exit 1
+fi
+
+#--arkose-auth-har-file <ARKOSE_AUTH_HAR_FILE>
+    #About the browser HAR file path requested by Auth ArkoseLabs
+read -e -p "$(echo -e ${GREEN}"是否上传ARKOSE_AUTH_HAR文件？(y/n): "${RESET})" auth_har
+if [ "$auth_har" == "y" ]; then
     attempts=0
     while [ $attempts -lt 3 ]; do
-	read -e -p "请输入本机存放HAR文件的路径(eg:/data/chat.openai.com.har): " hardir
+    read -e -p "请输入本机存放ARKOSE_AUTH_HAR文件的路径(eg:/data/auth.openai.com.har): " auth_hardir
         # 校验用户输入的路径是否不为空
-        if [ -z "$hardir" ]; then
+        if [ -z "$auth_hardir" ]; then
             ERROR "路径不能为空，请重新输入！"
-        elif [ ! -f "$hardir" ]; then
+        elif [ ! -f "$auth_hardir" ]; then
             ERROR "文件不存在，请重新输入！"
         else
             sed -i "s|#volumes|volumes|g" ${DOCKER_DIR}/docker-compose.yml
-            sed -i "s|#- HARFILE|- $hardir|g" ${DOCKER_DIR}/docker-compose.yml
+            sed -i "s|#- AUTH_HAR|- $auth_hardir|g" ${DOCKER_DIR}/docker-compose.yml
             break
         fi
         attempts=$((attempts + 1))
@@ -785,8 +844,36 @@ if [ "$har" == "y" ]; then
         ERROR "超过最大尝试次数,请确认文件路径后再次运行此脚本!"
         exit 1
     fi
-elif [ "$har" == "n" ]; then
-    WARN "不上传HAR文件"
+elif [ "$auth_har" == "n" ]; then
+    WARN "不上传ARKOSE_AUTH_HAR文件"
+else
+    ERROR "无效的输入，请输入 'y' 或 'n'"
+    exit 1
+fi
+
+read -e -p "$(echo -e ${GREEN}"是否上传ARKOSE_PLATFORM_HAR文件？(y/n): "${RESET})" platform_har
+if [ "$platform_har" == "y" ]; then
+    attempts=0
+    while [ $attempts -lt 3 ]; do
+    read -e -p "请输入本机存放ARKOSE_PLATFORM_HAR文件的路径(eg:/data/platform.openai.com.har): " platform_hardir
+        # 校验用户输入的路径是否不为空
+        if [ -z "$platform_hardir" ]; then
+            ERROR "路径不能为空，请重新输入！"
+        elif [ ! -f "$platform_hardir" ]; then
+            ERROR "文件不存在，请重新输入！"
+        else
+            sed -i "s|#volumes|volumes|g" ${DOCKER_DIR}/docker-compose.yml
+            sed -i "s|#- PLATFORM_HAR|- $platform_hardir|g" ${DOCKER_DIR}/docker-compose.yml
+            break
+        fi
+        attempts=$((attempts + 1))
+    done
+    if [ $attempts -ge 3 ]; then
+        ERROR "超过最大尝试次数,请确认文件路径后再次运行此脚本!"
+        exit 1
+    fi
+elif [ "$platform_har" == "n" ]; then
+    WARN "不上传ARKOSE_PLATFORM_HAR文件"
 else
     ERROR "无效的输入，请输入 'y' 或 'n'"
     exit 1
@@ -820,7 +907,10 @@ services:
     #volumes:
       #- ${PWD}/ssl:/etc
       #- ${PWD}/serve.toml:/serve.toml
-      #- HARFILE:/root/.chat.openai.com.har
+      #- HAR3:/root/.chat3.openai.com.har
+      #- HAR4:/root/.chat4.openai.com.har
+      #- AUTH_HAR:/root/.auth.openai.com.har
+      #- PLATFORM_HAR:/root/.platform.openai.com.har
     command: run --disable-webui
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
@@ -852,6 +942,10 @@ services:
     #volumes:
       #- ${PWD}/ssl:/etc
       #- ${PWD}/serve.toml:/serve.toml
+      #- HAR3:/root/.chat3.openai.com.har
+      #- HAR4:/root/.chat4.openai.com.har
+      #- AUTH_HAR:/root/.auth.openai.com.har
+      #- PLATFORM_HAR:/root/.platform.openai.com.har 
     command: run --disable-webui
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
@@ -957,6 +1051,7 @@ if [[ "$force_install" = "y" ]]; then
     WARN "开始强制安装..."
     INSTALL_DOCKER
     INSTALL_COMPOSE
+    INFO "**************************************"
     cd ${DOCKER_DIR} && docker-compose down &>/dev/null
     ninja_CONFIG
     cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && ninja_CHRCK_CONTAINER
@@ -967,6 +1062,7 @@ elif [[ "$URL" = "OK" ]];then
     INSTALL_COMPOSE
     cd ${DOCKER_DIR} && docker-compose down &>/dev/null
     ninja_CONFIG
+    INFO "**************************************"
     cd ${DOCKER_DIR} && docker-compose pull && docker-compose up -d && ninja_CHRCK_CONTAINER
 else
     ERROR "已取消安装."
@@ -1164,7 +1260,7 @@ main() {
     CHECK_PACKAGE_MANAGER
     CHECK_OS
     CHECKFIRE
-    INSTALL_PACKAGE
+    #INSTALL_PACKAGE
 
     show_menu
     read -e -p "$(echo -e ${GREEN}"请输入对应的数字: "${RESET})" api_choice
