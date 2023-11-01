@@ -1161,7 +1161,7 @@ main() {
     CHECK_PACKAGE_MANAGER
     CHECK_OS
     CHECKFIRE
-    #INSTALL_PACKAGE
+    INSTALL_PACKAGE
 
     show_menu
     read -e -p "$(echo -e ${GREEN}"请输入对应的数字: "${RESET})" api_choice
