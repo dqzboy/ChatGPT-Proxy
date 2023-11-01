@@ -35,6 +35,7 @@ echo
 echo -e "\033[32m机场推荐\033[0m(\033[34m按量不限时，解锁ChatGPT\033[0m)：\033[34;4mhttps://mojie.mx/#/register?code=CG6h8Irm\033[0m"
 echo
 echo "----------------------------------------------------------------------------------------------------------"
+echo
 
 SUCCESS() {
   ${SETCOLOR_SUCCESS} && echo "------------------------------------< $1 >-------------------------------------"  && ${SETCOLOR_NORMAL}
@@ -69,6 +70,7 @@ INTERFACE=$(ip -o -4 route show to default | awk '{print $5}')
 IP_ADDR=$(ip -o -4 addr show dev "$INTERFACE" | awk '{split($4, a, "/"); print a[1]}')
 
 function Progress() {
+set +x
 spin='-\|/'
 count=0
 endtime=$((SECONDS+10))
@@ -110,8 +112,7 @@ url="chat.openai.com"
 echo "Testing connection to ${url}..."
 if curl --output /dev/null --silent --head --fail ${url}; then
   echo "Connection successful!"
-  echo """
-╭──────────────────────────────────────────────────────╮
+  echo """╭──────────────────────────────────────────────────────╮
 │                                                      │
 │  提示：此处测试结果仅代表你的服务器可以访问OPENAI    │
 │       是否可以使用OPENAI接口还需要部署完成之后测试!  │
@@ -221,13 +222,17 @@ PACKAGES_YUM=(
 if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
     SUCCESS "Install necessary system components"
     for package in "${PACKAGES_YUM[@]}"; do
-        echo "正在安装 $package ..."
-        $package_manager -y install "$package" --skip-broken > /dev/null 2>&1
-        if [ $? -ne 0 ]; then
-            ERROR "安装 $Ppackage 失败,请检查系统安装源之后再次运行此脚本！"
-	    exit 1
+        if rpm -q "$package" &>/dev/null; then
+             echo "$package 已经安装，跳过..."
+        else
+            echo "正在安装 $package ..."
+            $package_manager -y install "$package" --skip-broken > /dev/null 2>&1
+            if [ $? -ne 0 ]; then
+                ERROR "安装 $package 失败，请检查系统安装源之后再次运行此脚本！"
+                exit 1
+            fi
         fi
-    done    
+    done
     # 检查 /etc/postfix/main.cf 文件是否存在
     if [ -f "/etc/postfix/main.cf" ]; then
         # 检查是否已经存在正确的配置
@@ -244,11 +249,15 @@ elif [ "$package_manager" = "apt-get" ];then
     dpkg --configure -a &>/dev/null
     $package_manager update &>/dev/null
     for package in "${PACKAGES_APT[@]}"; do
-        echo "正在安装 $package ..."
-        $package_manager install -y $package > /dev/null 2>&1
-        if [ $? -ne 0 ]; then
-            ERROR "安装 $package 失败,请检查系统安装源之后再次运行此脚本！"
-            exit 1
+        if dpkg -s "$package" &>/dev/null; then
+            echo "$package 已经安装，跳过..."
+        else
+            echo "正在安装 $package ..."
+            $package_manager install -y $package > /dev/null 2>&1
+            if [ $? -ne 0 ]; then
+                ERROR "安装 $package 失败,请检查系统安装源之后再次运行此脚本！"
+                exit 1
+            fi
         fi
     done
     # 检查 /etc/postfix/main.cf 文件是否存在
