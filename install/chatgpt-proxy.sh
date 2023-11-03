@@ -790,14 +790,6 @@ services:
       - PROXIES=                 # PROXIES=：可配置科学上网代理地址，例如：http://clash_vpsIP:7890；注释掉或者留空则不启用
       #http://host:port          # PROXIES=：科学上网代理地址，例如：http://clash_vpsIP:7890
       #socks5://host:port        # PROXIES=：科学上网代理地址，例如：socks5://clash_vpsIP:7890
-      # - CONFIG=/serve.toml
-      # - PORT=8080
-      # - HOST=0.0.0.0
-      # - TLS_CERT=
-      # - TLS_KEY=
-    #volumes:
-      #- ${PWD}/ssl:/etc
-      #- ${PWD}/serve.toml:/serve.toml
     command: run --disable-webui
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
@@ -821,14 +813,6 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - PROXIES=socks5://warp:10000
-      # - CONFIG=/serve.toml
-      # - PORT=8080
-      # - HOST=0.0.0.0
-      # - TLS_CERT=
-      # - TLS_KEY=
-    #volumes:
-      #- ${PWD}/ssl:/etc
-      #- ${PWD}/serve.toml:/serve.toml
     command: run --disable-webui
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
