@@ -157,32 +157,43 @@ case "$ID" in
         repo_type="centos"
         ;;
     *)
-        WARN "此脚本暂不支持您的系统: $ID"
+        WARN "This script does not currently support your system.: $ID"
         exit 1
         ;;
 esac
 
 echo "--------------------------------------------------------"
-echo "系统发行版: $NAME"
-echo "系统版本: $VERSION"
-echo "系统ID: $ID"
-echo "系统ID Like: $ID_LIKE"
+echo "System release:: $NAME"
+echo "System version: $VERSION"
+echo "System ID: $ID"
+echo "System ID Like: $ID_LIKE"
 echo "--------------------------------------------------------"
 }
 
 function CHECK_PACKAGE_MANAGER() {
-    # 判断使用的包管理工具是 yum 还是 dnf 还是 apt-get
     if command -v dnf &> /dev/null; then
         package_manager="dnf"
-	$package_manager clean all &> /dev/null
     elif command -v yum &> /dev/null; then
         package_manager="yum"
-	$package_manager clean all &> /dev/null
     elif command -v apt-get &> /dev/null; then
         package_manager="apt-get"
-	$package_manager update &> /dev/null
+    elif command -v apt &> /dev/null; then
+        package_manager="apt"
     else
         ERROR "Unsupported package manager."
+        exit 1
+    fi
+}
+
+function CHECK_PKG_MANAGER() {
+    if command -v rpm &> /dev/null; then
+        pkg_manager="rpm"
+    elif command -v dpkg &> /dev/null; then
+        pkg_manager="dpkg"
+    elif command -v apt &> /dev/null; then
+        pkg_manager="apt"
+    else
+        ERROR "Unable to determine the package management system."
         exit 1
     fi
 }
@@ -222,10 +233,10 @@ PACKAGES_YUM=(
 if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
     SUCCESS "Install necessary system components"
     for package in "${PACKAGES_YUM[@]}"; do
-        if rpm -q "$package" &>/dev/null; then
-             echo "$package 已经安装，跳过..."
+        if $pkg_manager -q "$package" &>/dev/null; then
+             echo "$package Already installed, skip..."
         else
-            echo "正在安装 $package ..."
+            echo "Installing $package ..."
             $package_manager -y install "$package" --skip-broken > /dev/null 2>&1
             if [ $? -ne 0 ]; then
                 ERROR "安装 $package 失败，请检查系统安装源之后再次运行此脚本！"
@@ -249,10 +260,10 @@ elif [ "$package_manager" = "apt-get" ];then
     dpkg --configure -a &>/dev/null
     $package_manager update &>/dev/null
     for package in "${PACKAGES_APT[@]}"; do
-        if dpkg -s "$package" &>/dev/null; then
-            echo "$package 已经安装，跳过..."
+        if $pkg_manager -s "$package" &>/dev/null; then
+            echo "$package Already installed, skip..."
         else
-            echo "正在安装 $package ..."
+            echo "Installing $package ..."
             $package_manager install -y $package > /dev/null 2>&1
             if [ $? -ne 0 ]; then
                 ERROR "安装 $package 失败,请检查系统安装源之后再次运行此脚本！"
@@ -272,7 +283,7 @@ elif [ "$package_manager" = "apt-get" ];then
 	echo "文件 /etc/postfix/main.cf 不存在"
     fi
 else
-    WARN "无法确定可用的包管理器"
+    WARN "Unable to determine the package management system."
     exit 1
 fi
 }
@@ -1152,6 +1163,7 @@ main() {
     CHECK_CPU
     CHECK_OPENAI
     CHECK_PACKAGE_MANAGER
+    CHECK_PKG_MANAGER
     CHECK_OS
     CHECKFIRE
     INSTALL_PACKAGE
