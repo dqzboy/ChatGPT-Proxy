@@ -368,6 +368,10 @@ docker exec chatgpt-proxy-server curl -x socks5://代理 ipinfo.io
  - 问题原因：字面意思，你的VPS或者节点IP被openai封锁了，无法访问；ping通不代表就可以正常访问
  - 问题解决：（1）更换IP；（2）使用warp
 
+ ### 8、ninja：code: 500 Internal Server Error latency=0 ms
+ - 问题原因：（1）节点IP完成被openai拉黑了；（2）由于现在GPT3.5和GPT4都需要验证Arkose Token
+ - 问题解决：（1）换一个可用的节点；（2）配置Arkose Token端点或先上传HAR文件之后，在进行访问chatgpt
+
 ## ChatGPT WEB项目一键部署脚本
 [chatgpt-web一键部署脚本](https://github.com/dqzboy/chatgpt-web)
 
