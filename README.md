@@ -94,6 +94,7 @@ version: '3'
 services:
   ninja:
     image: ghcr.io/gngpp/ninja:latest
+    #国内VPS无法下载镜像的使用镜像代理：ghcr.dockerproxy.com/gngpp/ninja:latest
     container_name: ninja
     restart: unless-stopped
     environment:
@@ -116,6 +117,7 @@ version: '3'
 services:
   ninja:
     image: ghcr.io/gngpp/ninja:latest
+    #国内VPS无法下载镜像的使用镜像代理：ghcr.dockerproxy.com/gngpp/ninja:latest
     container_name: ninja
     restart: unless-stopped
     environment:
