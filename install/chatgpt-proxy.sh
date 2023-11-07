@@ -763,30 +763,97 @@ function ninja_MODIFY_PORT() {
 DOCKER_DIR="/data/ninja-chatgpt-api"
 mkdir -p $DOCKER_DIR
 
-read -e -p "$(echo -e ${GREEN}"是否修改容器映射端口号？(y/n): "${RESET})" answer
+max_attempts=3
+answer=""
 
-if [ "$answer" == "y" ]; then
-    while true; do
-        read -e -p "请输入新的端口号(1-65535): " port
-        # 校验用户输入的端口是否为纯数字且在范围内
-        if ! [[ "$port" =~ ^[0-9]+$ ]] || ((port < 1)) || ((port > 65535)); then
-            ERROR "端口必须是1到65535之间的纯数字且不可为空。"
-        elif lsof -i:$port >/dev/null 2>&1; then
-            WARN "该端口已被占用，请重新输入！"
-        else
-            sed -i "s/- 8080:/- $port:/" ${DOCKER_DIR}/docker-compose.yml
-            break
-        fi
-    done
-    sed -i "s/- 8080:/- $port:/" ${DOCKER_DIR}/docker-compose.yml
+for ((i=1; i<=max_attempts; i++)); do
+    read -e -p "$(echo -e ${GREEN}"Modify the container port mapping? Default port 8080 (y/n): "${RESET})" answer
+
+    if [ "$answer" == "y" ]; then
+        while true; do
+            read -e -p "Please enter new port number(1-65535): " port
+            # 校验用户输入的端口是否为纯数字且在范围内
+            if ! [[ "$port" =~ ^[0-9]+$ ]] || ((port < 1)) || ((port > 65535)); then
+                ERROR "The port must be a pure number between 1 and 65535 and cannot be empty."
+            elif lsof -i:$port >/dev/null 2>&1; then
+                WARN "The port has been occupied, please re-enter!"
+            else
+                sed -i "s/- 8080:/- $port:/" ${DOCKER_DIR}/docker-compose.yml
+                break
+            fi
+        done
+        sed -i "s/- 8080:/- $port:/" ${DOCKER_DIR}/docker-compose.yml
+        break
+    elif [ "$answer" == "n" ]; then
+        echo "Do not modify!"
+        break
+    else
+        WARN "Invalid input. Please enter 'y' or 'n'."
+    fi
+done
+
+if [ "$answer" != "y" ] && [ "$answer" != "n" ]; then
+    ERROR "Invalid input for $max_attempts attempts. Exiting the script."
+    exit 1
 fi
 }
 
+function ninja_CONFIG_WEBUI() {
+max_attempts=3
+valid_input=false
+
+for ((i=1; i<=max_attempts; i++)); do
+    read -e -p "$(echo -e ${GREEN}"To disable the Ninja web UI? It's enabled by default (y/n): "${RESET})" webui
+
+    if [ "$webui" == "y" ]; then
+        valid_input=true
+        sed -i 's/command: run/& --disable-webui/' ${DOCKER_DIR}/docker-compose.yml
+        break
+    elif [ "$webui" == "n" ]; then
+        valid_input=true
+        echo "Do not modify!"
+        break
+    else
+        WARN "Invalid input. Please enter 'y' or 'n'."
+    fi
+done
+
+if [ "$valid_input" == "false" ]; then
+    ERROR "Invalid input for $max_attempts attempts. Exiting the script."
+    exit 1
+fi
+}
+
+function ninja_CONFIG_GPT3Arkose() {
+max_attempts=3
+valid_input=false
+
+for ((i=1; i<=max_attempts; i++)); do
+    read -e -p "$(echo -e ${GREEN}"Enable Arkose GPT-3.5 experiment? It's disable by default (y/n): "${RESET})" GPT3Arkose
+
+    if [ "$GPT3Arkose" == "y" ]; then
+        valid_input=true
+        sed -i 's/command: run/& --arkose-gpt3-experiment/' ${DOCKER_DIR}/docker-compose.yml
+        break
+    elif [ "$GPT3Arkose" == "n" ]; then
+        valid_input=true
+        echo "Do not modify!"
+        break
+    else
+        WARN "Invalid input. Please enter 'y' or 'n'."
+    fi
+done
+
+if [ "$valid_input" == "false" ]; then
+    ERROR "Invalid input for $max_attempts attempts. Exiting the script."
+    exit 1
+fi
+}
 
 function ninja_CONFIG() {
 DOCKER_DIR="/data/ninja-chatgpt-api"
 mkdir -p ${DOCKER_DIR}
-read -e -p "$(echo -e ${GREEN}"请输入使用的模式（api/warp）："${RESET})" mode
+read -e -p "$(echo -e ${GREEN}"Enter the mode to use (api/warp)："${RESET})" mode
 if [ "$mode" == "api" ]; then
 cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: '3'
@@ -798,12 +865,12 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Asia/Shanghai
-      - PROXIES=                 # PROXIES=：可配置科学上网代理地址，例如：http://clash_vpsIP:7890；注释掉或者留空则不启用
-      #http://host:port          # PROXIES=：科学上网代理地址，例如：http://clash_vpsIP:7890
-      #socks5://host:port        # PROXIES=：科学上网代理地址，例如：socks5://clash_vpsIP:7890
-    command: run --disable-webui
+      - PROXIES=
+      #http://host:port
+      #socks5://host:port
+    command: run
     ports:
-      - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
+      - 8080:7999
   watchtower:
     container_name: watchtower
     image: containrrr/watchtower
@@ -824,9 +891,9 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - PROXIES=socks5://warp:10000
-    command: run --disable-webui
+    command: run
     ports:
-      - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
+      - 8080:7999
     depends_on:
       - warp
 
@@ -857,7 +924,7 @@ case $modify_config in
     echo -e "本机网卡：${PURPLE}${INTERFACE}${RESET} 对应IP：${PURPLE}${IP_ADDR}${RESET}"
     ${SETCOLOR_SUCCESS} && echo "---------------------------------------------"  && ${SETCOLOR_NORMAL}
     # 获取用户输入的URL及其类型
-    read -e -p "$(echo -e ${GREEN}"Enter the URL (e.g. host:port): "${RESET})" url
+    read -e -p "$(echo -e ${GREEN}"Enter the proxy address (e.g. host:port): "${RESET})" url
     while true; do
       read -e -p "$(echo -e ${GREEN}"Is this a http or socks5 proxy? (http/socks5)："${RESET})" type
       case $type in
@@ -872,19 +939,19 @@ case $modify_config in
        if [ "$url_type" == "http" ]; then
           sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
           sed -i "s|#http://host:port|- PROXIES=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
-          sed -i 's/command: run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
+          sed -i 's/command: run/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
 	  sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
           sed -i "s|#socks5://host:port|- PROXIES=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
-          sed -i 's/command: run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
+          sed -i 's/command: run/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        fi
     elif [ "$mode" == "warp" ]; then
        if [ "$url_type" == "http" ]; then
           sed -i "s|- PROXIES=socks5://chatgpt-proxy-server-warp:65535|- PROXIES=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
-          sed -i 's/command: run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
+          sed -i 's/command: run/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
           sed -i "s|- PROXIES=socks5://chatgpt-proxy-server-warp:65535|- PROXIES=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
-          sed -i 's/command: run --disable-webui/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
+          sed -i 's/command: run/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        fi
     else
        echo "Do not modify！"
@@ -898,7 +965,10 @@ case $modify_config in
     ERROR "Invalid input. Skipping configuration modification."
     ;;
 esac
+# 调用修改端口、WEB UI以及是否开启GPT3.5Arkose的配置函数
 ninja_MODIFY_PORT
+ninja_CONFIG_WEBUI
+ninja_CONFIG_GPT3Arkose
 }
 
 
@@ -1154,9 +1224,17 @@ Platform-API:
   http(s)://host:port/dashboard/*
 ChatGPT-To-API:
   http(s)://host:port/to/v1/chat/completions"
+if [ "$webui" = "n" ];then
+INFO1 "Ninja WEB UI URL"
+echo "请在浏览器访问下面的地址
+  http(s)://host:port"
+fi
+
+if [ "$GPT3Arkose" == "y" ]; then
 INFO1 "HAR文件上传URL"
 echo "请在浏览器访问下面的地址
   http(s)://host:port/har/upload"
+fi
 }
 
 main() {
