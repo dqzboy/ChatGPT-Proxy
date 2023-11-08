@@ -23,7 +23,9 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 > **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新、403|401|429、ERROR检测邮箱告警、uptime-kuma监控等功能！
 - **说明**：目前脚本适用于CentOS 7\8\9、RHEL-8\9、Ubuntu、debian以及opencloudos系统；运行脚本需要确保网络环境稳定(确保系统所需组件可以正常下载)。
 - **提示**：目前脚本支持[linweiyuan/go-chatgpt-api](https://github.com/linweiyuan/go-chatgpt-api) 和 [gngpp/ninja](https://github.com/gngpp/ninja) 项目的一键部署。go-chatgpt-api项目作者已弃坑，大家搭建时可以选择部署 ninja
-- **提示**：目前GPT3.5和4都需要Arkose Token作为参数发送，所以你需要一个Arkose Toke端点或者去官方发送会话消息获取HAR日志记录文件，ninja项目可以使用启动参数`--arkose-token-endpoint`指定端点获取token 或者使用参数`--arkose-chat-har-file`指定HAR文件路径使用
+- **重要**：目前GPT4需要Arkose Token作为参数发送，所以你需要一个Arkose Toke端点或者去官方发送会话消息获取HAR日志记录文件，ninja项目可以使用启动参数`--arkose-token-endpoint`指定端点获取token 或者使用参数`--arkose-chat-har-file`指定HAR文件路径使用。
+- **下载HAR文件方法**：登入官网，浏览器打开 `F12` 选择网络，然后发送一次会话消息，下载 `https://tcr9i.chat.openai.com/fc/gt2/public_key/35536E1E-65B4-4D96-9D97-6ADB7EFF8147` 接口的HAR日志记录文件（GPT3.5和4的文件名称不一样，但是格式一样，这里列举的是GPT4）
+> 近日，`OpenAI`取消对`GPT-3.5`进行`Arkose`验证，可以不上传HAR特征文件使用（已上传的不影响），兼容后续可能会再次开启`Arkose`验证，需要加上启动参数`--arkose-gpt3-experiment`进行开启`GPT-3.5`模型`Arkose`验证处理(使用方法与GPT4一样)，WebUI不受影响.
 
 ```shell
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/main/install/chatgpt-proxy.sh)"
