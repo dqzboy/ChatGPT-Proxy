@@ -378,6 +378,3 @@ docker exec chatgpt-proxy-server curl -x socks5://代理 ipinfo.io
 
 ## ChatGPT WEB项目一键部署脚本
 [chatgpt-web一键部署脚本](https://github.com/dqzboy/chatgpt-web)
-
-## 推荐文章
-更多学习教程请关注 [浅时光博客](https://www.dqzboy.com/)
