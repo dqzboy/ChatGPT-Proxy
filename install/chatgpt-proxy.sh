@@ -107,10 +107,11 @@ printf "%*s\033[31m%s\033[0m%*s\n" $padding "" "$text" $padding ""
 SUCCESS "END"
 
 url="chat.openai.com"
+timeout=60  # 设置超时时间为60秒
 
 # 检测是否能够访问chat.openai.com
 echo "Testing connection to ${url}..."
-if curl --output /dev/null --silent --head --fail ${url}; then
+if curl --output /dev/null --silent --head --fail --max-time ${timeout} ${url}; then
   echo "Connection successful!"
   echo """╭──────────────────────────────────────────────────────╮
 │                                                      │
