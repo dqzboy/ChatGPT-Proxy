@@ -860,7 +860,7 @@ version: '3'
 
 services:
   ninja:
-    image: ghcr.io/gngpp/ninja:latest
+    image: gngpp/ninja:latest
     container_name: ninja
     restart: unless-stopped
     environment:
@@ -885,7 +885,7 @@ version: '3'
 
 services:
   ninja:
-    image: ghcr.io/gngpp/ninja:latest
+    image: gngpp/ninja:latest
     container_name: ninja
     restart: unless-stopped
     environment:
