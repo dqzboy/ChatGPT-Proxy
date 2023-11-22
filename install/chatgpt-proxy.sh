@@ -234,20 +234,20 @@ function INSTALL_PACKAGE(){
     if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
         SUCCESS "Install necessary system components"
         for package in "${PACKAGES_YUM[@]}"; do
-            read -e -p "Do you want to install $package? (y/n): " install_choice
-            if [ "$install_choice" = "y" ]; then
-                if $package_manager -q "$package" &>/dev/null; then
-                    echo "$package already installed, skip..."
-                else
+            if $pkg_manager -q "$package" &>/dev/null; then
+                echo "$package already installed, skip..."
+            else
+                read -e -p "Do you want to install $package? (y/n): " install_choice
+                if [ "$install_choice" = "y" ]; then
                     echo "Installing $package ..."
                     $package_manager -y install "$package" --skip-broken > /dev/null 2>&1
                     if [ $? -ne 0 ]; then
-                        ERROR "Installation of $package failed, please check the system installation source and run this script again!"
+                        ERROR "安装 $package 失败，请检查系统安装源之后再次运行此脚本！"
                         exit 1
                     fi
+                else
+                    echo "Skipping installation of $package..."
                 fi
-            else
-                echo "Skipping installation of $package..."
             fi
         done
     elif [ "$package_manager" = "apt-get" ]; then
@@ -255,20 +255,20 @@ function INSTALL_PACKAGE(){
         dpkg --configure -a &>/dev/null
         $package_manager update &>/dev/null
         for package in "${PACKAGES_APT[@]}"; do
-            read -e -p "Do you want to install $package? (y/n): " install_choice
-            if [ "$install_choice" = "y" ]; then
-                if $package_manager -s "$package" &>/dev/null; then
-                    echo "$package already installed, skip..."
-                else
+            if $pkg_manager -s "$package" &>/dev/null; then
+                echo "$package already installed, skip..."
+            else
+                read -e -p "Do you want to install $package? (y/n): " install_choice
+                if [ "$install_choice" = "y" ]; then
                     echo "Installing $package ..."
                     $package_manager install -y $package > /dev/null 2>&1
                     if [ $? -ne 0 ]; then
-                        ERROR "Installation of $package failed, please check the system installation source and run this script again!"
+                        ERROR "安装 $package 失败，请检查系统安装源之后再次运行此脚本！"
                         exit 1
                     fi
+                else
+                    echo "Skipping installation of $package..."
                 fi
-            else
-                echo "Skipping installation of $package..."
             fi
         done
     else
