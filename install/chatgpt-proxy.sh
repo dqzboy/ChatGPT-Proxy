@@ -224,69 +224,57 @@ fi
 }
 
 function INSTALL_PACKAGE(){
-PACKAGES_APT=(
-    lsof jq wget postfix mailutils
-)
-PACKAGES_YUM=(
-    epel-release lsof jq wget postfix yum-utils mailx s-nail
-)
+    PACKAGES_APT=(
+        lsof jq wget postfix mailutils
+    )
+    PACKAGES_YUM=(
+        epel-release lsof jq wget postfix yum-utils mailx s-nail
+    )
 
-if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
-    SUCCESS "Install necessary system components"
-    for package in "${PACKAGES_YUM[@]}"; do
-        if $pkg_manager -q "$package" &>/dev/null; then
-             echo "$package Already installed, skip..."
-        else
-            echo "Installing $package ..."
-            $package_manager -y install "$package" --skip-broken > /dev/null 2>&1
-            if [ $? -ne 0 ]; then
-                ERROR "安装 $package 失败，请检查系统安装源之后再次运行此脚本！"
-                exit 1
+    if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
+        SUCCESS "Install necessary system components"
+        for package in "${PACKAGES_YUM[@]}"; do
+            read -e -p "Do you want to install $package? (y/n): " install_choice
+            if [ "$install_choice" = "y" ]; then
+                if $package_manager -q "$package" &>/dev/null; then
+                    echo "$package already installed, skip..."
+                else
+                    echo "Installing $package ..."
+                    $package_manager -y install "$package" --skip-broken > /dev/null 2>&1
+                    if [ $? -ne 0 ]; then
+                        ERROR "Installation of $package failed, please check the system installation source and run this script again!"
+                        exit 1
+                    fi
+                fi
+            else
+                echo "Skipping installation of $package..."
             fi
-        fi
-    done
-    # 检查 /etc/postfix/main.cf 文件是否存在
-    if [ -f "/etc/postfix/main.cf" ]; then
-        # 检查是否已经存在正确的配置
-        if ! grep -q "^inet_interfaces = all" "/etc/postfix/main.cf"; then
-            # 将 inet_interfaces 设置为 all
-            sed -i 's/^inet_interfaces =.*/inet_interfaces = all/' /etc/postfix/main.cf
-            systemctl restart postfix &>/dev/null
-        fi
-    else
-        echo "文件 /etc/postfix/main.cf 不存在"
-    fi
-elif [ "$package_manager" = "apt-get" ];then
-    SUCCESS "Install necessary system components"
-    dpkg --configure -a &>/dev/null
-    $package_manager update &>/dev/null
-    for package in "${PACKAGES_APT[@]}"; do
-        if $pkg_manager -s "$package" &>/dev/null; then
-            echo "$package Already installed, skip..."
-        else
-            echo "Installing $package ..."
-            $package_manager install -y $package > /dev/null 2>&1
-            if [ $? -ne 0 ]; then
-                ERROR "安装 $package 失败,请检查系统安装源之后再次运行此脚本！"
-                exit 1
+        done
+    elif [ "$package_manager" = "apt-get" ]; then
+        SUCCESS "Install necessary system components"
+        dpkg --configure -a &>/dev/null
+        $package_manager update &>/dev/null
+        for package in "${PACKAGES_APT[@]}"; do
+            read -e -p "Do you want to install $package? (y/n): " install_choice
+            if [ "$install_choice" = "y" ]; then
+                if $package_manager -s "$package" &>/dev/null; then
+                    echo "$package already installed, skip..."
+                else
+                    echo "Installing $package ..."
+                    $package_manager install -y $package > /dev/null 2>&1
+                    if [ $? -ne 0 ]; then
+                        ERROR "Installation of $package failed, please check the system installation source and run this script again!"
+                        exit 1
+                    fi
+                fi
+            else
+                echo "Skipping installation of $package..."
             fi
-        fi
-    done
-    # 检查 /etc/postfix/main.cf 文件是否存在
-    if [ -f "/etc/postfix/main.cf" ]; then
-        # 检查是否已经存在正确的配置
-        if ! grep -q "^inet_interfaces = all" "/etc/postfix/main.cf"; then
-            # 将 inet_interfaces 设置为 all
-            sed -i 's/^inet_interfaces =.*/inet_interfaces = all/' /etc/postfix/main.cf
-            systemctl restart postfix &>/dev/null
-        fi
+        done
     else
-	echo "文件 /etc/postfix/main.cf 不存在"
+        WARN "Unable to determine the package management system."
+        exit 1
     fi
-else
-    WARN "Unable to determine the package management system."
-    exit 1
-fi
 }
 
 function INSTALL_DOCKER() {
