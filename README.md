@@ -309,6 +309,16 @@ OPENAI_API_BASE_URL=http://127.0.0.1:8080/platform
 
 #### 项目：[chatgpt-mirai-qq-bot](https://github.com/lss233/chatgpt-mirai-qq-bot)
 ```shell
+## ninja-chatgpt-api
+# ==== OpenAI 部分开始
+[openai]
+# OpenAI 相关设置
+# 自定义 ChatGPT 的 browserless 接入点
+# 自 3月9日 开始，不设置此项将无法正常使用 browserless 模式下的网页版 ChatGPT
+browserless_endpoint = "http(s)://你的服务地址或者IP/backend-api/"
+
+
+## go-chatgpt-api
 # ==== OpenAI 部分开始
 [openai]
 # OpenAI 相关设置
