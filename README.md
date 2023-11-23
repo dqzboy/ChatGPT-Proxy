@@ -267,9 +267,9 @@ docker-compose up -d
 - public-api, http(s)://host:port/public-api/*
 - platform-api, http(s)://host:port/v1/*
 - dashboard-api, http(s)://host:port/dashboard/*
-- chatgpt-to-api, http(s)://host:port/to/v1/chat/completions
+- chatgpt-to-api, http(s)://host:port/v1/chat/completions
 
-> 关于关于ChatGPT转API使用，直接拿AceessToken当API Key使用，接口路径：/to/v1/chat/completions
+> 关于关于ChatGPT转API使用，直接拿AceessToken当API Key使用，接口路径：/v1/chat/completions
 
 ### go-chatgpt-api
 - 原接口： http://go-chatgpt-api:8080/chatgpt/conversation
@@ -338,10 +338,9 @@ CHATGPT_BASE_URL = "http(s)://你的服务地址或者IP/chatgpt/backend-api/"
 http://IP:8080/imitate
 
 # ninja
-http://IP:8080/to
+http://IP:8080
 ```
 <img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/d834ea2f-a56e-45bf-a540-57f88afbefcd" width="1000px">
-<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/9fe9b7d9-a89d-4637-80c2-302041c1c553" width="1000px">
 
 ## 部署总结
 > 目前使用发现，只要确保节点稳定或者国内服务器配置的代理地址稳定(没有被opeai封锁)，那么就可以正常使用。
