@@ -385,5 +385,9 @@ docker exec chatgpt-proxy-server curl -x socks5://代理 ipinfo.io
  - 问题原因：（1）节点IP完成被openai拉黑了；（2）由于现在GPT3.5和GPT4都需要验证Arkose Token
  - 问题解决：（1）换一个可用的节点；（2）延迟0ms，那就需要配置Arkose Token端点或先上传HAR文件之后，在进行访问chatgpt
 
+ ### 9、OpenAI: {"detail":{"message":"Client challenge required","code":"challenge_required"}} (code: 418)
+ - 问题原因：使用的是AccessToekn，节点IP问题，出码了
+ - 问题解决：换一个可用的IP
+
 ## ChatGPT WEB项目一键部署脚本
 [chatgpt-web一键部署脚本](https://github.com/dqzboy/chatgpt-web)
