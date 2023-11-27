@@ -102,7 +102,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - PROXIES=                 # PROXIES=：可配置科学上网代理地址，例如：http://clash_vpsIP:7890；注释掉或者留空则不启用
-    command: run                 # --disable-direct关闭本地直连 --disable-webui关闭自带WEB
+    command: run                 # --enable-direct开启本地直连(默认关闭) --disable-webui关闭自带WEB  --arkose-gpt3-experiment开启GPT-3.5模型Arkose验证
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
 ```
@@ -125,7 +125,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - PROXIES=socks5://warp:10000
-    command: run                 # --disable-direct关闭本地直连 --disable-webui关闭自带WEB
+    command: run                 # --enable-direct开启本地直连(默认关闭) --disable-webui关闭自带WEB  --arkose-gpt3-experiment开启GPT-3.5模型Arkose验证
     ports:
       - 8080:7999                # 容器端口映射到宿主机8080端口；宿主机监听端口可按需改为其它端口
     depends_on:
