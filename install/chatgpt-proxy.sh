@@ -224,57 +224,95 @@ fi
 }
 
 function INSTALL_PACKAGE(){
-    PACKAGES_APT=(
-        lsof jq wget postfix mailutils
-    )
-    PACKAGES_YUM=(
-        epel-release lsof jq wget postfix yum-utils mailx s-nail
-    )
+# 每个软件包的安装超时时间（秒）
+TIMEOUT=600
+PACKAGES_APT=(
+    lsof jq wget postfix mailutils
+)
+PACKAGES_YUM=(
+    epel-release lsof jq wget postfix yum-utils mailx s-nail
+)
 
-    if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
-        SUCCESS "Install necessary system components"
-        for package in "${PACKAGES_YUM[@]}"; do
-            if $pkg_manager -q "$package" &>/dev/null; then
-                echo "$package already installed, skip..."
-            else
-                read -e -p "Do you want to install $package? (y/n): " install_choice
-                if [ "$install_choice" = "y" ]; then
-                    echo "Installing $package ..."
-                    $package_manager -y install "$package" --skip-broken > /dev/null 2>&1
-                    if [ $? -ne 0 ]; then
-                        ERROR "安装 $package 失败，请检查系统安装源之后再次运行此脚本！"
-                        exit 1
-                    fi
-                else
-                    echo "Skipping installation of $package..."
-                fi
-            fi
-        done
-    elif [ "$package_manager" = "apt-get" ]; then
-        SUCCESS "Install necessary system components"
-        dpkg --configure -a &>/dev/null
-        $package_manager update &>/dev/null
-        for package in "${PACKAGES_APT[@]}"; do
-            if $pkg_manager -s "$package" &>/dev/null; then
-                echo "$package already installed, skip..."
-            else
-                read -e -p "Do you want to install $package? (y/n): " install_choice
-                if [ "$install_choice" = "y" ]; then
-                    echo "Installing $package ..."
-                    $package_manager install -y $package > /dev/null 2>&1
-                    if [ $? -ne 0 ]; then
-                        ERROR "安装 $package 失败，请检查系统安装源之后再次运行此脚本！"
-                        exit 1
-                    fi
-                else
-                    echo "Skipping installation of $package..."
-                fi
-            fi
-        done
+if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
+    SUCCESS "Install necessary system components"
+    for package in "${PACKAGES_YUM[@]}"; do
+    if $pkg_manager -q "$package" &>/dev/null; then
+        echo "$package 已经安装，跳过..."
     else
-        WARN "Unable to determine the package management system."
-        exit 1
+        echo "安装 $package ..."
+
+        # 记录开始时间
+        start_time=$(date +%s)
+
+        # 安装软件包并等待完成
+        $package_manager -y install "$package" --skip-broken > /dev/null 2>&1 &
+        install_pid=$!
+
+        # 检查安装是否超时
+        while [[ $(($(date +%s) - $start_time)) -lt $TIMEOUT ]] && kill -0 $install_pid &>/dev/null; do
+        sleep 1
+        done
+
+        # 如果安装仍在运行，提示用户
+        if kill -0 $install_pid &>/dev/null; then
+        ERROR "$package 的安装时间超过 $TIMEOUT 秒。是否继续？ (y/n)"
+        read -r continue_install
+            if [ "$continue_install" != "y" ]; then
+                ERROR "$package 的安装超时。退出脚本。"
+                exit 1
+            fi
+        fi
+
+        # 检查安装结果
+        wait $install_pid
+        if [ $? -ne 0 ]; then
+            ERROR "$package 的安装失败。请检查系统安装源，然后再次运行此脚本。"
+            exit 1
+        fi
     fi
+    done
+    # 检查 /etc/postfix/main.cf 文件是否存在
+    if [ -f "/etc/postfix/main.cf" ]; then
+        # 检查是否已经存在正确的配置
+        if ! grep -q "^inet_interfaces = all" "/etc/postfix/main.cf"; then
+            # 将 inet_interfaces 设置为 all
+            sed -i 's/^inet_interfaces =.*/inet_interfaces = all/' /etc/postfix/main.cf
+            systemctl restart postfix &>/dev/null
+        fi
+    else
+        echo "文件 /etc/postfix/main.cf 不存在"
+    fi
+elif [ "$package_manager" = "apt-get" ];then
+    SUCCESS "Install necessary system components"
+    dpkg --configure -a &>/dev/null
+    $package_manager update &>/dev/null
+    for package in "${PACKAGES_APT[@]}"; do
+        if $pkg_manager -s "$package" &>/dev/null; then
+            echo "$package Already installed, skip..."
+        else
+            echo "Installing $package ..."
+            $package_manager install -y $package > /dev/null 2>&1
+            if [ $? -ne 0 ]; then
+                ERROR "安装 $package 失败,请检查系统安装源之后再次运行此脚本！"
+                exit 1
+            fi
+        fi
+    done
+    # 检查 /etc/postfix/main.cf 文件是否存在
+    if [ -f "/etc/postfix/main.cf" ]; then
+        # 检查是否已经存在正确的配置
+        if ! grep -q "^inet_interfaces = all" "/etc/postfix/main.cf"; then
+            # 将 inet_interfaces 设置为 all
+            sed -i 's/^inet_interfaces =.*/inet_interfaces = all/' /etc/postfix/main.cf
+            systemctl restart postfix &>/dev/null
+        fi
+    else
+	echo "文件 /etc/postfix/main.cf 不存在"
+    fi
+else
+    WARN "Unable to determine the package management system."
+    exit 1
+fi
 }
 
 function INSTALL_DOCKER() {
@@ -787,6 +825,32 @@ if [ "$answer" != "y" ] && [ "$answer" != "n" ]; then
 fi
 }
 
+function ninja_CONFIG_Direct() {
+max_attempts=3
+valid_input=false
+
+for ((i=1; i<=max_attempts; i++)); do
+    read -e -p "$(echo -e ${GREEN}"Is direct connection enabled? (Default: Disabled) (y/n): "${RESET})" Direct
+
+    if [ "$Direct" == "y" ]; then
+        valid_input=true
+        sed -i 's/command: run/& --enable-direct/' ${DOCKER_DIR}/docker-compose.yml
+        break
+    elif [ "$Direct" == "n" ]; then
+        valid_input=true
+        echo "Do not modify!"
+        break
+    else
+        WARN "Invalid input. Please enter 'y' or 'n'."
+    fi
+done
+
+if [ "$valid_input" == "false" ]; then
+    ERROR "Invalid input for $max_attempts attempts. Exiting the script."
+    exit 1
+fi
+}
+
 function ninja_CONFIG_WEBUI() {
 max_attempts=3
 valid_input=false
@@ -927,20 +991,16 @@ case $modify_config in
     if [ "$mode" == "api" ]; then
        if [ "$url_type" == "http" ]; then
           sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
-          sed -i "s|#http://host:port|- PROXIES=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
-          sed -i 's/command: run/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
+          sed -i "s|#http://host:port|- PROXIES=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml          
        elif [ "$url_type" == "socks5" ]; then
 	  sed -i '/- PROXIES=/d' ${DOCKER_DIR}/docker-compose.yml
           sed -i "s|#socks5://host:port|- PROXIES=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
-          sed -i 's/command: run/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        fi
     elif [ "$mode" == "warp" ]; then
        if [ "$url_type" == "http" ]; then
           sed -i "s|- PROXIES=socks5://chatgpt-proxy-server-warp:65535|- PROXIES=http://${url}|g" ${DOCKER_DIR}/docker-compose.yml
-          sed -i 's/command: run/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        elif [ "$url_type" == "socks5" ]; then
           sed -i "s|- PROXIES=socks5://chatgpt-proxy-server-warp:65535|- PROXIES=socks5://${url}|g" ${DOCKER_DIR}/docker-compose.yml
-          sed -i 's/command: run/& --disable-direct/' ${DOCKER_DIR}/docker-compose.yml
        fi
     else
        echo "Do not modify！"
@@ -956,6 +1016,7 @@ case $modify_config in
 esac
 # 调用修改端口、WEB UI以及是否开启GPT3.5Arkose的配置函数
 ninja_MODIFY_PORT
+ninja_CONFIG_Direct
 ninja_CONFIG_WEBUI
 ninja_CONFIG_GPT3Arkose
 }
