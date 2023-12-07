@@ -517,7 +517,7 @@ else
 fi
 
 # 提示用户是否需要修改配置
-read -e -p "$(echo -e ${GREEN}"Do you want to add a proxy address? (y/n)："${RESET})" modify_config
+read -e -p "$(echo -e ${GREEN}"是否添加代理? (y/n)："${RESET})" modify_config
 case $modify_config in
   [Yy]* )
     # 提示用户本机IP
@@ -525,9 +525,9 @@ case $modify_config in
     echo -e "本机网卡：${PURPLE}${INTERFACE}${RESET} 对应IP：${PURPLE}${IP_ADDR}${RESET}"
     ${SETCOLOR_SUCCESS} && echo "---------------------------------------------"  && ${SETCOLOR_NORMAL}
     # 获取用户输入的URL及其类型
-    read -e -p "$(echo -e ${GREEN}"Enter the URL (e.g. host:port): "${RESET})" url
+    read -e -p "$(echo -e ${GREEN}"输入代理地址 (e.g. host:port): "${RESET})" url
     while true; do
-      read -e -p "$(echo -e ${GREEN}"Is this a http or socks5 proxy? (http/socks5)："${RESET})" type
+      read -e -p "$(echo -e ${GREEN}"确认代理协议 (http/socks5)："${RESET})" type
       case $type in
           [Hh][Tt]* ) url_type="http"; break;;
           [Ss][Oo]* ) url_type="socks5"; break;;
@@ -797,16 +797,16 @@ max_attempts=3
 answer=""
 
 for ((i=1; i<=max_attempts; i++)); do
-    read -e -p "$(echo -e ${GREEN}"Modify the container port mapping? Default port 8080 (y/n): "${RESET})" answer
+    read -e -p "$(echo -e ${GREEN}"是否修改容器端口映射? 默认端口8080 (y/n): "${RESET})" answer
 
     if [ "$answer" == "y" ]; then
         while true; do
-            read -e -p "Please enter new port number(1-65535): " port
+            read -e -p "请输入新的端口号(1-65535): " port
             # 校验用户输入的端口是否为纯数字且在范围内
             if ! [[ "$port" =~ ^[0-9]+$ ]] || ((port < 1)) || ((port > 65535)); then
-                ERROR "The port must be a pure number between 1 and 65535 and cannot be empty."
+                ERROR "端口必须是 1 到 65535 之间的纯数字，并且不能为空。"
             elif lsof -i:$port >/dev/null 2>&1; then
-                WARN "The port has been occupied, please re-enter!"
+                WARN "端口已被占用，请重新输入！"
             else
                 sed -i "s/- 8080:/- $port:/" ${DOCKER_DIR}/docker-compose.yml
                 break
@@ -833,7 +833,7 @@ max_attempts=3
 valid_input=false
 
 for ((i=1; i<=max_attempts; i++)); do
-    read -e -p "$(echo -e ${GREEN}"Is direct connection enabled? (Default: Disabled) (y/n): "${RESET})" Direct
+    read -e -p "$(echo -e ${GREEN}"是否启用直连,不走代理池? 默认关闭 (y/n): "${RESET})" Direct
 
     if [ "$Direct" == "y" ]; then
         valid_input=true
@@ -859,7 +859,7 @@ max_attempts=3
 valid_input=false
 
 for ((i=1; i<=max_attempts; i++)); do
-    read -e -p "$(echo -e ${GREEN}"To disable the Ninja web UI? It's enabled by default (y/n): "${RESET})" webui
+    read -e -p "$(echo -e ${GREEN}"是否禁用 Ninja Web UI? 默认启用 (y/n): "${RESET})" webui
 
     if [ "$webui" == "y" ]; then
         valid_input=true
@@ -885,7 +885,7 @@ max_attempts=3
 valid_input=false
 
 for ((i=1; i<=max_attempts; i++)); do
-    read -e -p "$(echo -e ${GREEN}"Enable Arkose GPT-3.5 experiment? It's disable by default (y/n): "${RESET})" GPT3Arkose
+    read -e -p "$(echo -e ${GREEN}"是否启用 Arkose GPT-3.5 实验? 默认禁用 (y/n): "${RESET})" GPT3Arkose
 
     if [ "$GPT3Arkose" == "y" ]; then
         valid_input=true
@@ -909,7 +909,7 @@ fi
 function ninja_CONFIG() {
 DOCKER_DIR="/data/ninja-chatgpt-api"
 mkdir -p ${DOCKER_DIR}
-read -e -p "$(echo -e ${GREEN}"Enter the mode to use (api/warp)："${RESET})" mode
+read -e -p "$(echo -e ${GREEN}"输入要使用的模式 (api/warp)："${RESET})" mode
 if [ "$mode" == "api" ]; then
 cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: '3'
@@ -972,7 +972,7 @@ else
 fi
 
 # 提示用户是否需要修改配置
-read -e -p "$(echo -e ${GREEN}"Do you want to add a proxy address? (y/n)："${RESET})" modify_config
+read -e -p "$(echo -e ${GREEN}"是否添加代理? (y/n)："${RESET})" modify_config
 case $modify_config in
   [Yy]* )
     # 提示用户本机IP
@@ -980,9 +980,9 @@ case $modify_config in
     echo -e "本机网卡：${PURPLE}${INTERFACE}${RESET} 对应IP：${PURPLE}${IP_ADDR}${RESET}"
     ${SETCOLOR_SUCCESS} && echo "---------------------------------------------"  && ${SETCOLOR_NORMAL}
     # 获取用户输入的URL及其类型
-    read -e -p "$(echo -e ${GREEN}"Enter the proxy address (e.g. host:port): "${RESET})" url
+    read -e -p "$(echo -e ${GREEN}"输入代理地址 (e.g. host:port): "${RESET})" url
     while true; do
-      read -e -p "$(echo -e ${GREEN}"Is this a http or socks5 proxy? (http/socks5)："${RESET})" type
+      read -e -p "$(echo -e ${GREEN}"确认代理协议 (http/socks5)："${RESET})" type
       case $type in
           [Hh][Tt]* ) url_type="http"; break;;
           [Ss][Oo]* ) url_type="socks5"; break;;
