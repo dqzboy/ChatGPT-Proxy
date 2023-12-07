@@ -225,7 +225,7 @@ fi
 
 function INSTALL_PACKAGE(){
 # 每个软件包的安装超时时间（秒）
-TIMEOUT=600
+TIMEOUT=300
 PACKAGES_APT=(
     lsof jq wget postfix mailutils
 )
@@ -236,40 +236,43 @@ PACKAGES_YUM=(
 if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
     SUCCESS "Install necessary system components"
     for package in "${PACKAGES_YUM[@]}"; do
-    if $pkg_manager -q "$package" &>/dev/null; then
-        echo "$package 已经安装，跳过..."
-    else
-        echo "安装 $package ..."
+        if $pkg_manager -q "$package" &>/dev/null; then
+            echo "$package 已经安装，跳过..."
+        else
+            echo "安装 $package ..."
 
-        # 记录开始时间
-        start_time=$(date +%s)
+            # 记录开始时间
+            start_time=$(date +%s)
 
-        # 安装软件包并等待完成
-        $package_manager -y install "$package" --skip-broken > /dev/null 2>&1 &
-        install_pid=$!
+            # 安装软件包并等待完成
+            $package_manager -y install "$package" --skip-broken > /dev/null 2>&1 &
+            install_pid=$!
 
-        # 检查安装是否超时
-        while [[ $(($(date +%s) - $start_time)) -lt $TIMEOUT ]] && kill -0 $install_pid &>/dev/null; do
-        sleep 1
-        done
+            # 检查安装是否超时
+            while [[ $(($(date +%s) - $start_time)) -lt $TIMEOUT ]] && kill -0 $install_pid &>/dev/null; do
+                sleep 1
+            done
 
-        # 如果安装仍在运行，提示用户
-        if kill -0 $install_pid &>/dev/null; then
-        ERROR "$package 的安装时间超过 $TIMEOUT 秒。是否继续？ (y/n)"
-        read -r continue_install
-            if [ "$continue_install" != "y" ]; then
-                ERROR "$package 的安装超时。退出脚本。"
+            # 如果安装仍在运行，提示用户
+            if kill -0 $install_pid &>/dev/null; then
+                ERROR "$package 的安装时间超过 $TIMEOUT 秒。是否继续？ (y/n)"
+                read -r continue_install
+                if [ "$continue_install" != "y" ]; then
+                    ERROR "$package 的安装超时。退出脚本。"
+                    exit 1
+                else
+                    # 直接跳过等待，继续下一个软件包的安装
+                    continue
+                fi
+            fi
+
+            # 检查安装结果
+            wait $install_pid
+            if [ $? -ne 0 ]; then
+                ERROR "$package 安装失败。请检查系统安装源，然后再次运行此脚本！请尝试手动执行安装：$package_manager -y install $package"
                 exit 1
             fi
         fi
-
-        # 检查安装结果
-        wait $install_pid
-        if [ $? -ne 0 ]; then
-            ERROR "$package 的安装失败。请检查系统安装源，然后再次运行此脚本。"
-            exit 1
-        fi
-    fi
     done
     # 检查 /etc/postfix/main.cf 文件是否存在
     if [ -f "/etc/postfix/main.cf" ]; then
@@ -293,7 +296,7 @@ elif [ "$package_manager" = "apt-get" ];then
             echo "Installing $package ..."
             $package_manager install -y $package > /dev/null 2>&1
             if [ $? -ne 0 ]; then
-                ERROR "安装 $package 失败,请检查系统安装源之后再次运行此脚本！"
+                ERROR "安装 $package 失败,请检查系统安装源之后再次运行此脚本！请尝试手动执行安装：$package_manager -y install $package"
                 exit 1
             fi
         fi
