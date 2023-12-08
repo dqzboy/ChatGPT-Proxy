@@ -921,7 +921,6 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Asia/Shanghai
-      - PROXIES=
       #http://host:port
       #socks5://host:port
     command: run
