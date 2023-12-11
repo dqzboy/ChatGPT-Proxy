@@ -19,6 +19,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 
 > 如果部署或者配置过程出现问题或不懂的地方，请先搜索历史[issue](https://github.com/dqzboy/ChatGPT-Proxy/issues)或者加[TG交流群](https://t.me/+ghs_XDp1vwxkMGU9)
 
+> 机场推荐：[机场1：按量不限时、不限速、不限设备，解锁ChatGPT](https://mojie.me/#/register?code=CG6h8Irm) \ [机场2：按周期、不限速、不限设备、IEPL专线，解锁ChatGPT](https://teacat.cloud/#/register?code=ps4sZcDa)
 # ChatGPT-Porxy一键部署
 > **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新、403|401|429、ERROR检测邮箱告警、uptime-kuma监控等功能！
 - **说明**：目前脚本适用于CentOS 7\8\9、RHEL-8\9、Ubuntu、debian以及opencloudos系统；运行脚本需要确保网络环境稳定(确保系统所需组件可以正常下载)。
@@ -38,8 +39,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/mai
 ## 一、环境说明
 - 一台VPS，规格最低配 1C1G；**注意**：warp不支持arm架构的机器
 - VPS可以正常访问 [chatgpt](https://chat.openai.com)；或者国内服务器实现科学上网也可以
-  - 参考这篇文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
-  - 目前个人使用的机场：[机场1按量不限时，解锁ChatGPT](https://mojie.mx/#/register?code=CG6h8Irm) \ [机场2按周期，解锁ChatGPT](https://teacat.cloud/#/register?code=ps4sZcDa) 
+  - 参考文章[国内服务器实现科学上网](https://www.dqzboy.com/13754.html)
 - 部署docker和docker-compose
 
 > 特别说明：目前这个项目，经过多个版本迭代之后比较稳定；目前可以一个服务多人共用
