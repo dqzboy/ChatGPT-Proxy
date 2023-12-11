@@ -32,7 +32,7 @@ EOF
 
 echo "----------------------------------------------------------------------------------------------------------"
 echo
-echo -e "\033[32m机场推荐\033[0m(\033[34m按量不限时，解锁ChatGPT\033[0m)：\033[34;4mhttps://mojie.mx/#/register?code=CG6h8Irm\033[0m"
+echo -e "\033[32m机场推荐\033[0m(\033[34m按量不限时，解锁ChatGPT\033[0m)：\033[34;4mhttps://mojie.me/#/register?code=CG6h8Irm\033[0m"
 echo
 echo "----------------------------------------------------------------------------------------------------------"
 echo
@@ -87,17 +87,17 @@ done
 function CHECK_CPU() {
 # 判断当前操作系统是否为 ARM 或 AMD 架构
 if [[ "$(uname -m)" == "arm"* ]]; then
-    WARN "This script is not supported on ARM architecture. Exiting..."
+    WARN "此脚本不支持 ARM 架构。正在退出..."
     exit 1
 elif [[ "$(uname -m)" == "x86_64" ]]; then
-    INFO "This script is running on AMD architecture."
+    INFO "此脚本可在当前服务器上运行。"
 else
-    WARN "This script may not be fully compatible with the current architecture: $(uname -m)"
+    WARN "此脚本可能与当前CPU架构不完全兼容: $(uname -m)"
 fi
 }
 
 
-text="检测服务器是否能够访问chat.openai.com"
+text="检测服务器是否能够访问 chat.openai.com"
 width=75
 padding=$((($width - ${#text}) / 2))
 
@@ -123,7 +123,7 @@ if curl --output /dev/null --silent --head --fail --max-time ${timeout} ${url}; 
 else
   echo "Could not connect to ${url}."
   INFO "强制安装"
-  read -e -p "$(echo -e ${GREEN}"Do you want to force install dependencies? (y/n)："${RESET})" force_install
+  read -e -p "$(echo -e ${GREEN}"是否要强制执行安装？(y/n)："${RESET})" force_install
 fi
 }
 
@@ -158,7 +158,7 @@ case "$ID" in
         repo_type="centos"
         ;;
     *)
-        WARN "This script does not currently support your system.: $ID"
+        WARN "此脚本目前不支持您的系统: $ID"
         exit 1
         ;;
 esac
