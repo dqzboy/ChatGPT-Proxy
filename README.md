@@ -30,7 +30,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 ```shell
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/dqzboy/ChatGPT-Proxy/main/install/chatgpt-proxy.sh)"
 ```
-<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/76f6b21d-e305-419a-b065-6e515a38a2a2" width="1000px">
+<img src="https://github.com/dqzboy/ChatGPT-Proxy/assets/42825450/ab454813-85bd-4f23-ae7f-203baf9d15c2" width="1000px">
 
 ---
 
@@ -89,10 +89,9 @@ mkdir -p /data/go-chatgpt-api && cd $_
 #### 服务器直连或通过代理可正常访问ChatGPT
 - 如果你的VPS IP稳定，或者你使用的科学上网地址稳定，那就首选这种方式
 ```shell
-vim docker-compose.yml
+~]# vim docker-compose.yml
 
 version: '3'
-
 services:
   ninja:
     image: gngpp/ninja:latest    # ghcr.io/gngpp/ninja:latest
@@ -112,10 +111,9 @@ services:
   - 如果使用此模式还是提示Access denied，大概率是你机器IP不干净或者用的国内服务器导致验证码过不去
   - Cloudflare WARP官网文档：https://developers.cloudflare.com/warp-client/get-started/linux
 ```shell
-vim docker-compose.yml
+~]# vim docker-compose.yml
 
 version: '3'
-
 services:
   ninja:
     image: gngpp/ninja:latest    # ghcr.io/gngpp/ninja:latest
@@ -158,7 +156,7 @@ mkdir -p /data/go-chatgpt-api && cd $_
 #### 服务器直连或通过代理可正常访问ChatGPT
   - 如果你的VPS IP稳定，或者你使用的科学上网地址稳定，那就首选这种方式
 ```shell
-vim docker-compose.yml
+~]# vim docker-compose.yml
 
 version: "3" 
 services:
@@ -187,7 +185,7 @@ services:
   - 如果使用此模式还是提示Access denied，大概率是你机器IP不干净或者用的国内服务器导致验证码过不去
   - Cloudflare WARP官网文档：https://developers.cloudflare.com/warp-client/get-started/linux
 ```shell
-vim docker-compose.yml
+~]# vim docker-compose.yml
 
 version: "3"
 services:
