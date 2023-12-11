@@ -263,8 +263,7 @@ docker-compose up -d
 > 接口使用, * 表示任意URL后缀
 - backend-api, http(s)://host:port/backend-api/*
 - public-api, http(s)://host:port/public-api/*
-- platform-api, http(s)://host:port/v1/*
-- dashboard-api, http(s)://host:port/dashboard/*
+- platform-api, http(s)://host:port/dashboard/*
 - chatgpt-to-api, http(s)://host:port/v1/chat/completions
 
 > 关于关于ChatGPT转API使用，直接拿AceessToken当API Key使用，接口路径：/v1/chat/completions
