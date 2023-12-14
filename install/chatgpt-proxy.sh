@@ -388,20 +388,20 @@ function INSTALL_COMPOSE() {
 
     if ! command -v docker-compose &> /dev/null;then
         ERROR "docker-compose 未安装，正在进行安装..."
-        read -e -p "$(echo -e ${GREEN}"你的服务器是在国内还是国外? (国内输1;国外回车)："${RESET})" location       
+        read -e -p "$(echo -e ${GREEN}"当前服务器在国内还是国外? (国内输1;国外回车)："${RESET})" location       
         while [ $attempt -lt $MAX_ATTEMPTS ]; do
             attempt=$((attempt + 1))
 
             if [ "$location" == "1" ]; then
-                wget --continue -q "https://ghproxy.com/https://github.com/docker/compose/releases/download/$TAG/docker-compose-$(uname -s)-$(uname -m)" -O /usr/bin/docker-compose
+                wget --continue -q "https://ghproxy.com/https://github.com/docker/compose/releases/download/$TAG/docker-compose-$(uname -s)-$(uname -m)" -O /usr/local/bin/docker-compose
             else
-                wget --continue -q "https://github.com/docker/compose/releases/download/$TAG/docker-compose-$(uname -s)-$(uname -m)" -O /usr/bin/docker-compose
+                wget --continue -q "https://github.com/docker/compose/releases/download/$TAG/docker-compose-$(uname -s)-$(uname -m)" -O /usr/local/bin/docker-compose
             fi
 
             # 检查命令的返回值
             if [ $? -eq 0 ]; then
                 success=true
-                chmod +x /usr/bin/docker-compose
+                chmod +x /usr/local/bin/docker-compose
                 break
             fi
 
