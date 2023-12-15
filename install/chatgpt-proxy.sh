@@ -409,7 +409,7 @@ function INSTALL_COMPOSE() {
         done
 
         if $success; then
-            chmod +x /usr/bin/docker-compose
+            chmod +x /usr/local/bin/docker-compose
             SUCCESS1 ">>> $(docker-compose --version)"
         else
             ERROR "docker-compose 下载失败，请尝试手动安装docker-compose"
@@ -417,7 +417,7 @@ function INSTALL_COMPOSE() {
         fi
     else
        INFO1 "docker-compose 已安装..."
-       chmod +x /usr/bin/docker-compose
+       chmod +x /usr/local/bin/docker-compose
        SUCCESS1 ">>> $(docker-compose --version)" 
     fi
 }
