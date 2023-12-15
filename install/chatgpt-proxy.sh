@@ -1141,7 +1141,7 @@ chmod +x /opt/script/ninja-chatgpt-api/EmailAlert.sh
  
     nohup /opt/script/ninja-chatgpt-api/EmailAlert.sh > /dev/null 2>&1 &
     # 提示用户的定时任务执行时间
-    INFO1 "已设置告警消息接收邮箱为 $email 检查频率为 $alert_interval！"
+    INFO1 "已设置告警消息接收邮箱为 $email 检查频率为 $alert_interval！秒"
 elif [[ "$alert" == "n" ]]; then
     # 取消定时任务
     WARN "已取消 ERROR|WARN 日志错误检测告警功能！"
