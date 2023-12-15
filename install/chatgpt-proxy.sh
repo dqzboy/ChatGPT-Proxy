@@ -104,7 +104,7 @@ padding=$((($width - ${#text}) / 2))
 function CHECK_OPENAI() {
 SUCCESS "提示"
 printf "%*s\033[31m%s\033[0m%*s\n" $padding "" "$text" $padding ""
-SUCCESS "END"
+SUCCESS "END "
 
 url="chat.openai.com"
 timeout=60  # 设置超时时间为60秒
@@ -200,7 +200,7 @@ function CHECK_PKG_MANAGER() {
 }
 
 function CHECKFIRE() {
-SUCCESS "Firewall && SELinux detection."
+SUCCESS "检查防火墙和SELINUX"
 
 # Check if firewall is enabled
 systemctl stop firewalld &> /dev/null
@@ -234,7 +234,7 @@ PACKAGES_YUM=(
 )
 
 if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
-    SUCCESS "Install necessary system components"
+    SUCCESS "安装必要的系统组件"
     for package in "${PACKAGES_YUM[@]}"; do
         if $pkg_manager -q "$package" &>/dev/null; then
             echo "$package 已经安装，跳过..."
@@ -286,7 +286,7 @@ if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
         echo "文件 /etc/postfix/main.cf 不存在"
     fi
 elif [ "$package_manager" = "apt-get" ];then
-    SUCCESS "Install necessary system components"
+    SUCCESS "安装必要的系统组件"
     dpkg --configure -a &>/dev/null
     $package_manager update &>/dev/null
     for package in "${PACKAGES_APT[@]}"; do
@@ -775,7 +775,7 @@ chmod +x /opt/script/go-chatgpt-api/EmailAlert.sh
 
     nohup /opt/script/go-chatgpt-api/EmailAlert.sh > /dev/null 2>&1 &
     # 提示用户的定时任务执行时间
-    INFO1 "已设置告警消息接收邮箱为 $email 检查频率为 $alert_interval！"
+    INFO1 "已设置告警消息接收邮箱为 $email 检查频率为 $alert_interval！秒"
 elif [[ "$alert" == "n" ]]; then
     # 取消定时任务
     WARN "已取消401|403|429错误检测告警功能！"
@@ -909,6 +909,7 @@ fi
 function ninja_CONFIG() {
 DOCKER_DIR="/data/ninja-chatgpt-api"
 mkdir -p ${DOCKER_DIR}
+echo "--------------------------------------------------------"
 read -e -p "$(echo -e ${GREEN}"输入要使用的模式 (api/warp)："${RESET})" mode
 if [ "$mode" == "api" ]; then
 cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
@@ -1212,7 +1213,7 @@ function ADD_UPTIME_KUMA() {
             SUCCESS "CHECK"
             Progress
             SUCCESS1 ">>>>> Docker containers are up and running."
-            INFO1 "uptime-kuma 安装完成，请使用浏览器访问 IP:${UPTIME_PORT} 进行访问。"
+            INFO1 "uptime-kuma 安装完成，请在浏览器输入 IP:${UPTIME_PORT} 进行访问。"
         else
             SUCCESS "CHECK"
             Progress
@@ -1299,7 +1300,9 @@ main() {
     INSTALL_PACKAGE
 
     show_menu
+    echo "--------------------------------------------------------"
     read -e -p "$(echo -e ${GREEN}"请输入对应的数字: "${RESET})" api_choice
+    echo "--------------------------------------------------------"
     case $api_choice in
         1)
             deploy_go_chatgpt_api
