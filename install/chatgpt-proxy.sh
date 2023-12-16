@@ -85,14 +85,15 @@ done
 }
 
 function CHECK_CPU() {
-# 判断当前操作系统是否为 ARM 或 AMD 架构
-if [[ "$(uname -m)" == "arm"* ]]; then
-    WARN "此脚本不支持 ARM 架构。正在退出..."
-    exit 1
+if [[ "$(uname -m)" == "arm"* || "$(uname -m)" == "aarch64" ]]; then
+    WARN "WARNING: 当前服务器 CPU 架构为 $(uname -m)，warp 不支持该架构。请注意！"
+    echo
 elif [[ "$(uname -m)" == "x86_64" ]]; then
-    INFO "此脚本可在当前服务器上运行。"
+    INFO "INFO: 前服务器 CPU 架构为 $(uname -m)，warp 支持该架构。"
+    echo
 else
-    WARN "此脚本可能与当前CPU架构不完全兼容: $(uname -m)"
+    WARN "WARNING: 此脚本可能与当前 CPU 架构不完全兼容: $(uname -m)"
+    echo
 fi
 }
 
@@ -227,10 +228,10 @@ function INSTALL_PACKAGE(){
 # 每个软件包的安装超时时间（秒）
 TIMEOUT=300
 PACKAGES_APT=(
-    lsof jq wget postfix mailutils
+    lsof jq wget tar postfix mailutils
 )
 PACKAGES_YUM=(
-    epel-release lsof jq wget postfix yum-utils mailx s-nail
+    epel-release lsof jq wget tar postfix yum-utils mailx s-nail
 )
 
 if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
@@ -319,9 +320,29 @@ fi
 }
 
 function INSTALL_DOCKER() {
-# 定义下载的docker包的URL
-docker_ver=`curl -s https://download.docker.com/linux/static/stable/x86_64/ | grep -o 'docker-[0-9.]*.tgz' | sort -V | tail -n 1`
-url="https://download.docker.com/linux/static/stable/x86_64/$docker_ver"
+# 获取当前系统的CPU架构
+cpu_arch=$(uname -m)
+
+# 根据不同的CPU架构定义下载的Docker包的URL
+case $cpu_arch in
+  "arm")
+    docker_ver=$(curl -s https://download.docker.com/linux/static/stable/armel/ | grep -o 'docker-[0-9.]*.tgz' | sort -V | tail -n 1)
+    url="https://download.docker.com/linux/static/stable/armel/$docker_ver"
+    ;;
+  "aarch64")
+    docker_ver=$(curl -s https://download.docker.com/linux/static/stable/aarch64/ | grep -o 'docker-[0-9.]*.tgz' | sort -V | tail -n 1)
+    url="https://download.docker.com/linux/static/stable/aarch64/$docker_ver"
+    ;;
+  "x86_64")
+    docker_ver=$(curl -s https://download.docker.com/linux/static/stable/x86_64/ | grep -o 'docker-[0-9.]*.tgz' | sort -V | tail -n 1)
+    url="https://download.docker.com/linux/static/stable/x86_64/$docker_ver"
+    ;;
+  *)
+    ERROR "不支持的CPU架构: $cpu_arch"
+    exit 1
+    ;;
+esac
+
 # 定义要保存和解压的路径
 save_path="$PWD"
 
@@ -449,9 +470,13 @@ fi
 function GO_CONFIG() {
 DOCKER_DIR="/data/go-chatgpt-api"
 mkdir -p ${DOCKER_DIR}
-read -e -p "$(echo -e ${GREEN}"请输入使用的模式（api/warp）："${RESET})" mode
-if [ "$mode" == "api" ]; then
-cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
+MAX_ATTEMPTS=3
+attempt=0
+echo "--------------------------------------------------------"
+while [ $attempt -lt $MAX_ATTEMPTS ]; do
+  read -e -p "$(echo -e ${GREEN}"请输入使用的模式（api/warp）："${RESET})" mode
+  if [ "$mode" == "api" ]; then
+  cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: "3" 
 services:
   go-chatgpt-api:
@@ -477,8 +502,12 @@ services:
       - ./chat.openai.com.har:/app/chat.openai.com.har
     restart: unless-stopped
 EOF
-elif [ "$mode" == "warp" ]; then
-cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
+  elif [ "$mode" == "warp" ]; then
+      if [[ "$(uname -m)" == "arm"* || "$(uname -m)" == "aarch64" ]]; then
+          WARN "ERROR: 当前服务器 CPU 架构为 $(uname -m)，warp 不支持该架构。"
+      elif [[ "$(uname -m)" == "x86_64" ]]; then
+          INFO "INFO: 当前服务器 CPU 架构为 $(uname -m)，warp 支持该架构。"
+          cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: "3"
 services:
   go-chatgpt-api:
@@ -511,10 +540,23 @@ services:
       - LOG_LEVEL=OFF
     restart: unless-stopped
 EOF
-else
-  ERROR "Invalid or missing parameter"
-  exit 1
-fi
+          break
+      else
+          WARN "WARNING: 此脚本可能与当前 CPU 架构不完全兼容: $(uname -m)"
+      fi
+  else
+    ERROR "Invalid or missing parameter"
+    exit 1
+  fi
+
+  attempt=$((attempt + 1))
+  if [ $attempt -lt $MAX_ATTEMPTS ]; then
+    WARN "您已选择warp，但是当前服务器不支持该架构。请重新选择。 (尝试次数: $attempt)"
+  else
+    ERROR "您已连续选择warp，但是当前服务器不支持该架构。退出脚本。"
+    exit 1
+  fi
+done
 
 # 提示用户是否需要修改配置
 read -e -p "$(echo -e ${GREEN}"是否添加代理? (y/n)："${RESET})" modify_config
@@ -526,6 +568,11 @@ case $modify_config in
     ${SETCOLOR_SUCCESS} && echo "---------------------------------------------"  && ${SETCOLOR_NORMAL}
     # 获取用户输入的URL及其类型
     read -e -p "$(echo -e ${GREEN}"输入代理地址 (e.g. host:port): "${RESET})" url
+    while [[ -z "$url" ]]; do
+      WARN "代理地址不能为空，请重新输入。"
+      read -e -p "$(echo -e ${GREEN}"输入代理地址 (e.g. host:port): "${RESET})" url
+    done
+
     while true; do
       read -e -p "$(echo -e ${GREEN}"确认代理协议 (http/socks5)："${RESET})" type
       case $type in
@@ -909,12 +956,14 @@ fi
 function ninja_CONFIG() {
 DOCKER_DIR="/data/ninja-chatgpt-api"
 mkdir -p ${DOCKER_DIR}
+MAX_ATTEMPTS=3
+attempt=0
 echo "--------------------------------------------------------"
-read -e -p "$(echo -e ${GREEN}"输入要使用的模式 (api/warp)："${RESET})" mode
-if [ "$mode" == "api" ]; then
-cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
+while [ $attempt -lt $MAX_ATTEMPTS ]; do
+  read -e -p "$(echo -e ${GREEN}"输入要使用的模式 (api/warp)："${RESET})" mode
+  if [ "$mode" == "api" ]; then
+     cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: '3'
-
 services:
   ninja:
     image: gngpp/ninja:latest
@@ -935,10 +984,14 @@ services:
     command: --interval 3600 --cleanup
     restart: unless-stopped
 EOF
-elif [ "$mode" == "warp" ]; then
-cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
+     break
+  elif [ "$mode" == "warp" ]; then
+      if [[ "$(uname -m)" == "arm"* || "$(uname -m)" == "aarch64" ]]; then
+          WARN "ERROR: 当前服务器 CPU 架构为 $(uname -m)，warp 不支持该架构。"
+      elif [[ "$(uname -m)" == "x86_64" ]]; then
+          INFO "INFO: 当前服务器 CPU 架构为 $(uname -m)，warp 支持该架构。"
+          cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: '3'
-
 services:
   ninja:
     image: gngpp/ninja:latest
@@ -966,10 +1019,23 @@ services:
     command: --interval 3600 --cleanup
     restart: unless-stopped
 EOF
-else
-  ERROR "Invalid or missing parameter"
-  exit 1
-fi
+          break
+      else
+          WARN "WARNING: 此脚本可能与当前 CPU 架构不完全兼容: $(uname -m)"
+      fi
+  else
+    ERROR "Invalid or missing parameter"
+    exit 1
+  fi
+
+  attempt=$((attempt + 1))
+  if [ $attempt -lt $MAX_ATTEMPTS ]; then
+    WARN "您已选择warp，但是当前服务器不支持该架构。请重新选择。 (尝试次数: $attempt)"
+  else
+    ERROR "您已连续选择warp，但是当前服务器不支持该架构。退出脚本。"
+    exit 1
+  fi
+done
 
 # 提示用户是否需要修改配置
 read -e -p "$(echo -e ${GREEN}"是否添加代理? (y/n)："${RESET})" modify_config
@@ -981,6 +1047,10 @@ case $modify_config in
     ${SETCOLOR_SUCCESS} && echo "---------------------------------------------"  && ${SETCOLOR_NORMAL}
     # 获取用户输入的URL及其类型
     read -e -p "$(echo -e ${GREEN}"输入代理地址 (e.g. host:port): "${RESET})" url
+    while [[ -z "$url" ]]; do
+      WARN "代理地址不能为空，请重新输入。"
+      read -e -p "$(echo -e ${GREEN}"输入代理地址 (e.g. host:port): "${RESET})" url
+    done
     while true; do
       read -e -p "$(echo -e ${GREEN}"确认代理协议 (http/socks5)："${RESET})" type
       case $type in
