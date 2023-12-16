@@ -26,7 +26,7 @@ OpenAI提供了两种访问方式，一种是直接在ChatGPT网页端使用的A
 |:white_check_mark:八戒|[:link:官网](https://bajie.one/#/register?code=uX4zUk5c)|按量不限时、IEPL专线、不限速、不限设备、低延迟，高网速，解锁ChatGPT|
 
 # ChatGPT-Porxy一键部署
-> **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新、403|401|429、ERROR检测邮箱告警、uptime-kuma监控等功能！
+> **如果自己安装觉得麻烦，可以使用我提供的一键部署脚本！** 脚本目前已实现基础环境安装、所需组件依赖部署、镜像版本自动更新、403|401|429、ERROR检测邮箱告警、uptime-kuma监控等功能！脚本支持arm架构一键部署，但是注意 warp 不支持arm架构！
 
 🔔 **说明**：目前脚本适用于CentOS 7\8\9、RHEL-8\9、Ubuntu、debian以及opencloudos系统；运行脚本需要确保网络环境稳定(确保系统所需组件可以正常下载)。 <br>
 ⚠️ **提示**：目前脚本支持[linweiyuan/go-chatgpt-api](https://github.com/linweiyuan/go-chatgpt-api) 和 [gngpp/ninja](https://github.com/gngpp/ninja) 项目的一键部署。go-chatgpt-api项目作者已弃坑，大家搭建时可以选择部署 ninja <br>
