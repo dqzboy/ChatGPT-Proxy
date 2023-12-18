@@ -238,9 +238,9 @@ if [ "$package_manager" = "dnf" ] || [ "$package_manager" = "yum" ]; then
     SUCCESS "安装必要的系统组件"
     for package in "${PACKAGES_YUM[@]}"; do
         if $pkg_manager -q "$package" &>/dev/null; then
-            echo "$package 已经安装，跳过..."
+            echo "已经安装 $package ..."
         else
-            echo "安装 $package ..."
+            echo "正在安装 $package ..."
 
             # 记录开始时间
             start_time=$(date +%s)
