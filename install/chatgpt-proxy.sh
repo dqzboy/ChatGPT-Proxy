@@ -504,9 +504,9 @@ services:
 EOF
   elif [ "$mode" == "warp" ]; then
       if [[ "$(uname -m)" == "arm"* || "$(uname -m)" == "aarch64" ]]; then
-          WARN "ERROR: 当前服务器 CPU 架构为 $(uname -m)，warp 不支持该架构。"
+          WARN "当前服务器 CPU 架构为 $(uname -m)，warp 不支持该架构。"
       elif [[ "$(uname -m)" == "x86_64" ]]; then
-          INFO "INFO: 当前服务器 CPU 架构为 $(uname -m)，warp 支持该架构。"
+          INFO1 "当前服务器 CPU 架构为 $(uname -m)，warp 支持该架构。"
           cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: "3"
 services:
@@ -987,9 +987,9 @@ EOF
      break
   elif [ "$mode" == "warp" ]; then
       if [[ "$(uname -m)" == "arm"* || "$(uname -m)" == "aarch64" ]]; then
-          WARN "ERROR: 当前服务器 CPU 架构为 $(uname -m)，warp 不支持该架构。"
+          WARN "当前服务器 CPU 架构为 $(uname -m)，warp 不支持该架构。"
       elif [[ "$(uname -m)" == "x86_64" ]]; then
-          INFO "INFO: 当前服务器 CPU 架构为 $(uname -m)，warp 支持该架构。"
+          INFO1 "当前服务器 CPU 架构为 $(uname -m)，warp 支持该架构。"
           cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: '3'
 services:
