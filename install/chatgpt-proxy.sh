@@ -89,7 +89,7 @@ if [[ "$(uname -m)" == "arm"* || "$(uname -m)" == "aarch64" ]]; then
     WARN "WARNING: 当前服务器 CPU 架构为 $(uname -m)，warp 不支持该架构。请注意！"
     echo
 elif [[ "$(uname -m)" == "x86_64" ]]; then
-    INFO "INFO: 前服务器 CPU 架构为 $(uname -m)，warp 支持该架构。"
+    INFO1 "当前服务器 CPU 架构为 $(uname -m)，warp 支持该架构。"
     echo
 else
     WARN "WARNING: 此脚本可能与当前 CPU 架构不完全兼容: $(uname -m)"
