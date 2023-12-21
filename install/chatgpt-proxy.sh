@@ -414,7 +414,7 @@ function INSTALL_COMPOSE() {
             attempt=$((attempt + 1))
 
             if [ "$location" == "1" ]; then
-                wget --continue -q "https://ghproxy.com/https://github.com/docker/compose/releases/download/$TAG/docker-compose-$(uname -s)-$(uname -m)" -O /usr/local/bin/docker-compose
+                wget --continue -q "https://mirror.ghproxy.com/https://github.com/docker/compose/releases/download/$TAG/docker-compose-$(uname -s)-$(uname -m)" -O /usr/local/bin/docker-compose
             else
                 wget --continue -q "https://github.com/docker/compose/releases/download/$TAG/docker-compose-$(uname -s)-$(uname -m)" -O /usr/local/bin/docker-compose
             fi
