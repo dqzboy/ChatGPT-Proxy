@@ -40,7 +40,6 @@ echo
 TGCODE() {
     SUCCESS " TG Group "
     echo "█████████████████████████████████"
-    echo "█████████████████████████████████"
     echo "████ ▄▄▄▄▄ ██▀▀▄▄▀ ███ ▄▄▄▄▄ ████"
     echo "████ █   █ █▀███ ▀▄█▀█ █   █ ████"
     echo "████ █▄▄▄█ █▄▄█▀▀▄▄█▄█ █▄▄▄█ ████"
@@ -54,7 +53,6 @@ TGCODE() {
     echo "████ █   █ ██ ▄█▄▄  ▄  ▄▄█▄  ████"
     echo "████ █▄▄▄█ █▀▀█ ▄▄ █ ▀▀▀▀▄▄█ ████"
     echo "████▄▄▄▄▄▄▄█▄█▄█▄▄▄▄▄█▄██▄██▄████"
-    echo "█████████████████████████████████"
     echo "█████████████████████████████████"
 
     echo
@@ -419,7 +417,7 @@ EOF
      exit 1
   fi
 else 
-  INFO1 "docker 已安装..."
+  INFO1 "已经安装 docker ..."
   SUCCESS1 ">>> $(docker --version)"
   systemctl restart docker | grep -E "ERROR|ELIFECYCLE|WARN"
 fi
@@ -430,41 +428,48 @@ function INSTALL_COMPOSE() {
     MAX_ATTEMPTS=5
     attempt=0
     success=false
-
-    if ! command -v docker-compose &> /dev/null;then
-        ERROR "docker-compose 未安装，正在进行安装..."
+    chmod +x /usr/local/bin/docker-compose &>/dev/null
+    if ! command -v docker-compose &> /dev/null || [ -z "$(docker-compose --version)" ]; then
+        ERROR "docker-compose 未安装或安装不完整，正在进行安装..."
         read -e -p "$(echo -e ${GREEN}"当前服务器在国内还是国外? (国内输1;国外回车)："${RESET})" location       
         while [ $attempt -lt $MAX_ATTEMPTS ]; do
             attempt=$((attempt + 1))
 
             if [ "$location" == "1" ]; then
-                wget --continue -q "https://mirror.ghproxy.com/https://github.com/docker/compose/releases/download/$TAG/docker-compose-$(uname -s)-$(uname -m)" -O /usr/local/bin/docker-compose
+                wget --continue -q "https://mirrors.goproxyauth.com/https://github.com/docker/compose/releases/download/$TAG/docker-compose-$(uname -s)-$(uname -m)" -O /usr/local/bin/docker-compose
             else
                 wget --continue -q "https://github.com/docker/compose/releases/download/$TAG/docker-compose-$(uname -s)-$(uname -m)" -O /usr/local/bin/docker-compose
             fi
 
             # 检查命令的返回值
             if [ $? -eq 0 ]; then
-                success=true
-                chmod +x /usr/local/bin/docker-compose
-                break
+                # 在下载完成后再次检查是否可以执行 docker-compose --version
+                version_check=$(docker-compose --version)
+                if [ -n "$version_check" ]; then
+                    success=true
+                    chmod +x /usr/local/bin/docker-compose
+                    break
+                else
+                    ERROR "docker-compose 下载的文件不完整，正在尝试重新下载 (尝试次数: $attempt)"
+                    rm -f /usr/local/bin/docker-compose
+                fi
             fi
 
             ERROR "docker-compose 下载失败，正在尝试重新下载 (尝试次数: $attempt)"
         done
 
         if $success; then
-            chmod +x /usr/local/bin/docker-compose
             SUCCESS1 ">>> $(docker-compose --version)"
         else
             ERROR "docker-compose 下载失败，请尝试手动安装docker-compose"
             exit 1
         fi
     else
-       INFO1 "docker-compose 已安装..."
-       chmod +x /usr/local/bin/docker-compose
-       SUCCESS1 ">>> $(docker-compose --version)" 
+        INFO1 "已经安装 docker-compose ..."
+        chmod +x /usr/local/bin/docker-compose
+        SUCCESS1 ">>> $(docker-compose --version)" 
     fi
+
 }
 
 # --------------------------------------------------  go-chatgpt-api  --------------------------------------------------
