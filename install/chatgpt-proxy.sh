@@ -503,9 +503,9 @@ MAX_ATTEMPTS=3
 attempt=0
 echo "--------------------------------------------------------"
 while [ $attempt -lt $MAX_ATTEMPTS ]; do
-  read -e -p "$(echo -e ${GREEN}"请输入使用的模式（api/warp）："${RESET})" mode
+  read -e -p "$(echo -e ${GREEN}"输入要使用的模式 (api/warp)："${RESET})" mode
   if [ "$mode" == "api" ]; then
-  cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
+     cat > ${DOCKER_DIR}/docker-compose.yml <<\EOF
 version: "3" 
 services:
   go-chatgpt-api:
@@ -531,6 +531,7 @@ services:
       - ./chat.openai.com.har:/app/chat.openai.com.har
     restart: unless-stopped
 EOF
+     break
   elif [ "$mode" == "warp" ]; then
       if [[ "$(uname -m)" == "arm"* || "$(uname -m)" == "aarch64" ]]; then
           WARN "当前服务器 CPU 架构为 $(uname -m)，warp 不支持该架构。"
@@ -586,6 +587,7 @@ EOF
     exit 1
   fi
 done
+
 
 # 提示用户是否需要修改配置
 read -e -p "$(echo -e ${GREEN}"是否添加代理? (y/n)："${RESET})" modify_config
