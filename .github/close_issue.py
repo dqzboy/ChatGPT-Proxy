@@ -100,4 +100,5 @@ if '__main__' == __name__:
             print('issue: {}, login: {} not in stargazers'.format(issue['number'], login))
             close_issue(github_repo, issue['number'])
             lock_issue(github_repo, issue['number'])
+
     print('done')
